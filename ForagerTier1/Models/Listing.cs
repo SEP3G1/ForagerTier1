@@ -1,7 +1,8 @@
-﻿﻿using System;
+﻿using System;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
+using System.Globalization;
 using System.Linq;
 using System.Text.Json;
 using System.Threading.Tasks;
@@ -15,13 +16,12 @@ namespace ForagerTier1.Models
         public int UserId { get; set; }
         public int ProductId { get; set; }
 
-        [Required(ErrorMessage = "A product type has to be specified")]
         public Product Product { get; set; }
 
-        [Required(ErrorMessage = "Price has to be specified"), Range(0,999999, ErrorMessage = "Price has to be between 0 and 999.999")]
+        [Required(ErrorMessage = "Price has to be specified"), Range(0, 999999, ErrorMessage = "Price has to be between 0 and 999.999")]
         public double? Price { get; set; }
 
-        [Required(ErrorMessage = "Quantity has to be specified"), Range(0,999999, ErrorMessage ="Quantity has to be between 0 and 999.999")]
+        [Required(ErrorMessage = "Quantity has to be specified"), Range(0, 999999, ErrorMessage = "Quantity has to be between 0 and 999.999")]
         public double? Quantity { get; set; }
 
         [Required(ErrorMessage = "Unit has to be specified"), MaxLength(16)]
@@ -50,12 +50,12 @@ namespace ForagerTier1.Models
 
         public Listing()
         {
-            
+
         }
         public string getDate()
         {
             DateTime dateTime = new DateTime(Int64.Parse(BestBefore));
-            return dateTime.ToString("dd/mm/yyyy");
+            return dateTime.ToString("d", CultureInfo.CreateSpecificCulture("da-DK"));
         }
         public String getCover()
         {
@@ -76,7 +76,7 @@ namespace ForagerTier1.Models
         public string pricePrUnit()
         {
             double d = ((double)(Price / Quantity));
-            return Math.Round(d, 2)+"";
+            return Math.Round(d, 2) + "";
 
         }
         public List<string> getPictures()

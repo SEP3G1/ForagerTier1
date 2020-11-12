@@ -27,17 +27,23 @@
                     </select>
                 </div>
             </EditForm>
-            <EditForm Context="Listing" Model="@newListing">
+            <EditForm Context="Listing" Model="@newListing" OnValidSubmit="AddNewListing">
                 <DataAnnotationsValidator />
                 <ValidationSummary />
 
                 <div class="form-group">
                     Product:<br />
-                    <select @bind="newProduct">
-                        <option value="" selected disabled hidden>Choose here</option>
-                        @foreach (Product pc in productsToShow)
+                    <select @bind="newProduct" required>
+                        @if (productsToShow.Count == 0)
                         {
-                            <option value="@pc.ProductId.ToString()">@pc.Name</option>
+                            <option value="" disabled>Pick category first</option>
+                        }
+                        else
+                        {
+                            @foreach (Product pc in productsToShow)
+                            {
+                                <option value="@pc.ProductId.ToString()">@pc.Name</option>
+                            }
                         }
                     </select>
                 </div>
@@ -66,7 +72,7 @@
 
                 <div class="form-group">
                     Best Before:<br />
-                    <InputDate @bind-Value="date" @onchange="changeDate" />
+                    <input type="date" @onchange="@((arg) => changeDate(arg))" required />
                 </div>
 
                 <div class="form-group">
@@ -89,13 +95,34 @@
                     </InputSelect>
                 </div>
 
-
-
                 <div class="form-group">
-                    Pictures<br />
-                    <InputText @bind-Value="newListing.PictureList" />
+                    Images<br />
+                    <p>
+                        <InputFile OnChange="@OnInputFileChange" multiple />
+                    </p>
+
+                    @if (imageDataUrls.Count > 0)
+                    {
+                        <h4>Images</h4>
+
+                        <div class="card" style="width:30rem;">
+                            <div class="card-body">
+                                @foreach (var imageDataUrl in imageDataUrls)
+                                {
+                                    <img class="rounded m-1" src="@imageDataUrl" />
+                                }
+                            </div>
+                        </div>
+                    }
+                    <img src="@urlString"/>
                 </div>
 
+                <!--
+                <div class="form-group">
+                    Pictures<br />
+                    <InputText bind-Value="newListing.PictureList" />
+                </div>
+                -->
 
 
                 <div class="form-group">
@@ -121,6 +148,11 @@
     private Listing newListing = new Listing();
     private DateTime date = DateTime.Now;
     private string hasDeliveryAsString;
+
+    IList<string> imageDataUrls = new List<string>();
+    IList<IBrowserFile> images = new List<IBrowserFile>();
+    string urlString;
+
     protected override async Task OnParametersSetAsync()
     {
         products = SocketService.GetProducts();
@@ -129,6 +161,7 @@
 
     public void AddNewListing()
     {
+        TrySubmit();
         newListing.HasDelivery = hasDeliveryAsString.Equals("true");
         newListing.ProductId = Int32.Parse(newProduct);
         newListing.UserId = ((User)((CustomAuthenticationStateProvider)AuthenticationStateProvider).GetCashedUser()).UserId;
@@ -139,10 +172,9 @@
 
     public void updateCategory(ChangeEventArgs e)
     {
-        Console.WriteLine("Update catagory");
         productsToShow.Clear();
         newProductCategoryCache = e.Value.ToString();
-        foreach(Product p in products)
+        foreach (Product p in products)
         {
             if (p.ProductCategory.Equals(newProductCategoryCache))
                 productsToShow.Add(p);
@@ -152,12 +184,31 @@
     {
         newListing.Product = products.Find(c => c.ProductId == Int32.Parse(newProduct));
         newListing.Product.ProductCategory = newProductCategoryCache;
-        newListing.BestBefore = date.Ticks + "";
         newListing.StartDate = DateTime.Now.Ticks + "";
     }
 
-    public void changeDate()
+    public void changeDate(ChangeEventArgs e)
     {
-        Console.WriteLine(date.Ticks);
+        Console.WriteLine(e.Value.ToString());
+        string[] d = e.Value.ToString().Split("-");
+        newListing.BestBefore = new DateTime(int.Parse(d[0]), int.Parse(d[1]), int.Parse(d[2])).Ticks + "";
+    }
+
+    private async Task OnInputFileChange(InputFileChangeEventArgs e)
+    {
+        var maxAllowedFiles = 8;
+        var format = "image/png";
+
+        foreach (var imageFile in e.GetMultipleFiles(maxAllowedFiles))
+        {
+            var resizedImageFile = await imageFile.RequestImageFileAsync(format,800,800);
+            var buffer = new byte[resizedImageFile.Size];
+            await resizedImageFile.OpenReadStream().ReadAsync(buffer);
+            var imageDataUrl =
+                $"data:{format};base64,{Convert.ToBase64String(buffer)}";
+            imageDataUrls.Add(imageDataUrl);
+            images.Add(imageFile);
+        }
+        urlString = SocketService.UploadImageTest(images);
     }
 }
