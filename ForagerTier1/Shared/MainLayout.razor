@@ -1,0 +1,111 @@
+﻿@inherits LayoutComponentBase
+@using ForagerTier1.Models
+@using ForagerTier1.Persistance
+@using System.Windows.Input
+@inject NavigationManager NavigationManager
+@inject AuthenticationStateProvider AuthenticationStateProvider
+@inject ISocketService SocketService
+@inject IUserService UserService
+
+<div class="main">
+    <div id="headNav" class="@(hidden ? "hidden" : "")">
+        <div id="sticky" class="searchCont ">
+            <svg class="searchIcon" @onclick="@search" version="1.1" id="Capa_1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" x="0px" y="0px"
+                 viewBox="0 0 373.12 373.12" style="enable-background:new 0 0 373.12 373.12;" xml:space="preserve">
+            <g>
+            <g>
+            <path d="M266.667,234.667h-16.96l-5.867-5.867c20.907-24.213,33.493-55.68,33.493-90.133C277.333,62.08,215.253,0,138.667,0
+			            S0,62.08,0,138.667s62.08,138.667,138.667,138.667c34.453,0,65.92-12.587,90.133-33.387l5.867,5.867v16.853L341.333,373.12
+			            l31.787-31.787L266.667,234.667z M138.667,234.667c-53.013,0-96-42.987-96-96c0-53.013,42.987-96,96-96c53.013,0,96,42.987,96,96
+			            C234.667,191.68,191.68,234.667,138.667,234.667z" />
+
+	            </g>
+            </g>
+        </svg>
+            <input type="text" @bind="@value" @onkeyup="@KeyUp" id="searchIndex" placeholder="search" />
+        </div>
+
+
+        <div id="header" class="headCont">
+            <AuthorizeView>
+                <Authorized>
+                    @if (user != null)
+                    {
+                        <p>Hi, @user.Name</p>
+                    }
+                    <a class="login" @onclick="@logout">Logout</a>
+                </Authorized>
+            </AuthorizeView>
+            <button class="navButton"><a href="find">buy</a></button>
+            <a href="/"><div class="logo">forager<span>.</span></div></a>
+            <button class="navButton"><a href="sell">sell</a></button>
+            <AuthorizeView>
+                <NotAuthorized>
+                    <a class="login" @onclick="@login">Login</a>
+                </NotAuthorized>
+            </AuthorizeView>
+        </div>
+    </div>
+    <div class="content">
+        @Body
+    </div>
+    <div class="footer">
+
+    </div>
+</div>
+
+@code{
+    bool hidden = false;
+    string value = "";
+    User user;
+
+    protected override async Task OnParametersSetAsync()
+    {
+        if (user == null)
+        {
+            user = ((CustomAuthenticationStateProvider)AuthenticationStateProvider).GetCashedUser();
+        }
+        //Console.WriteLine(user.ToString());
+        if (NavigationManager.Uri.Split('/').ToList<string>()[3].Equals("listing"))
+        {
+            hidden = true;
+        }
+        else
+        {
+            hidden = false;
+        }
+    }
+
+    public void search()
+    {
+        value = UppercaseFirst(value.Trim());
+        NavigationManager.NavigateTo("/find/" + value);
+    }
+
+    void KeyUp(KeyboardEventArgs e)
+    {
+        if (e.Key == "Enter")
+        {
+            search();
+        }
+    }
+    public void login()
+    {
+        NavigationManager.NavigateTo("/Login");
+    }
+    public void logout()
+    {
+        ((CustomAuthenticationStateProvider)AuthenticationStateProvider).Logout();
+    }
+
+    static string UppercaseFirst(string s)
+    {
+        // Check for empty string.
+        if (string.IsNullOrEmpty(s))
+        {
+            return string.Empty;
+        }
+        // Return char and concat substring.
+        return char.ToUpper(s[0]) + s.Substring(1);
+    }
+}

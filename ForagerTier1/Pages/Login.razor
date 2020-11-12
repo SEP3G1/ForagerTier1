@@ -1,0 +1,87 @@
+﻿@page "/login"
+@using ForagerTier1.Persistance
+@using ForagerTier1.Models
+
+@inject AuthenticationStateProvider AuthenticationStateProvider
+@inject NavigationManager NavigationManager
+
+<div class="loginCont">
+    <div class="loginForm">
+        <AuthorizeView>
+            <NotAuthorized>
+                <h2>Log in:</h2>
+                <form>
+
+                    <div class="group">
+                        <input type="text" required @bind-value="email">
+                        <span class="highlight"></span>
+                        <span class="bar"></span>
+                        <label>Email</label>
+                    </div>
+
+                    <div class="group">
+                        <input type="password" required @onkeyup="KeyUpAsync" @bind-value="password">
+                        <span class="highlight"></span>
+                        <span class="bar"></span>
+                        <label>Password</label>
+                    </div>
+
+                </form>
+                <div style="color:red">@errorMessage</div>
+
+                <a href="" @onclick="PerformLogin">
+                    Login
+                </a>
+            </NotAuthorized>
+            <Authorized>
+                <a href="" @onclick="PerformLogout">
+                    Log out
+                </a>
+            </Authorized>
+        </AuthorizeView>
+    </div>
+</div>
+
+@code {
+    private string email;
+    private string password;
+    private string errorMessage;
+
+    public async Task PerformLogin()
+    {
+        errorMessage = "";
+        try
+        {
+            ((CustomAuthenticationStateProvider)AuthenticationStateProvider).ValidateLogin(email, password);
+            email = "";
+            password = "";
+        }
+        catch (Exception e)
+        {
+            errorMessage = e.Message;
+        }
+        NavigationManager.NavigateTo("/");
+    }
+
+    async void KeyUpAsync(KeyboardEventArgs e)
+    {
+        if (e.Key == "Enter")
+        {
+           await PerformLogin();
+        }
+    }
+
+    public void PerformLogout()
+    {
+        errorMessage = "";
+        email = "";
+        password = "";
+        try
+        {
+            ((CustomAuthenticationStateProvider)AuthenticationStateProvider).Logout();
+            NavigationManager.NavigateTo("/");
+        }
+        catch (Exception e) { }
+    }
+
+}

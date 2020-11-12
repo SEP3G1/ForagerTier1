@@ -1,0 +1,26 @@
+﻿@page "/"
+@page "/{loggedIn}"
+@using ForagerTier1.Models
+@using ForagerTier1.Pages
+@using ForagerTier1.Persistance
+@inject ISocketService SocketService
+@inject IUserService UserService
+
+<div class="block">
+    <h1 class="infoCont">
+        Reduce Foodwaste<span class="acc">.</span><br />
+        Buy Responsibly<span class="acc">.</span>
+    </h1>
+    <h3 class="infoCont">
+        Resturants are responsible for more than <span class="acc">20%</span> of the total foodwaste in Denmark.
+    </h3>
+    <h2 class="infoCont">
+        Use <span class="bold">forager<span class="acc">.</span></span> to <span class="bold">sell excess</span> of resources and <span class="bold">buy locally</span> from other resturants<span class="acc">.</span>
+    </h2>
+</div>
+<div class="banner"></div>
+
+@code{
+    [Parameter]
+    public bool? loggedIn { get; set; }
+}

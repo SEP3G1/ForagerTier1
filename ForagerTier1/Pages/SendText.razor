@@ -1,0 +1,19 @@
+﻿@page "/text"
+@using ForagerTier1.Models
+@inject ISocketService SocketService
+<h3>SendText</h3>
+<input type="text" @bind="@value" />
+<button @onclick="@send">Submit</button>
+@foreach(var s in echo)
+{
+    <p>@s</p>
+}
+
+@code {
+    string value = "";
+    List<string> echo = new List<string>();
+
+    public void send()
+    {
+    }
+}

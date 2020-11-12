@@ -1,0 +1,185 @@
+﻿using System;
+using System.Collections.Generic;
+using System.Net;
+using System.Net.Sockets;
+using System.Text.Json;
+using System.Text.Json.Serialization;
+using System.Threading.Tasks;
+
+namespace ForagerTier1.Models
+{
+    public class SocketService : ISocketService
+    {
+        private static string IP = "10.152.210.13";
+        private static int PORT = 4343;
+        private static Socket clientSocket;
+        
+        public SocketService()
+        {
+        }
+
+        public SearchQuery Search(string message)
+        {
+            if (clientSocket == null)
+            {
+                IPEndPoint serverAddress = new IPEndPoint(IPAddress.Parse(IP), PORT);
+
+                clientSocket = new Socket(AddressFamily.InterNetwork, SocketType.Stream, ProtocolType.Tcp);
+                clientSocket.Connect(serverAddress);
+            }
+            
+            string[] r = { "search", message };
+            message = JsonSerializer.Serialize(r);
+
+            //Sends message to connected Rest web API and gets a response in json
+            string rcv = SendReceive(message);
+
+            //Makes json deserializor case-insencitive
+            var options = new JsonSerializerOptions();
+            options.PropertyNameCaseInsensitive = true;
+            options.Converters.Add(new JsonStringEnumConverter());
+
+            //Deserializeing recieved query
+            SearchQuery sq = JsonSerializer.Deserialize<SearchQuery>(rcv, options);
+
+            return sq;
+        }
+        public User Login(string username, string password)
+        {
+            if (clientSocket == null)
+            {
+                IPEndPoint serverAddress = new IPEndPoint(IPAddress.Parse(IP), PORT);
+
+                clientSocket = new Socket(AddressFamily.InterNetwork, SocketType.Stream, ProtocolType.Tcp);
+                clientSocket.Connect(serverAddress);
+            }
+            string[] u = { username, password };
+            string[] r = { "login", JsonSerializer.Serialize(u) };
+            string message = JsonSerializer.Serialize(r);
+
+            //Sends message to connected Rest web API and gets a response in json
+            string rcv = SendReceive(message);
+
+            //Makes json deserializor case-insencitive
+            var options = new JsonSerializerOptions();
+            options.PropertyNameCaseInsensitive = true;
+            options.Converters.Add(new JsonStringEnumConverter());
+
+            //Deserializeing recieved query
+            User sq = JsonSerializer.Deserialize<User>(rcv, options);
+
+            return sq;
+        }
+
+        public string CreateListing(Listing listing)
+        {
+            if (clientSocket == null)
+            {
+                IPEndPoint serverAddress = new IPEndPoint(IPAddress.Parse(IP), PORT);
+
+                clientSocket = new Socket(AddressFamily.InterNetwork, SocketType.Stream, ProtocolType.Tcp);
+                clientSocket.Connect(serverAddress);
+            }
+
+            string[] r = {"createlisting", JsonSerializer.Serialize(listing)};
+            string message = JsonSerializer.Serialize(r);
+            
+            //Sends message to connected Rest web API and gets a response in json
+            string rcv = SendReceive(message);
+            return rcv;
+        }
+
+        public string SendReceive(string message)
+        {
+            // Sending
+            int toSendLen = System.Text.Encoding.ASCII.GetByteCount(message);
+            byte[] toSendBytes = System.Text.Encoding.ASCII.GetBytes(message);
+            byte[] toSendLenBytes = System.BitConverter.GetBytes(toSendLen);
+            clientSocket.Send(toSendLenBytes);
+            clientSocket.Send(toSendBytes);
+
+            // Receiving
+            byte[] rcvLenBytes = new byte[4];
+            clientSocket.Receive(rcvLenBytes);
+            int rcvLen = System.BitConverter.ToInt32(rcvLenBytes, 0);
+            byte[] rcvBytes = new byte[rcvLen];
+            clientSocket.Receive(rcvBytes);
+
+            //Converts recieved bits to string
+            return System.Text.Encoding.ASCII.GetString(rcvBytes);
+        }
+
+        public Listing GetListing(string id)
+        {
+            if (clientSocket == null)
+            {
+                IPEndPoint serverAddress = new IPEndPoint(IPAddress.Parse(IP), PORT);
+
+                clientSocket = new Socket(AddressFamily.InterNetwork, SocketType.Stream, ProtocolType.Tcp);
+                clientSocket.Connect(serverAddress);
+            }
+
+            string[] r = { "getlisting", id };
+            string message = JsonSerializer.Serialize(r);
+
+            //Sends message to connected Rest web API and gets a response in json
+            string rcv = SendReceive(message);
+
+            //Makes json deserializor case-insencitive
+            var options = new JsonSerializerOptions();
+            options.PropertyNameCaseInsensitive = true;
+            options.Converters.Add(new JsonStringEnumConverter());
+
+            Listing listing = JsonSerializer.Deserialize<Listing>(rcv, options);
+            return listing;
+        }
+
+        public List<Product> GetProducts()
+        {
+            if (clientSocket == null)
+            {
+                IPEndPoint serverAddress = new IPEndPoint(IPAddress.Parse(IP), PORT);
+
+                clientSocket = new Socket(AddressFamily.InterNetwork, SocketType.Stream, ProtocolType.Tcp);
+                clientSocket.Connect(serverAddress);
+            }
+
+            string[] r = { "getproducts", "" };
+            string message = JsonSerializer.Serialize(r);
+
+            //Sends message to connected Rest web API and gets a response in json
+            string rcv = SendReceive(message);
+            //Makes json deserializor case-insencitive
+            var options = new JsonSerializerOptions();
+            options.PropertyNameCaseInsensitive = true;
+            options.Converters.Add(new JsonStringEnumConverter());
+
+            List<Product> listing = JsonSerializer.Deserialize<List<Product>>(rcv, options);
+            return listing;
+        }
+
+        public List<string> GetProductCategories()
+        {
+            if (clientSocket == null)
+            {
+                IPEndPoint serverAddress = new IPEndPoint(IPAddress.Parse(IP), PORT);
+
+                clientSocket = new Socket(AddressFamily.InterNetwork, SocketType.Stream, ProtocolType.Tcp);
+                clientSocket.Connect(serverAddress);
+            }
+
+            string[] r = { "getproductcategories", "" };
+            string message = JsonSerializer.Serialize(r);
+
+            //Sends message to connected Rest web API and gets a response in json
+            string rcv = SendReceive(message);
+            //Makes json deserializor case-insencitive
+            var options = new JsonSerializerOptions();
+            options.PropertyNameCaseInsensitive = true;
+            options.Converters.Add(new JsonStringEnumConverter());
+
+            List<string> listing = JsonSerializer.Deserialize<List<string>>(rcv,options);
+            return listing;
+        }
+    }
+}

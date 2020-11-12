@@ -1,0 +1,131 @@
+﻿@page "/listing"
+@page "/listing/{id}"
+@using ForagerTier1.Models
+@inject IJSRuntime JSRuntime;
+@inject ISocketService SocketService
+@inject NavigationManager NavigationManager
+<div id="listingContainer">
+    <div class="listingContainerImage" style="background-image: url(@imageInView);">
+        @if (listing.getPictures().Count > 1)
+        {
+            <div class="listingContainerImageThumbContainer">
+                @foreach (string img in listing.getPictures())
+                {
+                    <div class="listingContainerImageThumb" style="background-image: url(@img);" @onclick="@(e => imageInView = img)"></div>
+                }
+            </div>
+        }
+    </div>
+    <div class="listingInfoContainer">
+        <div class="breadcrumbs">@listing.Product.ProductCategory > @listing.Product.Name ></div>
+        <h2>@listing.Product.Name</h2>
+        <div class="listingInfoTabel">
+            <div class="listingInfoTabelItem">
+                <p>Best before</p>
+                <h3>@listing.getDate()</h3>
+                <p>Quantity</p>
+                <h2>@listing.Quantity <span class="unit">@listing.Unit</span></h2>
+                <p>Comment</p>
+                <div class="comment">
+                    @listing.Comment
+                </div>
+            </div>
+            <div class="listingInfoTabelItem">
+                <p>Seller</p>
+                <h3>Seller name</h3>
+                <p>Address</p>
+                <h3>@listing.PickupAddress, @listing.Postcode</h3>
+                @if (listing.HasDelivery)
+                {
+                    <div class="breadcrumbs">Has delevery</div>
+                }
+                else
+                {
+                    <div class="breadcrumbs">Pickup only</div>
+                }
+            </div>
+        </div>
+        
+        <div class="priceListing">
+            <h2>$ @listing.Price</h2>
+            <p>pr. @listing.Unit</p>
+            <p>$ @listing.pricePrUnit()</p>
+        </div>
+    </div>
+</div>
+
+<h1 class="related">Related</h1>
+<div class="relatedCont">
+    <div class="listing">
+        <div class="listingImage" style="background-image: url(@listing.getCover());"></div>
+        <p class="type">@listing.Product.Name</p>
+        <table>
+            <tr>
+                <td>
+                    <p class="attr">Price:</p>
+                    <p class="price">$@listing.Price</p>
+                </td>
+                <td>
+                    <p class="attr">Quantity:</p>
+                    <p class="weight">@listing.Quantity @listing.Unit</p>
+                </td>
+            </tr>
+        </table>
+        <p class="attr">Best before:</p><br />
+        <p class="bestBy">@listing.getDate()</p>
+    </div>
+
+    <div class="listing">
+        <div class="listingImage" style="background-image: url(@listing.getCover());"></div>
+        <p class="type">@listing.Product.Name</p>
+        <table>
+            <tr>
+                <td>
+                    <p class="attr">Price:</p>
+                    <p class="price">$@listing.Price</p>
+                </td>
+                <td>
+                    <p class="attr">Quantity:</p>
+                    <p class="weight">@listing.Quantity @listing.Unit</p>
+                </td>
+            </tr>
+        </table>
+        <p class="attr">Best before:</p><br />
+        <p class="bestBy">@listing.getDate()</p>
+    </div>
+
+    <div class="listing">
+        <div class="listingImage" style="background-image: url(@listing.getCover());"></div>
+        <p class="type">@listing.Product.Name</p>
+        <table>
+            <tr>
+                <td>
+                    <p class="attr">Price:</p>
+                    <p class="price">$@listing.Price</p>
+                </td>
+                <td>
+                    <p class="attr">Quantity:</p>
+                    <p class="weight">@listing.Quantity @listing.Unit</p>
+                </td>
+            </tr>
+        </table>
+        <p class="attr">Best before:</p><br />
+        <p class="bestBy">@listing.getDate()</p>
+    </div>
+
+
+</div>
+@code {
+    [Parameter]
+    public string id { get; set; }
+    Listing listing;
+    string imageInView = "";
+
+    protected override async Task OnParametersSetAsync()
+    {
+        listing = (Listing)SocketService.GetListing(id);
+        imageInView = listing.getCover();
+        await JSRuntime.InvokeVoidAsync("setTitle", "forager. | " + listing.Product.Name);
+    }
+
+}

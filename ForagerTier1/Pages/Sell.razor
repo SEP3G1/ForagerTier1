@@ -1,0 +1,163 @@
+﻿@page "/sell"
+@inject ISocketService SocketService
+@inject IUserService UserService
+@inject AuthenticationStateProvider AuthenticationStateProvider
+@inject NavigationManager NavigationManager
+@using ForagerTier1.Models
+@using ForagerTier1.Persistance
+
+<AuthorizeView>
+    <NotAuthorized>
+        <Login />
+    </NotAuthorized>
+    <Authorized>
+        <h3>Sell</h3>
+        <div>
+            <EditForm Context="Category" Model="@newProductCategory">
+                <DataAnnotationsValidator />
+                <ValidationSummary />
+                <div class="form-group">
+                    Category:<br />
+                    <select @onchange="@((arg) => updateCategory(arg))">
+                        <option value="" selected disabled hidden>Choose here</option>
+                        @foreach (string pc in productCategories)
+                        {
+                            <option value="@pc">@pc</option>
+                        }
+                    </select>
+                </div>
+            </EditForm>
+            <EditForm Context="Listing" Model="@newListing">
+                <DataAnnotationsValidator />
+                <ValidationSummary />
+
+                <div class="form-group">
+                    Product:<br />
+                    <select @bind="newProduct">
+                        <option value="" selected disabled hidden>Choose here</option>
+                        @foreach (Product pc in productsToShow)
+                        {
+                            <option value="@pc.ProductId.ToString()">@pc.Name</option>
+                        }
+                    </select>
+                </div>
+
+                <div class="form-group">
+                    Price<br />
+                    <InputNumber @bind-Value="newListing.Price" @bind-Value:format="F2" />
+                </div>
+
+                <div class="form-group">
+                    Quantity<br />
+                    <InputNumber @bind-Value="newListing.Quantity" @bind-Value:format="F2" />
+                </div>
+
+                <div class="form-group">
+                    Unit<br />
+                    <InputSelect @bind-Value="newListing.Unit">
+                        <option value="" selected disabled hidden>Choose here</option>
+                        <option value="g">g</option>
+                        <option value="kg">kg</option>
+                        <option value="l">L</option>
+                        <option value="ml">ml</option>
+                        <option value="pcs">pcs.</option>
+                    </InputSelect>
+                </div>
+
+                <div class="form-group">
+                    Best Before:<br />
+                    <InputDate @bind-Value="date" @onchange="changeDate" />
+                </div>
+
+                <div class="form-group">
+                    Address:<br />
+                    <InputText @bind-Value="newListing.PickupAddress" />
+                </div>
+
+                <div class="form-group">
+                    Postcode:<br />
+                    <InputText @bind-Value="newListing.Postcode" />
+                </div>
+
+
+                <div class="form-group">
+                    Has delivery<br />
+                    <InputSelect @bind-Value="hasDeliveryAsString">
+                        <option value="" selected disabled hidden>Choose here</option>
+                        <option value="true">true</option>
+                        <option value="false">false</option>
+                    </InputSelect>
+                </div>
+
+
+
+                <div class="form-group">
+                    Pictures<br />
+                    <InputText @bind-Value="newListing.PictureList" />
+                </div>
+
+
+
+                <div class="form-group">
+                    Comment<br />
+                    <InputTextArea rows="2" @bind-Value="newListing.Comment" />
+                </div>
+                <div class="form-group">
+                    <button type="submit" class="btn btn-success">Submit</button>
+                </div>
+            </EditForm>
+        </div>
+    </Authorized>
+</AuthorizeView>
+
+
+@code {
+    private string newProductCategory = "";
+    private string newProductCategoryCache = "";
+    private List<Product> products;
+    private List<Product> productsToShow = new List<Product>();
+    private List<string> productCategories;
+    private string newProduct = "";
+    private Listing newListing = new Listing();
+    private DateTime date = DateTime.Now;
+    private string hasDeliveryAsString;
+    protected override async Task OnParametersSetAsync()
+    {
+        products = SocketService.GetProducts();
+        productCategories = SocketService.GetProductCategories();
+    }
+
+    public void AddNewListing()
+    {
+        newListing.HasDelivery = hasDeliveryAsString.Equals("true");
+        newListing.ProductId = Int32.Parse(newProduct);
+        newListing.UserId = ((User)((CustomAuthenticationStateProvider)AuthenticationStateProvider).GetCashedUser()).UserId;
+        string id = SocketService.CreateListing(newListing);
+
+        NavigationManager.NavigateTo("/listing/" + id);
+    }
+
+    public void updateCategory(ChangeEventArgs e)
+    {
+        Console.WriteLine("Update catagory");
+        productsToShow.Clear();
+        newProductCategoryCache = e.Value.ToString();
+        foreach(Product p in products)
+        {
+            if (p.ProductCategory.Equals(newProductCategoryCache))
+                productsToShow.Add(p);
+        }
+    }
+    public void TrySubmit()
+    {
+        newListing.Product = products.Find(c => c.ProductId == Int32.Parse(newProduct));
+        newListing.Product.ProductCategory = newProductCategoryCache;
+        newListing.BestBefore = date.Ticks + "";
+        newListing.StartDate = DateTime.Now.Ticks + "";
+    }
+
+    public void changeDate()
+    {
+        Console.WriteLine(date.Ticks);
+    }
+}

@@ -1,0 +1,85 @@
+﻿@page "/find"
+@page "/find/{search}"
+@using ForagerTier1.Models
+@inject ISocketService SocketService
+@inject IJSRuntime JSRuntime;
+@inject NavigationManager NavigationManager
+<div class="page">
+    <table class="searchMenu">
+        <tr>
+            <td>
+                <h2>@SearchQuery.Query</h2>
+                <p>Showing @SearchQuery.Listings.Count of @SearchQuery.Results:</p>
+            </td>
+            <td>
+                <button class="listButton @(grid?"":"active")" @onclick="displayList"></button>
+                <button class="gridButton @(grid?"active":"")" @onclick="displayGrid"></button>
+            </td>
+        </tr>
+    </table>
+    <div class="queryContainer">
+        @foreach (Listing Listing in SearchQuery.Listings)
+        {
+            <div class="@(grid?"":"list") listing @(Listing.HasDelivery ? "Delivery" : "")" @onclick="@(e => openListing(@Listing.ListingId))">
+                <div class="listingImage" style="background-image: url(@Listing.getCover());"></div>
+                <p class="type">@Listing.Product.Name</p>
+                <table>
+                    <tr>
+                        <td>
+                            <p class="attr">Price:</p>
+                            <p class="price">@Listing.Price</p>
+                        </td>
+                        <td>
+                            <p class="attr">Quantity:</p>
+                            <p class="weight">@Listing.Quantity @Listing.Unit</p>
+                        </td>
+                        @if (!grid)
+                        {
+                            <td class="bestByHeight">
+                                <p class="attr">Best before:</p><br />
+                                <p class="bestBy">@Listing.getDate()</p>
+                            </td>
+                        }
+                    </tr>
+                </table>
+
+                @if (grid)
+                {
+                    <p class="attr">Best before:</p><br />
+                    <p class="bestBy">@Listing.getDate()</p>
+                }
+
+            </div>
+        }
+    </div>
+
+</div>
+
+@code {
+    [Parameter]
+    public string search { get; set; }
+
+    bool grid = true;
+    SearchQuery SearchQuery;
+
+    protected override async Task OnParametersSetAsync()
+    {
+        SearchQuery = (SearchQuery)SocketService.Search(search);
+        await JSRuntime.InvokeVoidAsync("setTitle", "forager. | " + search);
+        //await JSRuntime.InvokeVoidAsync(user.ToString());
+    }
+
+    public void displayGrid()
+    {
+        grid = true;
+    }
+    public void displayList()
+    {
+        grid = false;
+    }
+    public void openListing(int id)
+    {
+        NavigationManager.NavigateTo($"/listing/{id}");
+    }
+
+}
