@@ -13,6 +13,7 @@ using ForagerTier1.Models;
 using Microsoft.AspNetCore.Components.Authorization;
 using ForagerTier1.Persistance;
 using System.Security.Claims;
+using Syncfusion.Blazor;
 
 namespace ForagerTier1
 {
@@ -34,6 +35,7 @@ namespace ForagerTier1
             services.AddSingleton<ISocketService, SocketService>();
             services.AddScoped<IUserService, UserService>();
             services.AddScoped<AuthenticationStateProvider, CustomAuthenticationStateProvider>();
+            services.AddSyncfusionBlazor();
 
             services.AddAuthorization(options => {
                 options.AddPolicy("MustBeVIA", a =>

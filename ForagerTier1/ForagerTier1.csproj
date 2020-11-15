@@ -12,4 +12,8 @@
     <None Include="wwwroot\css\open-iconic\README.md" />
   </ItemGroup>
 
+  <ItemGroup>
+    <PackageReference Include="Syncfusion.Blazor" Version="18.3.0.48" />
+  </ItemGroup>
+
 </Project>

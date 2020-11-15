@@ -2,6 +2,7 @@
 @using ForagerTier1.Models
 @using ForagerTier1.Persistance
 @using System.Windows.Input
+@using Syncfusion.Blazor.DropDowns;
 @inject NavigationManager NavigationManager
 @inject AuthenticationStateProvider AuthenticationStateProvider
 @inject ISocketService SocketService
@@ -9,15 +10,18 @@
 
 <div class="main">
     <div id="headNav" class="@(hidden ? "hidden" : "")">
-        <div id="sticky" class="searchCont ">
-            <svg class="searchIcon" @onclick="@search" version="1.1" id="Capa_1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" x="0px" y="0px"
-                 viewBox="0 0 373.12 373.12" style="enable-background:new 0 0 373.12 373.12;" xml:space="preserve">
-            <g>
-            <g>
-            <path d="M266.667,234.667h-16.96l-5.867-5.867c20.907-24.213,33.493-55.68,33.493-90.133C277.333,62.08,215.253,0,138.667,0
-			            S0,62.08,0,138.667s62.08,138.667,138.667,138.667c34.453,0,65.92-12.587,90.133-33.387l5.867,5.867v16.853L341.333,373.12
-			            l31.787-31.787L266.667,234.667z M138.667,234.667c-53.013,0-96-42.987-96-96c0-53.013,42.987-96,96-96c53.013,0,96,42.987,96,96
-			            C234.667,191.68,191.68,234.667,138.667,234.667z" />
+
+
+        <!-- "HTML Datalist søgebar" -->
+         <div id="sticky" class="searchCont ">
+             <svg class="searchIcon" @onclick="@search" version="1.1" id="Capa_1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" x="0px" y="0px"
+                  viewBox="0 0 373.12 373.12" style="enable-background:new 0 0 373.12 373.12;" xml:space="preserve">
+             <g>
+             <g>
+             <path d="M266.667,234.667h-16.96l-5.867-5.867c20.907-24.213,33.493-55.68,33.493-90.133C277.333,62.08,215.253,0,138.667,0
+                         S0,62.08,0,138.667s62.08,138.667,138.667,138.667c34.453,0,65.92-12.587,90.133-33.387l5.867,5.867v16.853L341.333,373.12
+                         l31.787-31.787L266.667,234.667z M138.667,234.667c-53.013,0-96-42.987-96-96c0-53.013,42.987-96,96-96c53.013,0,96,42.987,96,96
+                         C234.667,191.68,191.68,234.667,138.667,234.667z" />
 
 
 
@@ -25,20 +29,29 @@
 
 
 
-	            </g>
-            </g>
-        </svg>
-            <datalist id="suggestions">
-                @if (suggestionList != null)
-                {
-                    @foreach (var suggestion in suggestionList)
-                    {
-                        <option value="@suggestion">@suggestion</option>
-                    }
-                }
-            </datalist>
-            <input type="text" @bind="@value" @onkeydown="@KeyDown" @onkeyup="@KeyUp" id="searchIndex" placeholder="search" autoComplete="on" list="suggestions" />
-        </div>
+
+
+
+
+
+
+
+
+                 </g>
+             </g>
+         </svg>
+             <datalist id="suggestions">
+                 @if (suggestionList != null)
+                 {
+                     @foreach (var suggestion in suggestionList)
+                     {
+                         <option value="@suggestion">@suggestion</option>
+                     }
+                 }
+             </datalist>
+             <input type="text" @bind="@value" @onkeyup="@KeyUp" id="searchIndex" placeholder="search" autoComplete="on" list="suggestions" />
+         </div>
+
 
         <div id="header" class="headCont">
             <AuthorizeView>
@@ -60,6 +73,24 @@
             </AuthorizeView>
         </div>
     </div>
+
+    <!-- "Syncfusion søgebar" -->
+    <SfComboBox TValue="string" TItem="Suggestion" PopupHeight="350px" PopupWidth="350px" Placeholder="Search" DataSource="@LocalData" @bind-Value="@valueComboBox" @onkeypress="@(e => KeyUp(e))">
+        <ComboBoxFieldSettings Text="Text"></ComboBoxFieldSettings>
+    </SfComboBox>
+
+    @code {
+        public class Suggestion
+        {
+            public string Text { get; set; }
+        }
+        List<Suggestion> LocalData = new List<Suggestion>();
+
+
+
+    }
+
+
     <div class="content">
         @Body
     </div>
@@ -68,9 +99,13 @@
     </div>
 </div>
 
+
+
+
 @code{
     bool hidden = false;
     string value = "";
+    string valueComboBox = "";
     User user;
 
     // For dropdown
@@ -84,6 +119,20 @@
         productCategories = SocketService.GetProductCategories();
         listings = ((SearchQuery)SocketService.Search(null)).Listings;
         productNames = listings.Select(l => l.Product.Name).ToList();
+
+        suggestionList = new List<string>();
+        suggestionList.AddRange(productCategories);
+        suggestionList.AddRange(productNames);
+
+        List<string> allSuggestions = productCategories;
+        allSuggestions.AddRange(productNames);
+        foreach (string s in allSuggestions)
+        {
+            Suggestion sg = new Suggestion();
+            sg.Text = s;
+            LocalData.Add(sg);
+        }
+
 
         if (user == null)
         {
@@ -102,8 +151,17 @@
 
     public void search()
     {
-        value = UppercaseFirst(value.Trim());
-        NavigationManager.NavigateTo("/find/" + value);
+        if (valueComboBox == null && value.Length > 0)
+        {
+            value = UppercaseFirst(value.Trim());
+            NavigationManager.NavigateTo("/find/" + value);
+        }
+
+        if(valueComboBox != null && value.Length == 0)
+        {
+            valueComboBox = UppercaseFirst(valueComboBox.Trim());
+            NavigationManager.NavigateTo("/find/" + valueComboBox);
+        }
     }
 
     void KeyUp(KeyboardEventArgs e)
@@ -112,14 +170,6 @@
         {
             search();
         }
-    }
-
-    void KeyDown(KeyboardEventArgs e)
-    {
-        // Initialiseres på ny for hvert keypress, for ikke at få dropdown vist on focus ... Et workaround, som nok kan optimeres.
-        suggestionList = new List<string>();
-        suggestionList.AddRange(productCategories);
-        suggestionList.AddRange(productNames);
     }
 
     public void login()
