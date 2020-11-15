@@ -79,17 +79,12 @@
         <ComboBoxFieldSettings Text="Text"></ComboBoxFieldSettings>
     </SfComboBox>
 
-    @code {
+    @code { //TODO Flyttes
         public class Suggestion
         {
             public string Text { get; set; }
         }
-        List<Suggestion> LocalData = new List<Suggestion>();
-
-
-
     }
-
 
     <div class="content">
         @Body
@@ -113,6 +108,7 @@
     private List<string> productCategories;
     private IList<Listing> listings;
     private List<string> productNames;
+    List<Suggestion> LocalData = new List<Suggestion>();
 
     protected override async Task OnParametersSetAsync()
     {
@@ -124,9 +120,9 @@
         suggestionList.AddRange(productCategories);
         suggestionList.AddRange(productNames);
 
-        List<string> allSuggestions = productCategories;
-        allSuggestions.AddRange(productNames);
-        foreach (string s in allSuggestions)
+        LocalData = new List<Suggestion>();
+
+        foreach (string s in suggestionList)
         {
             Suggestion sg = new Suggestion();
             sg.Text = s;
