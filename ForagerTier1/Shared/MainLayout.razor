@@ -19,12 +19,26 @@
 			            l31.787-31.787L266.667,234.667z M138.667,234.667c-53.013,0-96-42.987-96-96c0-53.013,42.987-96,96-96c53.013,0,96,42.987,96,96
 			            C234.667,191.68,191.68,234.667,138.667,234.667z" />
 
+
+
+
+
+
+
 	            </g>
             </g>
         </svg>
-            <input type="text" @bind="@value" @onkeyup="@KeyUp" id="searchIndex" placeholder="search" />
+            <datalist id="suggestions">
+                @if (suggestionList != null)
+                {
+                    @foreach (var suggestion in suggestionList)
+                    {
+                        <option value="@suggestion">@suggestion</option>
+                    }
+                }
+            </datalist>
+            <input type="text" @bind="@value" @onkeydown="@KeyDown" @onkeyup="@KeyUp" id="searchIndex" placeholder="search" autoComplete="on" list="suggestions" />
         </div>
-
 
         <div id="header" class="headCont">
             <AuthorizeView>
@@ -59,8 +73,16 @@
     string value = "";
     User user;
 
+    // For dropdown
+    public List<string> suggestionList = new List<string>();
+    private List<string> productCategories;
+    private List<Listing> listings;
+    private List<string> productNames;
+
     protected override async Task OnParametersSetAsync()
     {
+        productCategories = SocketService.GetProductCategories();
+
         if (user == null)
         {
             user = ((CustomAuthenticationStateProvider)AuthenticationStateProvider).GetCashedUser();
@@ -89,6 +111,14 @@
             search();
         }
     }
+
+    void KeyDown(KeyboardEventArgs e)
+    {
+        // Initialiseres på ny for hvert keypress, for ikke at få dropdown vist on focus ... Et workaround, som nok kan optimeres.
+        suggestionList = new List<string>();
+        suggestionList.AddRange(productCategories);
+    }
+
     public void login()
     {
         NavigationManager.NavigateTo("/Login");
