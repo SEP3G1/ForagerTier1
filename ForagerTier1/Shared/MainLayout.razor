@@ -76,12 +76,14 @@
     // For dropdown
     public List<string> suggestionList = new List<string>();
     private List<string> productCategories;
-    private List<Listing> listings;
+    private IList<Listing> listings;
     private List<string> productNames;
 
     protected override async Task OnParametersSetAsync()
     {
         productCategories = SocketService.GetProductCategories();
+        listings = ((SearchQuery)SocketService.Search(null)).Listings;
+        productNames = listings.Select(l => l.Product.Name).ToList();
 
         if (user == null)
         {
@@ -117,6 +119,7 @@
         // Initialiseres på ny for hvert keypress, for ikke at få dropdown vist on focus ... Et workaround, som nok kan optimeres.
         suggestionList = new List<string>();
         suggestionList.AddRange(productCategories);
+        suggestionList.AddRange(productNames);
     }
 
     public void login()
