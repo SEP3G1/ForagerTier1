@@ -75,24 +75,24 @@
     </div>
 
     <!-- "Syncfusion søgebar" -->
-    <SfComboBox TValue="string" TItem="Suggestion" PopupHeight="350px" PopupWidth="350px" Placeholder="Search by productcategory, productname or postcode" 
-                DataSource="@LocalData" @bind-Value="@valueComboBox" @onkeypress="@(e => KeyUp(e))">
-        <ComboBoxFieldSettings Text="Text"></ComboBoxFieldSettings>
-    </SfComboBox>
+    <SfComboBox TValue="string" TItem="Suggestion" PopupHeight="350px" PopupWidth="350px" Placeholder="Search by productcategory, productname or postcode"
+                DataSource="@LocalData" @bind-Value="@valueComboBox" @onkeypress="@(e => KeyUp(e))" @onselectionchange="@(e => OnSelection())" Autofill="true">
+            <ComboBoxFieldSettings Text="Text"></ComboBoxFieldSettings>
+        </SfComboBox>
 
-    @code { //TODO Flyttes
-        public class Suggestion
-        {
-            public string Text { get; set; }
+        @code { //TODO Flyttes
+            public class Suggestion
+            {
+                public string Text { get; set; }
+            }
         }
-    }
 
-    <div class="content">
-        @Body
-    </div>
-    <div class="footer">
+        <div class="content">
+            @Body
+        </div>
+        <div class="footer">
 
-    </div>
+        </div>
 </div>
 
 
@@ -165,6 +165,11 @@
         {
             search();
         }
+    }
+
+    void OnSelection()
+    { 
+        search();
     }
 
     public void login()
