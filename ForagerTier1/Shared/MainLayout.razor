@@ -75,7 +75,8 @@
     </div>
 
     <!-- "Syncfusion søgebar" -->
-    <SfComboBox TValue="string" TItem="Suggestion" PopupHeight="350px" PopupWidth="350px" Placeholder="Search" DataSource="@LocalData" @bind-Value="@valueComboBox" @onkeypress="@(e => KeyUp(e))">
+    <SfComboBox TValue="string" TItem="Suggestion" PopupHeight="350px" PopupWidth="350px" Placeholder="Search by productcategory, productname or postcode" 
+                DataSource="@LocalData" @bind-Value="@valueComboBox" @onkeypress="@(e => KeyUp(e))">
         <ComboBoxFieldSettings Text="Text"></ComboBoxFieldSettings>
     </SfComboBox>
 
@@ -104,21 +105,22 @@
     User user;
 
     // For dropdown
-    public List<string> suggestionList = new List<string>();
+    public List<string> suggestionList = null;
     private List<string> productCategories;
     private IList<Listing> listings;
     private List<string> productNames;
+    private List<string> postCodes;
     List<Suggestion> LocalData = new List<Suggestion>();
 
     protected override async Task OnParametersSetAsync()
     {
-        productCategories = SocketService.GetProductCategories();
-        listings = ((SearchQuery)SocketService.Search(null)).Listings;
-        productNames = listings.Select(l => l.Product.Name).ToList();
+        listings = ((SearchQuery)SocketService.Search(null)).Listings; // Get listings
 
-        suggestionList = new List<string>();
-        suggestionList.AddRange(productCategories);
-        suggestionList.AddRange(productNames);
+        suggestionList = SocketService.GetProductCategories() //Get productcategories
+    .Concat(listings.Select(l => l.Product.Name)) //Add productnames
+    .Concat(listings.Select(l => l.Postcode)) // Add postcodes
+    .Distinct() //Remove duplicates
+    .ToList();
 
         LocalData = new List<Suggestion>();
 
