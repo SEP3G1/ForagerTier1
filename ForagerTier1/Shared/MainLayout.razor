@@ -105,12 +105,9 @@
     User user;
 
     // For dropdown
-    public List<string> suggestionList = null;
-    private List<string> productCategories;
+    public List<string> suggestionList;
     private IList<Listing> listings;
-    private List<string> productNames;
-    private List<string> postCodes;
-    List<Suggestion> LocalData = new List<Suggestion>();
+    List<Suggestion> LocalData;
 
     protected override async Task OnParametersSetAsync()
     {
