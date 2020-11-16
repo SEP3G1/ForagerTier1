@@ -22,21 +22,6 @@
                          S0,62.08,0,138.667s62.08,138.667,138.667,138.667c34.453,0,65.92-12.587,90.133-33.387l5.867,5.867v16.853L341.333,373.12
                          l31.787-31.787L266.667,234.667z M138.667,234.667c-53.013,0-96-42.987-96-96c0-53.013,42.987-96,96-96c53.013,0,96,42.987,96,96
                          C234.667,191.68,191.68,234.667,138.667,234.667z" />
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
                  </g>
              </g>
          </svg>
@@ -76,7 +61,7 @@
 
     <!-- "Syncfusion søgebar" -->
     <SfComboBox TValue="string" TItem="Suggestion" PopupHeight="350px" PopupWidth="350px" Placeholder="Search by productcategory, productname or postcode"
-                DataSource="@LocalData" @bind-Value="@valueComboBox" @onkeypress="@(e => KeyUp(e))" @onselectionchange="@(e => OnSelection())" Autofill="true">
+                DataSource="@LocalData" @bind-Value="@valueComboBox" @onkeypress="@(e => KeyUp(e))" @onselect="@(e => OnSelection())" @bind-Index="@indexComboBox" Autofill="true">
             <ComboBoxFieldSettings Text="Text"></ComboBoxFieldSettings>
         </SfComboBox>
 
@@ -102,6 +87,8 @@
     bool hidden = false;
     string value = "";
     string valueComboBox = "";
+    private int? indexComboBox { get; set; } = -1;
+
     User user;
 
     // For dropdown
@@ -119,6 +106,7 @@
     .Distinct() //Remove duplicates
     .ToList();
 
+        //Data for ComboBox searchbar
         LocalData = new List<Suggestion>();
 
         foreach (string s in suggestionList)
@@ -168,8 +156,12 @@
     }
 
     void OnSelection()
-    { 
-        search();
+    {
+        if (indexComboBox != -1)
+        {
+            valueComboBox = suggestionList[indexComboBox.Value];
+            search();
+        }
     }
 
     public void login()
