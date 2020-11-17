@@ -28,16 +28,7 @@
                  </g>
              </g>
          </svg>
-            <datalist id="suggestions">
-                @if (suggestionListForHtmlDropdown != null)
-                {
-                    @foreach (var suggestion in suggestionListForHtmlDropdown)
-                    {
-                        <option value="@suggestion">@suggestion</option>
-                    }
-                }
-            </datalist>
-            <input type="text" @bind="@value" @onkeyup="@KeyUp" id="searchIndex" placeholder="search" autoComplete="on" list="suggestions" />
+            <input type="text" id="searchIndex" placeholder="search" />
         </div>
 
 
@@ -64,8 +55,8 @@
 
     <!-- "Syncfusion søgebar" PopupHeight="350px" PopupWidth="350px" -->
     <SfComboBox TValue="string" TItem="Suggestion" CssClass="template" Placeholder="Search by productcategory, productname or postcode"
-                DataSource="@LocalData" @bind-Value="@valueComboBox" @onkeypress="@(e => KeyUp(e))" @onselect="@(e => OnSelection())" 
-                @bind-Index="@indexComboBox" Autofill="true" AllowFiltering="true">
+                DataSource="@LocalData" @bind-Value="@valueComboBox" @onkeypress="@(e => KeyUp(e))" @onselect="@(e => search())" 
+                Autofill="true" AllowFiltering="true">
         <ComboBoxTemplates TItem="Suggestion">
             <ItemTemplate>
                 <div>
@@ -97,29 +88,19 @@
 
 
 @code{
-    bool hidden = false;
-    string value = "";
-    string valueComboBox = "";
-    private int? indexComboBox { get; set; } = -1;
+        bool hidden = false;
+        string valueComboBox = "";
 
-    User user;
+        User user;
 
-    // For dropdown
-    public List<string> suggestionListForHtmlDropdown;
+    // For ComboBox dropdown
     public Dictionary<string, string> suggestionListForComboBoxDropdown;
     private IList<Listing> listings;
     List<Suggestion> LocalData;
 
     protected override async Task OnParametersSetAsync()
-    {
+    { 
         listings = ((SearchQuery)SocketService.Search(null)).Listings; // Get listings
-
-        suggestionListForHtmlDropdown = SocketService.GetProductCategories() //Get productcategories
-    .Concat(listings.Select(l => l.Product.Name)) //Add productnames
-    .Concat(listings.Select(l => l.Postcode)) // Add postcodes
-    .Distinct() //Remove duplicates
-    .ToList();
-
         suggestionListForComboBoxDropdown = new Dictionary<string, string>();
 
         foreach (string productcategory in SocketService.GetProductCategories()){
@@ -160,17 +141,13 @@
         {
             hidden = false;
         }
+
+        valueComboBox = null;
     }
 
     public void search()
     {
-        if (valueComboBox == null && value.Length > 0)
-        {
-            value = UppercaseFirst(value.Trim());
-            NavigationManager.NavigateTo("/find/" + value);
-        }
-
-        if(valueComboBox != null && value.Length == 0)
+        if (valueComboBox != null)
         {
             valueComboBox = UppercaseFirst(valueComboBox.Trim());
             NavigationManager.NavigateTo("/find/" + valueComboBox);
@@ -183,11 +160,6 @@
         {
             search();
         }
-    }
-
-    void OnSelection()
-    {
-            search();
     }
 
     public void login()
@@ -216,18 +188,6 @@
         margin: 0 auto;
         width: 300px;
     }
-
-  /*  .header {
-        font-weight: 600;
-        color: rgba(0, 0, 0, .54);
-        height: 48px;
-        padding: 15px 0 0 16px;
-        font-size: 16px;
-        background-color: #f5f5f5;
-        font-family: "Segoe UI", "GeezaPro", "DejaVu Serif";
-    } */
-
-
 
     .info {
         margin-left: 34px;
