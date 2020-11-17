@@ -53,7 +53,7 @@
         </div>
     </div>
 
-    <!-- "Syncfusion søgebar" PopupHeight="350px" PopupWidth="350px" -->
+    <!-- "Syncfusion søgebar" -->
     <SfComboBox TValue="string" TItem="Suggestion" CssClass="template" Placeholder="Search by productcategory, productname or postcode"
                 DataSource="@DataForComboBox" @bind-Value="@valueComboBox" @onkeypress="@(e => KeyUp(e))" @onselect="@(e => search())" 
                 Autofill="true" AllowFiltering="true">
