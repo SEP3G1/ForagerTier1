@@ -13,29 +13,32 @@
 
 
         <!-- "HTML Datalist søgebar" -->
-         <div id="sticky" class="searchCont ">
-             <svg class="searchIcon" @onclick="@search" version="1.1" id="Capa_1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" x="0px" y="0px"
-                  viewBox="0 0 373.12 373.12" style="enable-background:new 0 0 373.12 373.12;" xml:space="preserve">
-             <g>
-             <g>
-             <path d="M266.667,234.667h-16.96l-5.867-5.867c20.907-24.213,33.493-55.68,33.493-90.133C277.333,62.08,215.253,0,138.667,0
+        <div id="sticky" class="searchCont ">
+            <svg class="searchIcon" @onclick="@search" version="1.1" id="Capa_1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" x="0px" y="0px"
+                 viewBox="0 0 373.12 373.12" style="enable-background:new 0 0 373.12 373.12;" xml:space="preserve">
+            <g>
+            <g>
+            <path d="M266.667,234.667h-16.96l-5.867-5.867c20.907-24.213,33.493-55.68,33.493-90.133C277.333,62.08,215.253,0,138.667,0
                          S0,62.08,0,138.667s62.08,138.667,138.667,138.667c34.453,0,65.92-12.587,90.133-33.387l5.867,5.867v16.853L341.333,373.12
                          l31.787-31.787L266.667,234.667z M138.667,234.667c-53.013,0-96-42.987-96-96c0-53.013,42.987-96,96-96c53.013,0,96,42.987,96,96
                          C234.667,191.68,191.68,234.667,138.667,234.667z" />
+
+
+
                  </g>
              </g>
          </svg>
-             <datalist id="suggestions">
-                 @if (suggestionList != null)
-                 {
-                     @foreach (var suggestion in suggestionList)
-                     {
-                         <option value="@suggestion">@suggestion</option>
-                     }
-                 }
-             </datalist>
-             <input type="text" @bind="@value" @onkeyup="@KeyUp" id="searchIndex" placeholder="search" autoComplete="on" list="suggestions" />
-         </div>
+            <datalist id="suggestions">
+                @if (suggestionListForHtmlDropdown != null)
+                {
+                    @foreach (var suggestion in suggestionListForHtmlDropdown)
+                    {
+                        <option value="@suggestion">@suggestion</option>
+                    }
+                }
+            </datalist>
+            <input type="text" @bind="@value" @onkeyup="@KeyUp" id="searchIndex" placeholder="search" autoComplete="on" list="suggestions" />
+        </div>
 
 
         <div id="header" class="headCont">
@@ -59,25 +62,34 @@
         </div>
     </div>
 
-    <!-- "Syncfusion søgebar" -->
-    <SfComboBox TValue="string" TItem="Suggestion" PopupHeight="350px" PopupWidth="350px" Placeholder="Search by productcategory, productname or postcode"
-                DataSource="@LocalData" @bind-Value="@valueComboBox" @onkeypress="@(e => KeyUp(e))" @onselect="@(e => OnSelection())" @bind-Index="@indexComboBox" Autofill="true">
-            <ComboBoxFieldSettings Text="Text"></ComboBoxFieldSettings>
-        </SfComboBox>
+    <!-- "Syncfusion søgebar" PopupHeight="350px" PopupWidth="350px" @onselect="@(e => OnSelection())"-->
+    <SfComboBox TValue="string" TItem="Suggestion" CssClass="template" Placeholder="Search by productcategory, productname or postcode"
+                DataSource="@LocalData" @bind-Value="@valueComboBox" @onkeypress="@(e => KeyUp(e))" @bind-Index="@indexComboBox" Autofill="true" AllowFiltering="true">
+        <ComboBoxTemplates TItem="Suggestion">
+            <ItemTemplate>
+                <div>
+                    <img class="empImage" src="@((context as Suggestion).Eimg)" />
+                    <div class="ename"> @((context as Suggestion).Text) </div>
+                </div>
+            </ItemTemplate>
+        </ComboBoxTemplates>
+        <ComboBoxFieldSettings Text="Text"></ComboBoxFieldSettings>
+    </SfComboBox>
 
-        @code { //TODO Flyttes
-            public class Suggestion
-            {
-                public string Text { get; set; }
-            }
+    @code { //TODO Flyttes
+        public class Suggestion
+        {
+            public string Text { get; set; }
+            public string Eimg { get; set; }
         }
+    }
 
-        <div class="content">
-            @Body
-        </div>
-        <div class="footer">
+    <div class="content">
+        @Body
+    </div>
+    <div class="footer">
 
-        </div>
+    </div>
 </div>
 
 
@@ -92,7 +104,8 @@
     User user;
 
     // For dropdown
-    public List<string> suggestionList;
+    public List<string> suggestionListForHtmlDropdown;
+    public Dictionary<string, string> suggestionListForComboBoxDropdown;
     private IList<Listing> listings;
     List<Suggestion> LocalData;
 
@@ -100,19 +113,35 @@
     {
         listings = ((SearchQuery)SocketService.Search(null)).Listings; // Get listings
 
-        suggestionList = SocketService.GetProductCategories() //Get productcategories
+        suggestionListForHtmlDropdown = SocketService.GetProductCategories() //Get productcategories
     .Concat(listings.Select(l => l.Product.Name)) //Add productnames
     .Concat(listings.Select(l => l.Postcode)) // Add postcodes
     .Distinct() //Remove duplicates
     .ToList();
 
+        suggestionListForComboBoxDropdown = new Dictionary<string, string>();
+
+        foreach (string productcategory in SocketService.GetProductCategories()){
+            suggestionListForComboBoxDropdown.Add(productcategory, "https://foodion.net/images/app/foodion_logo_square.png");
+        }
+
+        foreach(Listing listing in listings)
+        {
+            suggestionListForComboBoxDropdown.Add(listing.Product.Name, listing.Product.ImagesString);
+        }
+
+        foreach (string postcode in listings.Select(l => l.Postcode).Distinct().ToList()){
+            suggestionListForComboBoxDropdown.Add(postcode, "https://img.icons8.com/ios/452/zip-code.png");
+        }
+
         //Data for ComboBox searchbar
         LocalData = new List<Suggestion>();
 
-        foreach (string s in suggestionList)
+        foreach(KeyValuePair<string,string> suggestion in suggestionListForComboBoxDropdown)
         {
             Suggestion sg = new Suggestion();
-            sg.Text = s;
+            sg.Text = suggestion.Key;
+            sg.Eimg = suggestion.Value;
             LocalData.Add(sg);
         }
 
@@ -159,7 +188,7 @@
     {
         if (indexComboBox != -1)
         {
-            valueComboBox = suggestionList[indexComboBox.Value];
+            valueComboBox = suggestionListForHtmlDropdown[indexComboBox.Value];
             search();
         }
     }
@@ -184,3 +213,79 @@
         return char.ToUpper(s[0]) + s.Substring(1);
     }
 }
+
+<style>
+    .control-wrapper {
+        margin: 0 auto;
+        width: 300px;
+    }
+
+  /*  .header {
+        font-weight: 600;
+        color: rgba(0, 0, 0, .54);
+        height: 48px;
+        padding: 15px 0 0 16px;
+        font-size: 16px;
+        background-color: #f5f5f5;
+        font-family: "Segoe UI", "GeezaPro", "DejaVu Serif";
+    } */
+
+
+
+    .info {
+        margin-left: 34px;
+    }
+
+    .ename {
+        display: block !important;
+        opacity: .87;
+        font-size: 16px;
+        margin-top: 8px;
+    }
+
+    .name {
+        padding: 5px 42px;
+        opacity: .87;
+        line-height: 1.063em;
+    }
+
+    .job {
+        opacity: .54;
+        font-size: 14px;
+        margin-top: -15px;
+        margin-bottom: 7px;
+    }
+
+    .empImage {
+        margin: 6px 16px;
+        float: left;
+        width: 50px;
+        height: 50px;
+    }
+
+    .value {
+        border-radius: 50%;
+        float: left;
+        margin-top: 2px;
+        margin-left: 2px;
+    }
+
+    .template.e-popup .e-list-item * {
+        display: block;
+        text-indent: 0;
+    }
+
+    .template .e-dropdownbase.e-content {
+        max-height: 800px !important; /*200px*/
+    }
+
+    .combo-height {
+        height: 400px; 
+    }
+
+    .padding-top {
+        padding-top: 55px;
+    }
+</style>
+
+
