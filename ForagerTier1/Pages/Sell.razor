@@ -11,126 +11,93 @@
         <Login />
     </NotAuthorized>
     <Authorized>
-        <h3>Sell</h3>
         <div>
-            <EditForm Context="Category" Model="@newProductCategory">
-                <DataAnnotationsValidator />
-                <ValidationSummary />
-                <div class="form-group">
-                    Category:<br />
-                    <select @onchange="@((arg) => updateCategory(arg))">
-                        <option value="" selected disabled hidden>Choose here</option>
-                        @foreach (string pc in productCategories)
-                        {
-                            <option value="@pc">@pc</option>
-                        }
-                    </select>
-                </div>
-            </EditForm>
-            <EditForm Context="Listing" Model="@newListing" OnValidSubmit="AddNewListing">
-                <DataAnnotationsValidator />
-                <ValidationSummary />
-
-                <div class="form-group">
-                    Product:<br />
-                    <select @bind="newProduct" required>
-                        @if (productsToShow.Count == 0)
-                        {
-                            <option value="" disabled>Pick category first</option>
-                        }
-                        else
-                        {
-                            @foreach (Product pc in productsToShow)
-                            {
-                                <option value="@pc.ProductId.ToString()">@pc.Name</option>
-                            }
-                        }
-                    </select>
-                </div>
-
-                <div class="form-group">
-                    Price<br />
-                    <InputNumber @bind-Value="newListing.Price" @bind-Value:format="F2" />
-                </div>
-
-                <div class="form-group">
-                    Quantity<br />
-                    <InputNumber @bind-Value="newListing.Quantity" @bind-Value:format="F2" />
-                </div>
-
-                <div class="form-group">
-                    Unit<br />
-                    <InputSelect @bind-Value="newListing.Unit">
-                        <option value="" selected disabled hidden>Choose here</option>
-                        <option value="g">g</option>
-                        <option value="kg">kg</option>
-                        <option value="l">L</option>
-                        <option value="ml">ml</option>
-                        <option value="pcs">pcs.</option>
-                    </InputSelect>
-                </div>
-
-                <div class="form-group">
-                    Best Before:<br />
-                    <input type="date" @onchange="@((arg) => changeDate(arg))" required />
-                </div>
-
-                <div class="form-group">
-                    Address:<br />
-                    <InputText @bind-Value="newListing.PickupAddress" />
-                </div>
-
-                <div class="form-group">
-                    Postcode:<br />
-                    <InputText @bind-Value="newListing.Postcode" />
-                </div>
-
-
-                <div class="form-group">
-                    Has delivery<br />
-                    <InputSelect @bind-Value="hasDeliveryAsString">
-                        <option value="" selected disabled hidden>Choose here</option>
-                        <option value="true">true</option>
-                        <option value="false">false</option>
-                    </InputSelect>
-                </div>
-
-                <div class="form-group">
-                    Images<br />
-                    <p>
-                        <InputFile OnChange="@OnInputFileChange" multiple />
-                    </p>
-
-                    @if (imageDataUrls.Count > 0)
-                    {
-                        <h4>Images</h4>
-
-                        <div class="card" style="width:30rem;">
-                            <div class="card-body">
-                                @foreach (var imageDataUrl in imageDataUrls)
-                                {
-                                    <img class="rounded m-1" src="@imageDataUrl" />
-                                }
-                            </div>
+            <EditForm class="sellCont" Context="Listing" Model="@newListing" OnValidSubmit="AddNewListing">
+                <h1>Create a listing<span class="acc">.</span></h1>
+                <h3>Search through the products to find exactly what you want to sell. Then specify the quantity and total price for the listing. Upload up to 8 photos of your product. Remember, good photos drasticly reduces the time it takes to sell your product! <br /> Under 'Best Before' you can press the calender to easily find the expiration date. Anything else to add? Leave it in the comment</h3>
+                <div class="sellColum">
+                    <DataAnnotationsValidator />
+                    <ValidationSummary />
+                    <div class="form-group">
+                        <p>Category</p>
+                        <RadzenDropDown AllowClear="false" AllowFiltering="true" FilterCaseSensitivity="FilterCaseSensitivity.CaseInsensitive" Data=@productCategories @bind-Value=@newProductCategory
+                                        Change=@((arg) => updateCategory(arg)) required />
+                    </div>
+                    <div class="form-group">
+                        <p>Product</p>
+                        <RadzenDropDown AllowClear="true" AllowFiltering="true" FilterCaseSensitivity="FilterCaseSensitivity.CaseInsensitive" Data=@productsToShow @bind-Value=@newListing.ProductId
+                                        TextProperty="Name" ValueProperty="ProductId" Change=@((arg) => updateProduct(arg)) />
+                    </div>
+                    <div class="form-group">
+                        <p>Quantity</p>
+                        <div style="display: flex;">
+                            <InputNumber @bind-Value="newListing.Quantity" @bind-Value:format="F2" style="width: 14rem;" />
+                            <select @bind=@newListing.Unit style="width:5rem">
+                                <option value="kg" selected>kg</option>
+                                <option value="g">g</option>
+                                <option value="l">L</option>
+                                <option value="ml">ml</option>
+                                <option value="pcs">pcs.</option>
+                            </select>
                         </div>
-                    }
-                    <img src="@urlString"/>
+                    </div>
+
+                    <div class="form-group">
+                        <p>Price</p>
+                        <InputNumber @bind-Value="newListing.Price" @bind-Value:format="F2" />
+                    </div>
+
+                    <div class="form-group">
+                        <p>Images</p>
+                        <p>
+                            <InputFile OnChange="@OnInputFileChange" multiple />
+                        </p>
+
+                        @if (imageDataUrls.Count > 0)
+                        {
+                            <h4>Images</h4>
+
+                            <div class="card" style="width:30rem;">
+                                <div class="card-body">
+                                    @foreach (var imageDataUrl in imageDataUrls)
+                                    {
+                                        <img class="rounded m-1" src="@imageDataUrl" />
+                                    }
+                                </div>
+                            </div>
+                        }
+                    </div>
                 </div>
 
-                <!--
-                <div class="form-group">
-                    Pictures<br />
-                    <InputText bind-Value="newListing.PictureList" />
-                </div>
-                -->
+                <div class="sellColum">
+                    <div class="form-group">
+                        <p>Best Before:</p>
+                        <RadzenDatePicker @bind-Value=@date DateFormat="d" Change=@(args => changeDate(args)) Style="width:20rem;" />
+                    </div>
+
+                    <div class="form-group">
+                        <p>Address</p>
+                        <InputText @bind-Value="newListing.PickupAddress" />
+                    </div>
+
+                    <div class="form-group">
+                        <p>Postcode</p>
+                        <InputText @bind-Value="newListing.Postcode" />
+                    </div>
 
 
-                <div class="form-group">
-                    Comment<br />
-                    <InputTextArea rows="2" @bind-Value="newListing.Comment" />
-                </div>
-                <div class="form-group">
-                    <button type="submit" class="btn btn-success">Submit</button>
+                    <div class="form-group">
+                        <RadzenCheckBox id="CheckBox1" @bind-Value=@newListing.HasDelivery TValue="bool" /> Has delivery
+                    </div>
+
+
+                    <div class="form-group">
+                        <p>Comment</p>
+                        <InputTextArea rows="2" @bind-Value="newListing.Comment" style="width:20rem" />
+                    </div>
+                    <div class="form-group">
+                        <button type="submit" class="btn btn-success">Submit</button>
+                    </div>
                 </div>
             </EditForm>
         </div>
@@ -140,14 +107,12 @@
 
 @code {
     private string newProductCategory = "";
-    private string newProductCategoryCache = "";
     private List<Product> products;
-    private List<Product> productsToShow = new List<Product>();
+    private List<Product> productsToShow;
+    private List<string> DeliveryOptions = new List<string>() { "true", "false" };
     private List<string> productCategories;
-    private string newProduct = "";
     private Listing newListing = new Listing();
     private DateTime date = DateTime.Now;
-    private string hasDeliveryAsString;
 
     IList<string> imageDataUrls = new List<string>();
     IList<IBrowserFile> images = new List<IBrowserFile>();
@@ -156,42 +121,45 @@
     protected override async Task OnParametersSetAsync()
     {
         products = SocketService.GetProducts();
+        productsToShow = new List<Product>(products);
         productCategories = SocketService.GetProductCategories();
     }
 
     public void AddNewListing()
     {
         TrySubmit();
-        newListing.HasDelivery = hasDeliveryAsString.Equals("true");
-        newListing.ProductId = Int32.Parse(newProduct);
         newListing.UserId = ((User)((CustomAuthenticationStateProvider)AuthenticationStateProvider).GetCashedUser()).UserId;
         string id = SocketService.CreateListing(newListing);
 
         NavigationManager.NavigateTo("/listing/" + id);
     }
 
-    public void updateCategory(ChangeEventArgs e)
+    public void updateCategory(object e)
     {
         productsToShow.Clear();
-        newProductCategoryCache = e.Value.ToString();
         foreach (Product p in products)
         {
-            if (p.ProductCategory.Equals(newProductCategoryCache))
+            if (p.ProductCategory.Equals(newProductCategory))
                 productsToShow.Add(p);
+        }
+    }
+    public void updateProduct(object e)
+    {
+        if (newProductCategory.Equals(""))
+        {
+            if(newListing.ProductId != 0)
+                newProductCategory = products.First(p => p.ProductId == newListing.ProductId).ProductCategory;
         }
     }
     public void TrySubmit()
     {
-        newListing.Product = products.Find(c => c.ProductId == Int32.Parse(newProduct));
-        newListing.Product.ProductCategory = newProductCategoryCache;
+        newListing.Product.ProductCategory = newProductCategory;
         newListing.StartDate = DateTime.Now.Ticks + "";
     }
 
-    public void changeDate(ChangeEventArgs e)
+    public void changeDate(object e)
     {
-        Console.WriteLine(e.Value.ToString());
-        string[] d = e.Value.ToString().Split("-");
-        newListing.BestBefore = new DateTime(int.Parse(d[0]), int.Parse(d[1]), int.Parse(d[2])).Ticks + "";
+        newListing.BestBefore = ((DateTime)e).Ticks + "";
     }
 
     private async Task OnInputFileChange(InputFileChangeEventArgs e)
@@ -209,6 +177,5 @@
             imageDataUrls.Add(imageDataUrl);
             images.Add(imageFile);
         }
-        urlString = SocketService.UploadImageTest(images);
     }
 }

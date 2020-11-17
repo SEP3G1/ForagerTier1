@@ -12,4 +12,8 @@
     <None Include="wwwroot\css\open-iconic\README.md" />
   </ItemGroup>
 
+  <ItemGroup>
+    <PackageReference Include="Radzen.Blazor" Version="2.17.1" />
+  </ItemGroup>
+
 </Project>
