@@ -104,17 +104,17 @@
         suggestionListForComboBox = new Dictionary<string, string>();
         DataForComboBox = new List<Suggestion>();
 
-        SocketService.GetProductCategories().ForEach(productcategory
-        => suggestionListForComboBox.Add(productcategory, "https://foodion.net/images/app/foodion_logo_square.png"));
+        SocketService.GetProductCategories().ForEach(p
+        => suggestionListForComboBox.Add(p, "https://foodion.net/images/app/foodion_logo_square.png"));
 
-        listings.ToList().ForEach(listing
-            => suggestionListForComboBox.Add(listing.Product.Name, listing.Product.ImagesString));
+        listings.Select(l => new { l.Product.Name, l.Product.ImagesString }).Distinct().ToList().ForEach(p
+        => suggestionListForComboBox.Add(p.Name, p.ImagesString));
 
-        listings.Select(l => l.Postcode).Distinct().ToList().ForEach(postcode
-            => suggestionListForComboBox.Add(postcode, "https://img.icons8.com/ios/452/zip-code.png"));
+        listings.Select(l => l.Postcode).Distinct().ToList().ForEach(p
+        => suggestionListForComboBox.Add(p, "https://img.icons8.com/ios/452/zip-code.png"));
 
         suggestionListForComboBox.ToList().ForEach(s
-            => DataForComboBox.Add(new Suggestion() { Text = s.Key, Image = s.Value }));
+        => DataForComboBox.Add(new Suggestion() { Text = s.Key, Image = s.Value }));
 
 
 
