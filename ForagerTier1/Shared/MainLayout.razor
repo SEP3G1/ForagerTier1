@@ -62,9 +62,10 @@
         </div>
     </div>
 
-    <!-- "Syncfusion søgebar" PopupHeight="350px" PopupWidth="350px" @onselect="@(e => OnSelection())"-->
+    <!-- "Syncfusion søgebar" PopupHeight="350px" PopupWidth="350px" -->
     <SfComboBox TValue="string" TItem="Suggestion" CssClass="template" Placeholder="Search by productcategory, productname or postcode"
-                DataSource="@LocalData" @bind-Value="@valueComboBox" @onkeypress="@(e => KeyUp(e))" @bind-Index="@indexComboBox" Autofill="true" AllowFiltering="true">
+                DataSource="@LocalData" @bind-Value="@valueComboBox" @onkeypress="@(e => KeyUp(e))" @onselect="@(e => OnSelection())" 
+                @bind-Index="@indexComboBox" Autofill="true" AllowFiltering="true">
         <ComboBoxTemplates TItem="Suggestion">
             <ItemTemplate>
                 <div>
@@ -186,11 +187,7 @@
 
     void OnSelection()
     {
-        if (indexComboBox != -1)
-        {
-            valueComboBox = suggestionListForHtmlDropdown[indexComboBox.Value];
             search();
-        }
     }
 
     public void login()
