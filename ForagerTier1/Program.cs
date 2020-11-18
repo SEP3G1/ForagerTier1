@@ -15,6 +15,7 @@ namespace ForagerTier1
     {
         public static void Main(string[] args)
         {
+            Syncfusion.Licensing.SyncfusionLicenseProvider.RegisterLicense("MzM2OTgzQDMxMzgyZTMzMmUzMEMzTTZCckxmbWkvYnVOTDBTVFdnT2RSbG9hYy9rZVJjK2RHakxxc0tvMnM9");
             CreateHostBuilder(args).Build().Run();
         }
 
