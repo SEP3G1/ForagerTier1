@@ -34,6 +34,7 @@ namespace ForagerTier1
             services.AddServerSideBlazor();
             services.AddSingleton<ISocketService, SocketService>();
             services.AddScoped<IUserService, UserService>();
+            services.AddScoped<ICompanyService, CompanyService>();
             services.AddScoped<AuthenticationStateProvider, CustomAuthenticationStateProvider>();
             services.AddSyncfusionBlazor();
 

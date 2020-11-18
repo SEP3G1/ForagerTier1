@@ -1,0 +1,78 @@
+﻿@page "/addCompany"
+@inject ISocketService SocketService
+@inject IUserService UserService
+@inject ICompanyService CompanyService
+@inject AuthenticationStateProvider AuthenticationStateProvider
+@inject NavigationManager NavigationManager
+@using ForagerTier1.Models
+@using ForagerTier1.Persistance 
+
+<AuthorizeView>
+    <NotAuthorized>
+        <Login />
+    </NotAuthorized>
+    <Authorized>
+        <div>
+            <EditForm class="sellCont" Context="Listing" Model="@newCompany" OnValidSubmit="AddNewCompany">
+                <h1>Create a company<span class="acc">.</span></h1>
+                <h3>Create a company in the form below</h3>
+                <div class="sellColum">
+                    <DataAnnotationsValidator />
+                    <ValidationSummary />
+
+                    <div class="form-group">
+                        <p>Cvr</p>
+                        <InputText @bind-Value="newCompany.Cvr" />
+                    </div>
+
+                    <div class="form-group">
+                        <p>Name</p>
+                        <InputText @bind-Value="newCompany.Name" />
+                    </div>
+
+                    <div class="form-group">
+                        <p>Address</p>
+                        <InputText @bind-Value="newCompany.Address" />
+                    </div>
+
+                    <div class="form-group">
+                        <p>Postcode</p>
+                        <InputText @bind-Value="newCompany.Postcode" />
+                    </div>
+
+                    <div class="form-group">
+                        <p>ConnectionAddress</p>
+                        <InputText @bind-Value="newCompany.ConnectionAddress" />
+                    </div>
+
+                    <div class="form-group">
+                        <button type="submit" class="btn btn-success">Submit</button>
+                    </div>
+                </div>
+            </EditForm>
+        </div>
+    </Authorized>
+</AuthorizeView>
+
+
+@code {
+
+    private Company newCompany = new Company();
+
+    protected override async Task OnParametersSetAsync()
+    {
+
+    }
+
+    public void AddNewCompany()
+    {
+        // TrySubmit();
+        newCompany = CompanyService.CreateCompany(newCompany); //Ændres
+        Console.WriteLine("companyId: " + newCompany.CompanyId);
+        //  string id = SocketService.CreateListing(newListing);
+
+        //  NavigationManager.NavigateTo("/listing/" + id);
+    }
+}
+}
+
