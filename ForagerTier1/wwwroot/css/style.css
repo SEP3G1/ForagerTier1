@@ -11,7 +11,6 @@ body {
     min-height: 100vh;
 }
 #headNav {
-    background: red;
     transition: height .2s ease;
     height: 11.5rem;
 
@@ -98,18 +97,28 @@ body {
     padding-right: 0;
     cursor: pointer;
 }
-#searchIndex {
+.searchIndex {
     height: 6rem;
     width: calc(100% - 6rem);
     font-family: Helvetica, sans-serif;
     margin: 0 !important;
-    font-size: 2.5rem;
     background-color: var(--sb-bg);
     color: var(--dark-gray);
-    outline: none;
-    border: none;
+    outline: none !important;
+    border: none !important;
+    border-radius: 0;
     padding: 0 2rem;
 }
+.e-control.e-combobox.e-lib.e-input {
+    height: 5rem;
+    margin-top: .5rem;
+    font-size: 2.5rem;
+    outline: none !important;
+    border: none !important;
+}
+    .e-input-group-icon {
+        font-size: 5rem;
+    }
 .searchCont:hover {
     box-shadow: rgba(50, 50, 93, 0.15) 0px 6px 12px -2px, rgba(0, 0, 0, 0.2) 0px 3px 7px -3px;
 }
@@ -125,6 +134,70 @@ body {
 .hidden .searchCont{
     transform: translate(0, -100%);
 }
+
+.control-wrapper {
+    margin: 0 auto;
+    width: 300px;
+}
+
+.info {
+    margin-left: 34px;
+}
+
+.suggestionText {
+    display: block !important;
+    opacity: .87;
+    font-size: 16px;
+    margin-top: 8px;
+}
+
+.name {
+    padding: 5px 42px;
+    opacity: .87;
+    line-height: 1.063em;
+}
+
+.job {
+    opacity: .54;
+    font-size: 14px;
+    margin-top: -15px;
+    margin-bottom: 7px;
+}
+
+.suggestionImage {
+    margin: 6px 16px;
+    float: left;
+    width: 50px;
+    height: 50px;
+}
+
+.value {
+    border-radius: 50%;
+    float: left;
+    margin-top: 2px;
+    margin-left: 2px;
+}
+
+.template.e-popup .e-list-item * {
+    display: block;
+    text-indent: 0;
+}
+
+.template .e-dropdownbase.e-content {
+    max-height: 800px !important; /*200px*/
+}
+
+.combo-height {
+    height: 400px;
+}
+
+.padding-top {
+    padding-top: 55px;
+}
+
+
+
+
 h1 {
     text-align: center;
     color: #2f2f2f;
@@ -300,7 +373,6 @@ h2 {
             border-radius: 0;
             width: 7rem !important;
             height: 5rem;
-            background-color: red;
             padding: .3rem;
             margin-right: .3rem;
         }
@@ -509,4 +581,11 @@ input, textarea {
 .sellColum p{
     font-size: 1.5rem;
     margin-bottom: 0rem;
+}
+
+::-webkit-scrollbar-thumb {
+    border-radius: 10px;
+    width: 10px !important;
+    -webkit-box-shadow: inset 0 0 6px rgba(0,0,0,.3);
+    background-color: #555 !important;
 }

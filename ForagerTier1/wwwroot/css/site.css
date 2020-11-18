@@ -305,7 +305,7 @@ input:focus ~ .highlight {
     width: 100% !important;
 }
 
-    .select2-container--material ::placeholder {
+    .select2-container--material::placeholder {
         color: inherit;
     }
 

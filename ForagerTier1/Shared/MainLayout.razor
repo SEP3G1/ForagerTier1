@@ -25,10 +25,26 @@
 
 
 
+
+
+
+
                  </g>
              </g>
          </svg>
-            <input type="text" id="searchIndex" placeholder="search" />
+            <SfComboBox TValue="string" TItem="Suggestion" CssClass="searchIndex" Placeholder="Search..." @onclick="@(e => search())"
+                        DataSource="@DataForComboBox" @bind-Value="@valueComboBox" @onkeypress="@(e => KeyUp(e))" @onselect="@(e => search())"
+                        Autofill="true" AllowFiltering="true">
+                <ComboBoxTemplates TItem="Suggestion">
+                    <ItemTemplate>
+                        <div>
+                            <img class="suggestionImage" src="@((context as Suggestion).Image)" />
+                            <div class="suggestionText"> @((context as Suggestion).Text) </div>
+                        </div>
+                    </ItemTemplate>
+                </ComboBoxTemplates>
+                <ComboBoxFieldSettings Text="Text"></ComboBoxFieldSettings>
+            </SfComboBox>
         </div>
 
 
@@ -54,28 +70,6 @@
     </div>
 
     <!-- "Syncfusion søgebar" -->
-    <SfComboBox TValue="string" TItem="Suggestion" CssClass="template" Placeholder="Search by productcategory, productname or postcode"
-                DataSource="@DataForComboBox" @bind-Value="@valueComboBox" @onkeypress="@(e => KeyUp(e))" @onselect="@(e => search())" 
-                Autofill="true" AllowFiltering="true">
-        <ComboBoxTemplates TItem="Suggestion">
-            <ItemTemplate>
-                <div>
-                    <img class="suggestionImage" src="@((context as Suggestion).Image)" />
-                    <div class="suggestionText"> @((context as Suggestion).Text) </div>
-                </div>
-            </ItemTemplate>
-        </ComboBoxTemplates>
-        <ComboBoxFieldSettings Text="Text"></ComboBoxFieldSettings>
-    </SfComboBox>
-
-    @code {
-        public class Suggestion
-        {
-            public string Text { get; set; }
-            public string Image { get; set; }
-        }
-    }
-
     <div class="content">
         @Body
     </div>
@@ -102,28 +96,6 @@
 
     protected override async Task OnParametersSetAsync()
     {
-        // For ComboBox dropdown
-
-        listings = ((SearchQuery)SocketService.Search(null)).Listings; // Get listings
-        suggestionListForComboBox = new Dictionary<string, string>();
-        DataForComboBox = new List<Suggestion>();
-
-        SocketService.GetProductCategories().ForEach(p
-        => suggestionListForComboBox.Add(p, "https://foodion.net/images/app/foodion_logo_square.png"));
-
-        /*OBS: ImagesString bruges her som værende én URL. 
-        Hvis ImagesString kommer til at indeholde flere URL'er, så skal noget gøres anderledes her:*/
-        listings.Select(l => new { l.Product.Name, l.Product.ImagesString }).Distinct().ToList().ForEach(p
-        => suggestionListForComboBox.Add(p.Name, p.ImagesString));
-
-        listings.Select(l => l.Postcode).Distinct().ToList().ForEach(p
-        => suggestionListForComboBox.Add(p, "https://img.icons8.com/ios/452/zip-code.png"));
-
-        suggestionListForComboBox.ToList().ForEach(s
-        => DataForComboBox.Add(new Suggestion() { Text = s.Key, Image = s.Value }));
-
-
-
         if (user == null)
         {
             user = ((CustomAuthenticationStateProvider)AuthenticationStateProvider).GetCashedUser();
@@ -143,6 +115,28 @@
 
     public void search()
     {
+        if(listings == null)
+        {
+            // For ComboBox dropdown
+
+            listings = ((SearchQuery)SocketService.Search(null)).Listings; // Get listings
+            suggestionListForComboBox = new Dictionary<string, string>();
+            DataForComboBox = new List<Suggestion>();
+
+            SocketService.GetProductCategories().ForEach(p
+            => suggestionListForComboBox.Add(p, "https://foodion.net/images/app/foodion_logo_square.png"));
+
+            /*OBS: ImagesString bruges her som værende én URL. 
+            Hvis ImagesString kommer til at indeholde flere URL'er, så skal noget gøres anderledes her:*/
+            listings.Select(l => new { l.Product.Name, l.Product.ImagesString }).Distinct().ToList().ForEach(p
+            => suggestionListForComboBox.Add(p.Name, p.ImagesString));
+
+            listings.Select(l => l.Postcode).Distinct().ToList().ForEach(p
+            => suggestionListForComboBox.Add(p, "https://img.icons8.com/ios/452/zip-code.png"));
+
+            suggestionListForComboBox.ToList().ForEach(s
+            => DataForComboBox.Add(new Suggestion() { Text = s.Key, Image = s.Value }));
+        }
         if (valueComboBox != null)
         {
             valueComboBox = UppercaseFirst(valueComboBox.Trim());
@@ -177,76 +171,12 @@
         // Return char and concat substring.
         return char.ToUpper(s[0]) + s.Substring(1);
     }
+
+
+    public class Suggestion
+    {
+        public string Text { get; set; }
+        public string Image { get; set; }
+    }
 }
-
-
-
-<style>
-
-    /* Styling for ComboBox */
-
-    .control-wrapper {
-        margin: 0 auto;
-        width: 300px;
-    }
-
-    .info {
-        margin-left: 34px;
-    }
-
-    .suggestionText {
-        display: block !important;
-        opacity: .87;
-        font-size: 16px;
-        margin-top: 8px;
-    }
-
-    .name {
-        padding: 5px 42px;
-        opacity: .87;
-        line-height: 1.063em;
-    }
-
-    .job {
-        opacity: .54;
-        font-size: 14px;
-        margin-top: -15px;
-        margin-bottom: 7px;
-    }
-
-    .suggestionImage {
-        margin: 6px 16px;
-        float: left;
-        width: 50px;
-        height: 50px;
-    }
-
-    .value {
-        border-radius: 50%;
-        float: left;
-        margin-top: 2px;
-        margin-left: 2px;
-    }
-
-    .template.e-popup .e-list-item * {
-        display: block;
-        text-indent: 0;
-    }
-
-    .template .e-dropdownbase.e-content {
-        max-height: 800px !important; /*200px*/
-    }
-
-    .combo-height {
-        height: 400px; 
-    }
-
-    .padding-top {
-        padding-top: 55px;
-    }
-
-    /* Styling for ComboBox END */
-
-</style>
-
 
