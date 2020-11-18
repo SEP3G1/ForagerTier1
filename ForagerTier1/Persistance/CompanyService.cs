@@ -16,5 +16,11 @@ namespace ForagerTier1.Persistance
             string id = socketService.AddCompany(newCompany);
             return id;
         }
+
+        public Company GetCompany(string id)
+        {
+            SocketService socketService = new SocketService();
+            return socketService.GetCompany(id);
+        }
     }
 }

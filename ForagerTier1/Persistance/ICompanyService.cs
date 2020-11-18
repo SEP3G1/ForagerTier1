@@ -9,5 +9,6 @@ namespace ForagerTier1.Persistance
     interface ICompanyService
     {
         string CreateCompany(Company newCompany);
-    }
+        Company GetCompany(string id);
+     }
 }
