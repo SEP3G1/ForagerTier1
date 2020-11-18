@@ -1,4 +1,5 @@
-﻿using System;
+﻿
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
@@ -8,10 +9,12 @@ namespace ForagerTier1.Persistance
 {
     public class CompanyService : ICompanyService
     {
-        public Company CreateCompany(Company newCompany)
+        public Company Company { get; set; }
+        public string CreateCompany(Company newCompany)
         {
-            Console.WriteLine("Not implemented 1234");
-            return new Company();
+            SocketService socketService = new SocketService();
+            string id = socketService.AddCompany(newCompany);
+            return id;
         }
     }
 }

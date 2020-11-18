@@ -66,12 +66,9 @@
 
     public void AddNewCompany()
     {
-        // TrySubmit();
-        newCompany = CompanyService.CreateCompany(newCompany); //Ændres
-        Console.WriteLine("companyId: " + newCompany.CompanyId);
-        //  string id = SocketService.CreateListing(newListing);
+        string id = CompanyService.CreateCompany(newCompany);
 
-        //  NavigationManager.NavigateTo("/listing/" + id);
+        NavigationManager.NavigateTo("/company/" + id);
     }
 }
 }

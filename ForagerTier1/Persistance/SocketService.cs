@@ -11,10 +11,10 @@ namespace ForagerTier1.Models
 {
     public class SocketService : ISocketService
     {
-        private static string IP = "192.168.10.110";
+        private static string IP = "192.168.10.101";
         private static int PORT = 4343;
         private static Socket clientSocket;
-        
+
         public SocketService()
         {
         }
@@ -89,6 +89,25 @@ namespace ForagerTier1.Models
             string rcv = SendReceive(message);
             return rcv;
         }
+
+        public string AddCompany(Company company)
+        {
+            if (clientSocket == null)
+            {
+                IPEndPoint serverAddress = new IPEndPoint(IPAddress.Parse(IP), PORT);
+
+                clientSocket = new Socket(AddressFamily.InterNetwork, SocketType.Stream, ProtocolType.Tcp);
+                clientSocket.Connect(serverAddress);
+            }
+
+            string[] r = { "createcompany", JsonSerializer.Serialize(company) };
+            string message = JsonSerializer.Serialize(r);
+
+            //Sends message to connected Rest web API and gets a response in json
+            string rcv = SendReceive(message);
+            return rcv;
+        }
+
         public string UploadImageTest(IList<IBrowserFile> imgs)
         {
             if (clientSocket == null)
@@ -149,6 +168,31 @@ namespace ForagerTier1.Models
 
             Listing listing = JsonSerializer.Deserialize<Listing>(rcv, options);
             return listing;
+        }
+
+        public Company GetCompany(string id)
+        {
+            if (clientSocket == null)
+            {
+                IPEndPoint serverAddress = new IPEndPoint(IPAddress.Parse(IP), PORT);
+
+                clientSocket = new Socket(AddressFamily.InterNetwork, SocketType.Stream, ProtocolType.Tcp);
+                clientSocket.Connect(serverAddress);
+            }
+
+            string[] r = { "getcompany", id };
+            string message = JsonSerializer.Serialize(r);
+
+            //Sends message to connected Rest web API and gets a response in json
+            string rcv = SendReceive(message);
+
+            //Makes json deserializor case-insencitive
+            var options = new JsonSerializerOptions();
+            options.PropertyNameCaseInsensitive = true;
+            options.Converters.Add(new JsonStringEnumConverter());
+
+            Company company = JsonSerializer.Deserialize<Company>(rcv, options);
+            return company;
         }
 
         public List<Product> GetProducts()
