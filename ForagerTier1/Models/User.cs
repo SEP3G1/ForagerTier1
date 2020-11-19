@@ -15,6 +15,7 @@ namespace ForagerTier1.Models
         public string Password { get; set; }
         [Required, MaxLength(64)]
         public string Email { get; set; }
+        public int CompanyId { get; set; }
 
     }
 }

@@ -242,5 +242,22 @@ namespace ForagerTier1.Models
             List<string> listing = JsonSerializer.Deserialize<List<string>>(rcv,options);
             return listing;
         }
+
+        public void SendMessage(string Message, int SendToUserId, int SendFromCompanyId)
+        {
+            if (clientSocket == null)
+            {
+                IPEndPoint serverAddress = new IPEndPoint(IPAddress.Parse(IP), PORT);
+
+                clientSocket = new Socket(AddressFamily.InterNetwork, SocketType.Stream, ProtocolType.Tcp);
+                clientSocket.Connect(serverAddress);
+            }
+            string[] a = {Message, SendToUserId + "", SendFromCompanyId + ""};
+            string[] r = { "sendMessage", JsonSerializer.Serialize(a) };
+            string message = JsonSerializer.Serialize(r);
+
+            //Sends message to connected Rest web API and gets a response in json
+            SendReceive(message);
+        }
     }
 }

@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Text.Json.Serialization;
 using System.Threading.Tasks;
 
 namespace ForagerTier1.Models
@@ -15,6 +16,7 @@ namespace ForagerTier1.Models
         public string Address { get; set; } // Udfyld
         public string PostCode { get; set; } // Udfyld
         public string Logo { get; set; }
+
         public List<Employee> Employees { get; set; }
         public string ConnectionAddress { get; set; } //Udfyld
 

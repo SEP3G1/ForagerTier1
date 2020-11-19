@@ -14,5 +14,7 @@ namespace ForagerTier1.Models
         Listing GetListing(string id);
         List<Product> GetProducts();
         List<string> GetProductCategories();
+
+        void SendMessage(string Message, int SendToUserId, int SendFromCompanyId);
     }
 }

@@ -4,6 +4,7 @@
 @inject IJSRuntime JSRuntime;
 @inject ISocketService SocketService
 @inject NavigationManager NavigationManager
+@inject IUserService UserService 
 <div id="listingContainer">
     <div class="listingContainerImage" style="background-image: url(@imageInView);">
         @if (listing.getPictures().Count > 1)
@@ -43,6 +44,10 @@
                 {
                     <div class="breadcrumbs">Pickup only</div>
                 }
+            </div>
+            <div class="form-group">
+                <input type="text" @bind="message"/>
+                <input type="button" @onclick="SendMessage" />
             </div>
         </div>
         
@@ -120,12 +125,17 @@
     public string id { get; set; }
     Listing listing;
     string imageInView = "";
+    string message = "";
 
     protected override async Task OnParametersSetAsync()
     {
         listing = (Listing)SocketService.GetListing(id);
         imageInView = listing.getCover();
         await JSRuntime.InvokeVoidAsync("setTitle", "forager. | " + listing.Product.Name);
+    }
+    private void SendMessage()
+    {
+        SocketService.SendMessage(message, listing.UserId, ((User)UserService.GetUser()).CompanyId);
     }
 
 }
