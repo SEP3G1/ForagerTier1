@@ -1,4 +1,5 @@
 ﻿@page "/sell"
+@page "/sell/{ListingId}"
 @inject ISocketService SocketService
 @inject IUserService UserService
 @inject AuthenticationStateProvider AuthenticationStateProvider
@@ -106,10 +107,12 @@
 
 
 @code {
+    [Parameter]
+    public string ListingId { get; init; }
+
     private string newProductCategory = "";
     private List<Product> products;
     private List<Product> productsToShow;
-    private List<string> DeliveryOptions = new List<string>() { "true", "false" };
     private List<string> productCategories;
     private Listing newListing = new Listing();
     private DateTime date = DateTime.Now;
@@ -123,6 +126,12 @@
         products = SocketService.GetProducts();
         productsToShow = new List<Product>(products);
         productCategories = SocketService.GetProductCategories();
+
+        if (ListingId is not null)
+        {
+            newListing = SocketService.GetListing(ListingId);
+            newProductCategory = newListing.Product.ProductCategory;
+        }
     }
 
     public void AddNewListing()
@@ -147,7 +156,7 @@
     {
         if (newProductCategory.Equals(""))
         {
-            if(newListing.ProductId != 0)
+            if (newListing.ProductId != 0)
                 newProductCategory = products.First(p => p.ProductId == newListing.ProductId).ProductCategory;
         }
     }
@@ -168,7 +177,7 @@
 
         foreach (var imageFile in e.GetMultipleFiles(maxAllowedFiles))
         {
-            var resizedImageFile = await imageFile.RequestImageFileAsync(format,800,800);
+            var resizedImageFile = await imageFile.RequestImageFileAsync(format, 800, 800);
             var buffer = new byte[resizedImageFile.Size];
             await resizedImageFile.OpenReadStream().ReadAsync(buffer);
             var imageDataUrl =
