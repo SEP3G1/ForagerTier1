@@ -85,8 +85,8 @@ namespace ForagerTier1.Persistance
         private ClaimsIdentity SetupClaimsForUser(User user)
         {
             List<Claim> claims = new List<Claim>();
-            claims.Add(new Claim(ClaimTypes.Name, user.Email));
-            claims.Add(new Claim("Level", user.SecurityLevel.ToString()));
+            claims.Add(new Claim("SecurityLevel", user.SecurityLevel.ToString()));
+            claims.Add(new Claim("WorksFor", user.CompanyId.ToString()));
 
             ClaimsIdentity identity = new ClaimsIdentity(claims, "apiauth_type");
             return identity;

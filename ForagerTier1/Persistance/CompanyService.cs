@@ -10,17 +10,27 @@ namespace ForagerTier1.Persistance
     public class CompanyService : ICompanyService
     {
         public Company Company { get; set; }
+        public SocketService socketService;
         public string CreateCompany(Company newCompany)
         {
-            SocketService socketService = new SocketService();
+            if(socketService == null)
+                socketService = new SocketService();
             string id = socketService.AddCompany(newCompany);
             return id;
         }
 
         public Company GetCompany(string id)
         {
-            SocketService socketService = new SocketService();
+            if (socketService == null)
+                socketService = new SocketService();
             return socketService.GetCompany(id);
+        }
+
+        public Company GetCompanyFromUserId(int id)
+        {
+            if (socketService == null)
+                socketService = new SocketService();
+            return socketService.GetCompanyFromUserId(id);
         }
     }
 }

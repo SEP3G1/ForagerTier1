@@ -15,6 +15,13 @@ namespace ForagerTier1.Models
             return User;
         }
 
+        public User GetUser(int id)
+        {
+            SocketService socketService = new SocketService();
+            User first = socketService.GetUser(id);
+            return first;
+        }
+
         public User ValidateUser(string userName, string password)
         {
             SocketService socketService = new SocketService();

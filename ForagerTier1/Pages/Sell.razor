@@ -4,6 +4,7 @@
 @inject IUserService UserService
 @inject AuthenticationStateProvider AuthenticationStateProvider
 @inject NavigationManager NavigationManager
+@inject IUserService UserService
 @using ForagerTier1.Models
 @using ForagerTier1.Persistance
 
@@ -97,7 +98,7 @@
                         <InputTextArea rows="2" @bind-Value="newListing.Comment" style="width:20rem" />
                     </div>
                     <div class="form-group">
-                        <button type="submit" class="btn btn-success">Submit</button>
+                        <button type="submit" class="btn btn-success">@buttonText</button>
                     </div>
                 </div>
             </EditForm>
@@ -109,6 +110,8 @@
 @code {
     [Parameter]
     public string ListingId { get; init; }
+    [CascadingParameter]
+    private Task<AuthenticationState> authenticationStateTask { get; set; }
 
     private string newProductCategory = "";
     private List<Product> products;
@@ -120,6 +123,7 @@
     IList<string> imageDataUrls = new List<string>();
     IList<IBrowserFile> images = new List<IBrowserFile>();
     string urlString;
+    string buttonText = "Submit";
 
     protected override async Task OnParametersSetAsync()
     {
@@ -129,8 +133,22 @@
 
         if (ListingId is not null)
         {
-            newListing = SocketService.GetListing(ListingId);
-            newProductCategory = newListing.Product.ProductCategory;
+            var gListing = SocketService.GetListing(ListingId);
+            var authState = await authenticationStateTask;
+            var user = authState.User;
+
+            if (user.Identity.IsAuthenticated)
+            {
+                if (((User)((CustomAuthenticationStateProvider)AuthenticationStateProvider).GetCashedUser()).CompanyId == UserService.GetUser(gListing.UserId).CompanyId)
+                {
+                    newListing = gListing;
+                    newProductCategory = newListing.Product.ProductCategory;
+                    buttonText = "Update";
+                }
+                else
+                    NavigationManager.NavigateTo("/sell");
+            }
+
         }
     }
 
@@ -138,7 +156,11 @@
     {
         TrySubmit();
         newListing.UserId = ((User)((CustomAuthenticationStateProvider)AuthenticationStateProvider).GetCashedUser()).UserId;
-        string id = SocketService.CreateListing(newListing);
+        string id;
+        if (buttonText.Equals("Submit"))
+            id = SocketService.CreateListing(newListing);
+        else
+            id = SocketService.UpdateListing(newListing);
 
         NavigationManager.NavigateTo("/listing/" + id);
     }

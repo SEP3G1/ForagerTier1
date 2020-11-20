@@ -9,5 +9,6 @@ namespace ForagerTier1.Models
     {
         User ValidateUser(string username, string password);
         User GetUser();
+        User GetUser(int id);
     }
 }

@@ -1,10 +1,15 @@
 ﻿@page "/listing"
 @page "/listing/{id}"
 @using ForagerTier1.Models
+@using ForagerTier1.Persistance
 @inject IJSRuntime JSRuntime;
 @inject ISocketService SocketService
 @inject NavigationManager NavigationManager
-@inject IUserService UserService 
+@inject IUserService UserService
+@inject ICompanyService CompanyService
+@inject AuthenticationStateProvider AuthenticationStateProvider
+
+
 <div id="listingContainer">
     <div class="listingContainerImage" style="background-image: url(@imageInView);">
         @if (listing.getPictures().Count > 1)
@@ -32,8 +37,12 @@
                 </div>
             </div>
             <div class="listingInfoTabelItem">
+                @if (myListing)
+                {
+                    <input type="button" class="edit" value="Edit listing" @onclick="Edit" />
+                }
                 <p>Seller</p>
-                <h3>Seller name</h3>
+                <h3>@Company.Name</h3>
                 <p>Address</p>
                 <h3>@listing.PickupAddress, @listing.Postcode</h3>
                 @if (listing.HasDelivery)
@@ -44,13 +53,22 @@
                 {
                     <div class="breadcrumbs">Pickup only</div>
                 }
-            </div>
-            <div class="form-group">
-                <input type="text" @bind="message"/>
-                <input type="button" @onclick="SendMessage" />
+                @if (!myListing)
+                {
+                    <p style="margin-top: 2rem;">Contact</p>
+                    <AuthorizeView>
+                        <Authorized>
+                            <textarea class="messageInput" @bind="message"></textarea>
+                            <input type="button" class="sendMessage" @onclick="SendMessage" value="Send message to @Company.Name" />
+                        </Authorized>
+                        <NotAuthorized>
+                            <h3>Login to contact seller</h3>
+                        </NotAuthorized>
+                    </AuthorizeView>
+                }
             </div>
         </div>
-        
+
         <div class="priceListing">
             <h2>$ @listing.Price</h2>
             <p>pr. @listing.Unit</p>
@@ -61,81 +79,72 @@
 
 <h1 class="related">Related</h1>
 <div class="relatedCont">
-    <div class="listing">
-        <div class="listingImage" style="background-image: url(@listing.getCover());"></div>
-        <p class="type">@listing.Product.Name</p>
-        <table>
-            <tr>
-                <td>
-                    <p class="attr">Price:</p>
-                    <p class="price">$@listing.Price</p>
-                </td>
-                <td>
-                    <p class="attr">Quantity:</p>
-                    <p class="weight">@listing.Quantity @listing.Unit</p>
-                </td>
-            </tr>
-        </table>
-        <p class="attr">Best before:</p><br />
-        <p class="bestBy">@listing.getDate()</p>
-    </div>
+    @foreach (Listing Listing in RecommendedListings)
+    {
+        <div class="listing @(Listing.HasDelivery ? "Delivery" : "")" @onclick="@(e => openListing(@Listing.ListingId))">
+            <div class="listingImage" style="background-image: url(@Listing.getCover());"></div>
+            <p class="type">@Listing.Product.Name</p>
+            <table>
+                <tr>
+                    <td>
+                        <p class="attr">Price:</p>
+                        <p class="price">@Listing.Price</p>
+                    </td>
+                    <td>
+                        <p class="attr">Quantity:</p>
+                        <p class="weight">@Listing.Quantity @Listing.Unit</p>
+                    </td>
+                </tr>
+            </table>
+            <p class="attr">Best before:</p><br />
+            <p class="bestBy">@Listing.getDate()</p>
 
-    <div class="listing">
-        <div class="listingImage" style="background-image: url(@listing.getCover());"></div>
-        <p class="type">@listing.Product.Name</p>
-        <table>
-            <tr>
-                <td>
-                    <p class="attr">Price:</p>
-                    <p class="price">$@listing.Price</p>
-                </td>
-                <td>
-                    <p class="attr">Quantity:</p>
-                    <p class="weight">@listing.Quantity @listing.Unit</p>
-                </td>
-            </tr>
-        </table>
-        <p class="attr">Best before:</p><br />
-        <p class="bestBy">@listing.getDate()</p>
-    </div>
-
-    <div class="listing">
-        <div class="listingImage" style="background-image: url(@listing.getCover());"></div>
-        <p class="type">@listing.Product.Name</p>
-        <table>
-            <tr>
-                <td>
-                    <p class="attr">Price:</p>
-                    <p class="price">$@listing.Price</p>
-                </td>
-                <td>
-                    <p class="attr">Quantity:</p>
-                    <p class="weight">@listing.Quantity @listing.Unit</p>
-                </td>
-            </tr>
-        </table>
-        <p class="attr">Best before:</p><br />
-        <p class="bestBy">@listing.getDate()</p>
-    </div>
-
-
+        </div>
+    }
 </div>
 @code {
     [Parameter]
     public string id { get; set; }
+    [CascadingParameter]
+    private Task<AuthenticationState> authenticationStateTask { get; set; }
+
     Listing listing;
+    Company Company = new Company();
+    List<Listing> RecommendedListings = new List<Listing>();
     string imageInView = "";
     string message = "";
+    string _authMessage = "";
+    int fromCompanyId = -1;
+    bool myListing = false;
 
     protected override async Task OnParametersSetAsync()
     {
         listing = (Listing)SocketService.GetListing(id);
         imageInView = listing.getCover();
         await JSRuntime.InvokeVoidAsync("setTitle", "forager. | " + listing.Product.Name);
-    }
-    private void SendMessage()
-    {
-        SocketService.SendMessage(message, listing.UserId, ((User)UserService.GetUser()).CompanyId);
+        RecommendedListings = (List<Listing>)SocketService.Search(listing.Product.ProductCategory).Listings;
+        Company = CompanyService.GetCompanyFromUserId(listing.UserId);
+        var authState = await authenticationStateTask;
+        var user = authState.User;
+
+        if (user.Identity.IsAuthenticated)
+        {
+            fromCompanyId = ((User)((CustomAuthenticationStateProvider)AuthenticationStateProvider).GetCashedUser()).CompanyId;
+            myListing = fromCompanyId == Company.CompanyId;
+        }
     }
 
+    private void SendMessage()
+    {
+        if (!message.Equals(""))
+            SocketService.SendMessage(message, listing.UserId, fromCompanyId);
+    }
+    public void openListing(int id)
+    {
+        NavigationManager.NavigateTo($"/listing/{id}");
+    }
+    public void Edit()
+    {
+        NavigationManager.NavigateTo($"/sell/{id}");
+    }
 }

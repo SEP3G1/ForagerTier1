@@ -11,10 +11,13 @@ namespace ForagerTier1.Models
         string UploadImageTest(IList<IBrowserFile> imgs);
         User Login(string username, string password);
         string CreateListing(Listing listing);
+        string UpdateListing(Listing listing);
         Listing GetListing(string id);
         List<Product> GetProducts();
         List<string> GetProductCategories();
-
+        User GetUser(int id);
+        Company GetCompanyFromUserId(int id);
+        Company GetCompany(string id);
         void SendMessage(string Message, int SendToUserId, int SendFromCompanyId);
     }
 }

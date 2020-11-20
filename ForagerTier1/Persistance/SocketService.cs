@@ -45,6 +45,8 @@ namespace ForagerTier1.Models
 
             return sq;
         }
+
+
         public User Login(string username, string password)
         {
             if (clientSocket == null)
@@ -150,7 +152,6 @@ namespace ForagerTier1.Models
             if (clientSocket == null)
             {
                 IPEndPoint serverAddress = new IPEndPoint(IPAddress.Parse(IP), PORT);
-
                 clientSocket = new Socket(AddressFamily.InterNetwork, SocketType.Stream, ProtocolType.Tcp);
                 clientSocket.Connect(serverAddress);
             }
@@ -195,6 +196,31 @@ namespace ForagerTier1.Models
             return company;
         }
 
+        public Company GetCompanyFromUserId(int id)
+        {
+
+            if (clientSocket == null)
+            {
+                IPEndPoint serverAddress = new IPEndPoint(IPAddress.Parse(IP), PORT);
+
+                clientSocket = new Socket(AddressFamily.InterNetwork, SocketType.Stream, ProtocolType.Tcp);
+                clientSocket.Connect(serverAddress);
+            }
+
+            string[] r = { "getcompanyFromUserId", id + ""};
+            string message = JsonSerializer.Serialize(r);
+
+            //Sends message to connected Rest web API and gets a response in json
+            string rcv = SendReceive(message);
+
+            //Makes json deserializor case-insencitive
+            var options = new JsonSerializerOptions();
+            options.PropertyNameCaseInsensitive = true;
+            options.Converters.Add(new JsonStringEnumConverter());
+
+            Company company = JsonSerializer.Deserialize<Company>(rcv, options);
+            return company;
+        }
         public List<Product> GetProducts()
         {
             if (clientSocket == null)
@@ -258,6 +284,49 @@ namespace ForagerTier1.Models
 
             //Sends message to connected Rest web API and gets a response in json
             SendReceive(message);
+        }
+
+        public User GetUser(int id)
+        {
+            if (clientSocket == null)
+            {
+                IPEndPoint serverAddress = new IPEndPoint(IPAddress.Parse(IP), PORT);
+
+                clientSocket = new Socket(AddressFamily.InterNetwork, SocketType.Stream, ProtocolType.Tcp);
+                clientSocket.Connect(serverAddress);
+            }
+
+            string[] r = { "getUser", id + ""};
+            string message = JsonSerializer.Serialize(r);
+
+            //Sends message to connected Rest web API and gets a response in json
+            string rcv = SendReceive(message);
+
+            //Makes json deserializor case-insencitive
+            var options = new JsonSerializerOptions();
+            options.PropertyNameCaseInsensitive = true;
+            options.Converters.Add(new JsonStringEnumConverter());
+
+            User u= JsonSerializer.Deserialize<User>(rcv, options);
+            return u;
+        }
+
+        public string UpdateListing(Listing listing)
+        {
+            if (clientSocket == null)
+            {
+                IPEndPoint serverAddress = new IPEndPoint(IPAddress.Parse(IP), PORT);
+
+                clientSocket = new Socket(AddressFamily.InterNetwork, SocketType.Stream, ProtocolType.Tcp);
+                clientSocket.Connect(serverAddress);
+            }
+
+            string[] r = { "updatelisting", JsonSerializer.Serialize(listing) };
+            string message = JsonSerializer.Serialize(r);
+
+            //Sends message to connected Rest web API and gets a response in json
+            string rcv = SendReceive(message);
+            return rcv;
         }
     }
 }
