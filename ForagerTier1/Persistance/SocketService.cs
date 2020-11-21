@@ -146,7 +146,15 @@ namespace ForagerTier1.Models
             //Converts recieved bits to string
             return System.Text.Encoding.ASCII.GetString(rcvBytes);
         }
-
+        public void Send(string message)
+        {
+            // Sending
+            int toSendLen = System.Text.Encoding.ASCII.GetByteCount(message);
+            byte[] toSendBytes = System.Text.Encoding.ASCII.GetBytes(message);
+            byte[] toSendLenBytes = System.BitConverter.GetBytes(toSendLen);
+            clientSocket.Send(toSendLenBytes);
+            clientSocket.Send(toSendBytes);
+        }
         public Listing GetListing(string id)
         {
             if (clientSocket == null)
@@ -282,8 +290,8 @@ namespace ForagerTier1.Models
             string[] r = { "sendMessage", JsonSerializer.Serialize(a) };
             string message = JsonSerializer.Serialize(r);
 
-            //Sends message to connected Rest web API and gets a response in json
-            SendReceive(message);
+            //Sends message to connected Rest web API
+            Send(message);
         }
 
         public User GetUser(int id)

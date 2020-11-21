@@ -603,3 +603,6 @@ input, textarea {
     color: white;
     margin-bottom: 2rem;
 }
+.breadcrumbs a{
+    color: #555;
+}

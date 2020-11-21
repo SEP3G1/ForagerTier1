@@ -8,6 +8,7 @@ namespace ForagerTier1.Models
     {
         SearchQuery Search(string message);
         string SendReceive(string message);
+        void Send(string message);
         string UploadImageTest(IList<IBrowserFile> imgs);
         User Login(string username, string password);
         string CreateListing(Listing listing);
