@@ -6,7 +6,7 @@
 @inject ICompanyService Companyservice
 @inject NavigationManager NavigationManager
 
-
+<button @onclick="@EditCompany">EditCompany</button>
         <h2>@company.Name</h2>
         <p>Cvr:</p>
         <h3>@company.Cvr</h3>
@@ -34,6 +34,11 @@
                     CompanyService companyService = new CompanyService(); //TODO Bør instantiering her undgås?
                     company = (Company)companyService.GetCompany(id);
                     await JSRuntime.InvokeVoidAsync("setTitle", "forager. | " + company.Name);
+                }
+
+                public void EditCompany()
+                {
+                    NavigationManager.NavigateTo("/editcompany/" + id);
                 }
 
             }

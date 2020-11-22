@@ -13,6 +13,7 @@ namespace ForagerTier1.Models
         User Login(string username, string password);
         string CreateListing(Listing listing);
         string UpdateListing(Listing listing);
+        string AddCompany(Company newCompany);
         Listing GetListing(string id);
         List<Product> GetProducts();
         List<string> GetProductCategories();
@@ -20,5 +21,6 @@ namespace ForagerTier1.Models
         Company GetCompanyFromUserId(int id);
         Company GetCompany(string id);
         void SendMessage(string Message, int SendToUserId, int SendFromCompanyId);
+        string UpdateCompany(Company company);
     }
 }
