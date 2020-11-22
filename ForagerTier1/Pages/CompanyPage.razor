@@ -6,8 +6,13 @@
 @inject ICompanyService Companyservice
 @inject NavigationManager NavigationManager
 
-<button @onclick="@EditCompany">EditCompany</button>
-        <h2>@company.Name</h2>
+
+<div class="sellCont">
+    <button type="submit" class="btn btn-warning" @onclick="@EditCompany">Edit</button>
+    <button type="submit" class="btn btn-danger">Delete</button>
+    <h1>@company.Name<span class="acc">.</span></h1>
+
+    <div class="sellColum">
         <p>Cvr:</p>
         <h3>@company.Cvr</h3>
         <p>TrustScore:</p>
@@ -22,23 +27,24 @@
         <h3>@company.Logo</h3>
         <p>ConnectionAddress:</p>
         <h3>@company.ConnectionAddress</h3>
+    </div>
+</div>
 
+        @code {
+            [Parameter]
+            public string id { get; set; }
+            Company company;
 
-            @code {
-                [Parameter]
-                public string id { get; set; }
-                Company company;
-
-                protected override async Task OnParametersSetAsync()
-                {
-                    CompanyService companyService = new CompanyService(); //TODO Bør instantiering her undgås?
-                    company = (Company)companyService.GetCompany(id);
-                    await JSRuntime.InvokeVoidAsync("setTitle", "forager. | " + company.Name);
-                }
-
-                public void EditCompany()
-                {
-                    NavigationManager.NavigateTo("/editcompany/" + id);
-                }
-
+            protected override async Task OnParametersSetAsync()
+            {
+                CompanyService companyService = new CompanyService();
+                company = (Company)companyService.GetCompany(id);
+                await JSRuntime.InvokeVoidAsync("setTitle", "forager. | " + company.Name);
             }
+
+            public void EditCompany()
+            {
+                NavigationManager.NavigateTo("/editcompany/" + id);
+            }
+
+        }
