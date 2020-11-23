@@ -83,10 +83,10 @@
 
 
 @code{
-    bool hidden = false;
-    string valueComboBox = "";
+        bool hidden = false;
+        string valueComboBox = "";
 
-    User user;
+        User user;
 
     // For ComboBox dropdown
     private IList<Listing> listings;
@@ -127,10 +127,12 @@
             SocketService.GetProductCategories().ForEach(p
             => suggestionListForComboBox.Add(p, "https://foodion.net/images/app/foodion_logo_square.png"));
 
-            /*OBS: ImagesString bruges her som værende én URL. 
-            Hvis ImagesString kommer til at indeholde flere URL'er, så skal noget gøres anderledes her:*/
-            listings.Select(l => new { l.Product.Name, l.Product.ImagesString }).Distinct().ToList().ForEach(p
-            => suggestionListForComboBox.Add(p.Name, p.ImagesString));
+            Dictionary<string, string> productDictionary = new Dictionary<string, string>();
+
+            foreach (Listing l in listings){
+                productDictionary.Add(l.Product.Name, l.getCover());}
+
+            productDictionary.Distinct().ToList().ForEach(p => suggestionListForComboBox.Add(p.Key, p.Value));
 
             listings.Select(l => l.Postcode).Distinct().ToList().ForEach(p
             => suggestionListForComboBox.Add(p, "https://img.icons8.com/ios/452/zip-code.png"));
