@@ -22,24 +22,24 @@
 
                     <div class="form-group">
                         <p>Cvr</p>
-                        <InputText @bind-Value="company.Cvr" />
+                        <RadzenTextBox @bind-Value=@company.Cvr />
                     </div>
 
                     <div class="form-group">
                         <p>Name</p>
-                        <InputText @bind-Value="company.Name" />
+                        <RadzenTextBox @bind-Value=@company.Name />
                     </div>
 
                     <div class="form-group">
                         <p>Address</p>
-                        <InputText @bind-Value="company.Address" />
+                        <RadzenTextBox @bind-Value=@company.Address />
                     </div>
 
                 </div>
                 <div class="sellColum">
                     <div class="form-group">
                         <p>Postcode</p>
-                        <InputText @bind-Value="company.PostCode" />
+                        <RadzenTextBox @bind-Value=@company.PostCode />
                     </div>
                     <div class="form-group">
                         <RadzenTemplateForm TItem="Company" Data=@company>
