@@ -11,7 +11,7 @@ namespace ForagerTier1.Models
 {
     public class SocketService : ISocketService
     {
-        private static string IP = "192.168.10.101";
+        private static string IP = "10.152.222.49";
         private static int PORT = 4343;
         private static Socket clientSocket;
 
