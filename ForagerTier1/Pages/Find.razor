@@ -83,7 +83,7 @@
         NewSearchQuery = (SearchQuery)SocketService
                 .LazyFilterSearch(search, filter, sequenceNumber);
 
-        if (SearchQuery != null)
+        if (sequenceNumber > 0)
         {
             foreach(Listing listing in NewSearchQuery.Listings)
             {
