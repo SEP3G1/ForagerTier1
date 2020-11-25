@@ -26,21 +26,31 @@ body {
     flex-wrap: wrap;
     z-index: 100;
 }
-    .headCont p {
+    .headCont .menu {
         color: white;
         margin: 0;
+        background: var(--logo-bg);
         position: absolute;
         left: 0;
         margin-left: 2rem;
     }
-    .headCont .login {
-        cursor: pointer;
-        color: white !important;
-        margin: 0;
-        position: absolute;
-        right: 0;
-        margin-right: 2rem;
-    }
+.navigation-item-link {
+    color: white !important;
+}
+.navigation-item-wrapper {
+    background-color: var(--logo-bg);
+}
+.headCont .menu a:hover {
+    text-decoration: none !important;
+}
+        .headCont .login {
+            cursor: pointer;
+            color: white !important;
+            margin: 0;
+            position: absolute;
+            right: 0;
+            margin-right: 2rem;
+        }
 #headNav .logo {
     font-family: 'Crete Round', serif;
     color: white;
