@@ -126,7 +126,7 @@
             hidden = false;
         }
 
-        //valueComboBox = null;
+       // valueComboBox = "";
     }
 
     public void GetNextSequence()
@@ -169,7 +169,7 @@
             suggestionListForComboBox.ToList().ForEach(s
             => DataForComboBox.Add(new Suggestion() { Text = s.Key, Image = s.Value }));
         }
-        if (valueComboBox != null)
+        if (suggestionListForComboBox.Keys.Contains(valueComboBox))
         {
             valueComboBox = UppercaseFirst(valueComboBox.Trim());
             NavigationManager.NavigateTo("/find/" + valueComboBox + "/" + SequenceNumber);
