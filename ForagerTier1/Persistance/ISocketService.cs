@@ -20,7 +20,7 @@ namespace ForagerTier1.Models
         User GetUser(int id);
         Company GetCompanyFromUserId(int id);
         Company GetCompany(string id);
-        void SendMessage(string Message, int SendToUserId, int SendFromCompanyId);
+        void SendMessage(string Message, int SendToUserId, int SendFromCompanyId, int ListingId);
         string UpdateCompany(Company company);
     }
 }

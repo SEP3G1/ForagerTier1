@@ -48,7 +48,6 @@ namespace ForagerTier1
                 options.AddPolicy("VA", a =>
                    a.RequireAuthenticatedUser().RequireClaim("SecurityLevel", "1"));
             });
-
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.

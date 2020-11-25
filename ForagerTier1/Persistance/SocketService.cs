@@ -11,12 +11,13 @@ namespace ForagerTier1.Models
 {
     public class SocketService : ISocketService
     {
-        private static string IP = "10.152.222.49";
+        private static string IP = "192.168.87.168";
         private static int PORT = 4343;
         private static Socket clientSocket;
 
         public SocketService()
         {
+
         }
 
         public SearchQuery Search(string message)
@@ -276,7 +277,7 @@ namespace ForagerTier1.Models
             return listing;
         }
 
-        public void SendMessage(string Message, int SendToUserId, int SendFromCompanyId)
+        public void SendMessage(string Message, int SendToUserId, int SendFromCompanyId, int ListingId)
         {
             if (clientSocket == null)
             {
@@ -285,7 +286,7 @@ namespace ForagerTier1.Models
                 clientSocket = new Socket(AddressFamily.InterNetwork, SocketType.Stream, ProtocolType.Tcp);
                 clientSocket.Connect(serverAddress);
             }
-            string[] a = {Message, SendToUserId + "", SendFromCompanyId + ""};
+            string[] a = {Message, SendToUserId + "", SendFromCompanyId + "", ListingId + ""};
             string[] r = { "sendMessage", JsonSerializer.Serialize(a) };
             string message = JsonSerializer.Serialize(r);
 

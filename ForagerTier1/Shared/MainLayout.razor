@@ -51,11 +51,12 @@
         <div id="header" class="headCont">
             <AuthorizeView>
                 <Authorized>
-                    @if (user != null)
+                    @if (GetUser() != null)
                     {
                     <RadzenMenu>
-                        <RadzenMenuItem Text="@user.Name" Icon="account_box">
-                            <RadzenMenuItem Text="Add Company" Path="addcompany" Icon="tab"></RadzenMenuItem>
+                        <RadzenMenuItem Text="@GetUser().Name" Icon="account_box">
+                            <RadzenMenuItem Text="Profile" Path="addcompany" Icon="perm_identity"></RadzenMenuItem>
+                            <RadzenMenuItem Text="Add Company" Path="addcompany" Icon="domain"></RadzenMenuItem>
                         </RadzenMenuItem>
                     </RadzenMenu>
                     }
@@ -86,10 +87,10 @@
 
 
 @code{
-        bool hidden = false;
-        string valueComboBox = "";
+    bool hidden = false;
+    string valueComboBox = "";
 
-        User user;
+    User user;
 
     // For ComboBox dropdown
     private IList<Listing> listings;
@@ -102,7 +103,7 @@
     {
         if (user == null)
         {
-            user = ((CustomAuthenticationStateProvider)AuthenticationStateProvider).GetCashedUser();
+            user = GetUser();
         }
         //Console.WriteLine(user.ToString());
         if (NavigationManager.Uri.Split('/').ToList<string>()[3].Equals("listing"))
@@ -115,6 +116,10 @@
         }
 
         valueComboBox = null;
+    }
+    private User GetUser()
+    {
+        return ((CustomAuthenticationStateProvider)AuthenticationStateProvider).GetCashedUser();
     }
 
     public void search()
