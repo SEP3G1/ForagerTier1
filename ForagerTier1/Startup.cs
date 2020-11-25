@@ -40,7 +40,13 @@ namespace ForagerTier1
 
             services.AddAuthorization(options => {
                 options.AddPolicy("Admin", a =>
-                   a.RequireAuthenticatedUser().RequireClaim("SecurityLevel", "5"));
+                   a.RequireAuthenticatedUser().RequireClaim("SecurityLevel", "4"));
+                options.AddPolicy("Moderator", a =>
+                   a.RequireAuthenticatedUser().RequireClaim("SecurityLevel", "3"));
+                options.AddPolicy("VR", a =>
+                   a.RequireAuthenticatedUser().RequireClaim("SecurityLevel", "2"));
+                options.AddPolicy("VA", a =>
+                   a.RequireAuthenticatedUser().RequireClaim("SecurityLevel", "1"));
             });
 
         }

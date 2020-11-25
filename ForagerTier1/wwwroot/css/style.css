@@ -26,14 +26,14 @@ body {
     flex-wrap: wrap;
     z-index: 100;
 }
-    .headCont .menu {
-        color: white;
-        margin: 0;
-        background: var(--logo-bg);
-        position: absolute;
-        left: 0;
-        margin-left: 2rem;
-    }
+.headCont .menu {
+    color: white;
+    margin: 0;
+    background: var(--logo-bg);
+    position: absolute;
+    left: 0;
+    margin-left: 2rem;
+}
 .navigation-item-link {
     color: white !important;
 }
@@ -43,14 +43,14 @@ body {
 .headCont .menu a:hover {
     text-decoration: none !important;
 }
-        .headCont .login {
-            cursor: pointer;
-            color: white !important;
-            margin: 0;
-            position: absolute;
-            right: 0;
-            margin-right: 2rem;
-        }
+.headCont .login {
+    cursor: pointer;
+    color: white !important;
+    margin: 0;
+    position: absolute;
+    right: 0;
+    margin-right: 2rem;
+}
 #headNav .logo {
     font-family: 'Crete Round', serif;
     color: white;
