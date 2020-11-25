@@ -13,6 +13,7 @@
   </ItemGroup>
 
   <ItemGroup>
+    <PackageReference Include="Newtonsoft.Json" Version="12.0.3" />
     <PackageReference Include="Syncfusion.Blazor" Version="18.3.0.48" />
   </ItemGroup>
 

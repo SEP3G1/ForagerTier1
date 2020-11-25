@@ -1,0 +1,66 @@
+﻿@page "/moderatelistings"
+@using ForagerTier1.Models
+@inject ISocketService SocketService
+@inject IJSRuntime JSRuntime;
+@inject NavigationManager NavigationManager
+@attribute [Authorize (Policy = "Admin, Moderator")]
+
+    <AuthorizeView>
+        <NotAuthorized>
+            <Login />
+        </NotAuthorized>
+        <Authorized>
+            <div class="page">
+                <div class="queryContainer">
+                    <table>
+                        <tr>
+                            <td>ListingId</td>
+                            <td>Illegal goods</td>
+                            <td>Breaking the law</td>
+                            <td>Offensive picture</td>
+                            <td>Offensive description</td>
+                        </tr>
+                        @foreach (Report report in reports)
+                        {
+                            <!--Count amounts of type-->
+                            
+                            <tr>
+                                <td>
+                                    <p @onclick="@(() => openListing(@report.ListingId))">@report.ListingId</p>
+                                </td>
+                                <td>
+
+                                    <p>@report.ReportType</p>
+                                </td>
+
+                            </tr>
+
+                        }
+                    </table>
+                </div>
+            </div>
+        </Authorized>
+    </AuthorizeView>
+
+    @code {
+
+        List<Report> reports = new List<Report>();
+        List<Report> sortedReports = new List<Report>();
+
+        protected override async Task OnParametersSetAsync()
+        {
+            reports = (List<Report>)SocketService.GetAllReports();
+            Sort(reports);
+        }
+
+        public void Sort(List<Report> reports)
+        {
+            
+        }
+
+        public void openListing(int id)
+        {
+            NavigationManager.NavigateTo($"/listing/{id}");
+        }
+
+    }

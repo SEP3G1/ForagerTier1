@@ -74,6 +74,9 @@
             <p>pr. @listing.Unit</p>
             <p>$ @listing.pricePrUnit()</p>
         </div>
+        <div>
+            <input type="button" style="text-decoration-color:red" @onclick="Report" value="report listing" />
+        </div>
     </div>
 </div>
 
@@ -146,5 +149,16 @@
     public void Edit()
     {
         NavigationManager.NavigateTo($"/sell/{id}");
+    }
+
+    public void Report()
+    {
+        Report report = new Report();
+        report.ListingId = listing.ListingId;
+        report.UserId = ((User)((CustomAuthenticationStateProvider)AuthenticationStateProvider).GetCashedUser()).UserId;
+        report.ReportType = "TestReport";
+        report.Time = DateTime.Now.Ticks + "";
+        string message = SocketService.ReportListing(report);
+        Console.WriteLine("Report id: " + message);
     }
 }

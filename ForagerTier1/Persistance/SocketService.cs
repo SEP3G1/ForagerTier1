@@ -11,7 +11,7 @@ namespace ForagerTier1.Models
 {
     public class SocketService : ISocketService
     {
-        private static string IP = "10.152.222.49";
+        private static string IP = "192.168.1.69";
         private static int PORT = 4343;
         private static Socket clientSocket;
 
@@ -352,6 +352,45 @@ namespace ForagerTier1.Models
             //Sends message to connected Rest web API and gets a response in json
             string rcv = SendReceive(message);
             return rcv;
+        }
+
+        public string ReportListing(Report report)
+        {
+            if (clientSocket == null)
+            {
+                IPEndPoint serverAddress = new IPEndPoint(IPAddress.Parse(IP), PORT);
+
+                clientSocket = new Socket(AddressFamily.InterNetwork, SocketType.Stream, ProtocolType.Tcp);
+                clientSocket.Connect(serverAddress);
+            }
+
+            string[] r = { "reportlisting", JsonSerializer.Serialize(report) };
+            string message = JsonSerializer.Serialize(r);
+
+            //Sends message to connected Rest web API and gets a response in json
+            string rcv = SendReceive(message);
+            return rcv;
+        }
+
+        public List<Report> GetAllReports()
+        {
+            if (clientSocket == null)
+            {
+                IPEndPoint serverAddress = new IPEndPoint(IPAddress.Parse(IP), PORT);
+
+                clientSocket = new Socket(AddressFamily.InterNetwork, SocketType.Stream, ProtocolType.Tcp);
+                clientSocket.Connect(serverAddress);
+            }
+
+            string[] r = { "getallreports", "" };
+            string message = JsonSerializer.Serialize(r);
+
+            //Sends message to connected Rest web API and gets a response in json
+            string rcv = SendReceive(message);
+
+            //SKAL være Newtonsoft.Json ellers deserializer den til et array med 0
+            List<Report> reports = Newtonsoft.Json.JsonConvert.DeserializeObject<List<Report>>(rcv);
+            return reports;
         }
     }
 }
