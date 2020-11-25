@@ -65,6 +65,7 @@
 
     bool grid = true;
     SearchQuery SearchQuery;
+    SearchQuery NewSearchQuery;
     public string filter { get; set; }
 
     protected override async Task OnParametersSetAsync()
@@ -79,8 +80,20 @@
 
     public async Task LazyFilterSearch()
     {
-        SearchQuery = (SearchQuery)SocketService
-            .LazyFilterSearch(search, filter, sequenceNumber);
+        NewSearchQuery = (SearchQuery)SocketService
+                .LazyFilterSearch(search, filter, sequenceNumber);
+
+        if (SearchQuery != null)
+        {
+            foreach(Listing listing in NewSearchQuery.Listings)
+            {
+                SearchQuery.Listings.Add(listing);
+            }
+        }
+        else
+        {
+            SearchQuery = NewSearchQuery;
+        }
     }
 
     public async void Filter()
