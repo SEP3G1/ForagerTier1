@@ -42,31 +42,33 @@
                     <input type="button" class="edit" value="Edit listing" @onclick="Edit" />
                 }
                 <p>Seller</p>
-                <h3>@Company.Name</h3>
-                <p>Address</p>
-                <h3>@listing.PickupAddress, @listing.Postcode</h3>
-                @if (listing.HasDelivery)
-                {
-                    <div class="breadcrumbs">Has delevery</div>
-                }
-                else
-                {
-                    <div class="breadcrumbs">Pickup only</div>
-                }
-                @if (!myListing)
-                {
-                    <p style="margin-top: 2rem;">Contact</p>
-                    <AuthorizeView>
-                        <Authorized>
-                            <textarea class="messageInput" @bind="message"></textarea>
-                            <input type="button" class="sendMessage" @onclick="SendMessage" value="Send message to @Company.Name" />
-                        </Authorized>
-                        <NotAuthorized>
-                            <h3>Login to contact seller</h3>
-                        </NotAuthorized>
-                    </AuthorizeView>
-                }
-            </div>
+                <a href="company/@Company.CompanyId"><h3>@Company.Name</h3></a>
+                    <p>Address</p>
+                    <h3>@listing.PickupAddress, @listing.Postcode</h3>
+                    <p>Trust Score</p>
+                    <h3>@Company.TrustScore</h3>
+                    @if (listing.HasDelivery)
+                    {
+                        <div class="breadcrumbs">Has delivery</div>
+                    }
+                    else
+                    {
+                        <div class="breadcrumbs">Pickup only</div>
+                    }
+                    @if (!myListing)
+                    {
+                        <p style="margin-top: 2rem;">Contact</p>
+                        <AuthorizeView>
+                            <Authorized>
+                                <textarea class="messageInput" @bind="message"></textarea>
+                                <input type="button" class="sendMessage" @onclick="SendMessage" value="Send message to @Company.Name" />
+                            </Authorized>
+                            <NotAuthorized>
+                                <h3>Login to contact seller</h3>
+                            </NotAuthorized>
+                        </AuthorizeView>
+                    }
+</div>
         </div>
 
         <div class="priceListing">
