@@ -46,6 +46,33 @@ namespace ForagerTier1.Models
             return sq;
         }
 
+        public SearchQuery LazyFilterSearch(string message, string filter, int sequenceNumber)
+        {
+            if (clientSocket == null)
+            {
+                IPEndPoint serverAddress = new IPEndPoint(IPAddress.Parse(IP), PORT);
+
+                clientSocket = new Socket(AddressFamily.InterNetwork, SocketType.Stream, ProtocolType.Tcp);
+                clientSocket.Connect(serverAddress);
+            }
+            Console.WriteLine("in LazyFilterSearch(string message, string filter, int sequenceNumber) where sequenceNumber is now: " + sequenceNumber);
+            string[] r = { "lazyFilterSearch", message, filter, sequenceNumber+"" };
+            message = JsonSerializer.Serialize(r);
+
+            //Sends message to connected Rest web API and gets a response in json
+            string rcv = SendReceive(message);
+
+            //Makes json deserializor case-insencitive
+            var options = new JsonSerializerOptions();
+            options.PropertyNameCaseInsensitive = true;
+            options.Converters.Add(new JsonStringEnumConverter());
+
+            //Deserializeing recieved query
+            SearchQuery sq = JsonSerializer.Deserialize<SearchQuery>(rcv, options);
+
+            return sq;
+        }
+
         public User Login(string username, string password)
         {
             if (clientSocket == null)

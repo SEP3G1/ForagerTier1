@@ -1,5 +1,6 @@
 ﻿@page "/find"
 @page "/find/{search}"
+@page "/find/{search}/{sequenceNumber:int}"
 @using ForagerTier1.Models
 @inject ISocketService SocketService
 @inject IJSRuntime JSRuntime;
@@ -52,21 +53,40 @@
             </div>
         }
     </div>
-
+    <button @onclick="@LazyFilterSearch">Load more Listings</button>
 </div>
 
 @code {
     [Parameter]
     public string search { get; init; }
 
+    [Parameter]
+    public int sequenceNumber { get; set; }
+
     bool grid = true;
     SearchQuery SearchQuery;
+    public string filter { get; set; }
 
     protected override async Task OnParametersSetAsync()
     {
-        SearchQuery = (SearchQuery)SocketService.Search(search);
+        filter = "none";
+
+        LazyFilterSearch();
+        //SearchQuery = (SearchQuery)SocketService.Search(search);
         await JSRuntime.InvokeVoidAsync("setTitle", "forager. | " + search);
         //await JSRuntime.InvokeVoidAsync(user.ToString());
+    }
+
+    public async Task LazyFilterSearch()
+    {
+        SearchQuery = (SearchQuery)SocketService
+            .LazyFilterSearch(search, filter, sequenceNumber);
+    }
+
+    public async void Filter()
+    {
+        sequenceNumber = 0;
+        await LazyFilterSearch();
     }
 
     public void displayGrid()

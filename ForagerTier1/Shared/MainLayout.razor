@@ -29,11 +29,19 @@
 
 
 
+
+
+
+
+
+
+
+
                  </g>
              </g>
          </svg>
             <SfComboBox TValue="string" TItem="Suggestion" CssClass="searchIndex" Placeholder="Search..." @onclick="@(e => search())"
-                        DataSource="@DataForComboBox" @bind-Value="@valueComboBox" @onkeypress="@(e => KeyUp(e))" @onselect="@(e => search())"
+                        DataSource="@DataForComboBox" @bind-Value="@valueComboBox" @onkeypress="@(e => KeyUp(e))" @onselect="@(e => clearSequenceNumberAndsearch())"
                         Autofill="true" AllowFiltering="true">
                 <ComboBoxTemplates TItem="Suggestion">
                     <ItemTemplate>
@@ -45,6 +53,7 @@
                 </ComboBoxTemplates>
                 <ComboBoxFieldSettings Text="Text"></ComboBoxFieldSettings>
             </SfComboBox>
+            <button @onclick="@GetNextSequence">Load more Listings</button>
         </div>
 
 
@@ -86,10 +95,13 @@
 
 
 @code{
-        bool hidden = false;
-        string valueComboBox = "";
+    bool hidden = false;
+    string valueComboBox = "";
 
-        User user;
+    [Parameter]
+    public int SequenceNumber { get; set; }
+
+    User user;
 
     // For ComboBox dropdown
     private IList<Listing> listings;
@@ -114,7 +126,21 @@
             hidden = false;
         }
 
-        valueComboBox = null;
+        //valueComboBox = null;
+    }
+
+    public void GetNextSequence()
+    {
+        SequenceNumber += 2;
+        Console.WriteLine("in GetNextSequence() - SequenceNumber = " + SequenceNumber);
+        search();
+        NavigationManager.NavigateTo("/find/" + valueComboBox + "/" + SequenceNumber);
+    }
+
+    public void clearSequenceNumberAndsearch()
+    {
+        SequenceNumber = 0;
+        search();
     }
 
     public void search()
@@ -146,7 +172,7 @@
         if (valueComboBox != null)
         {
             valueComboBox = UppercaseFirst(valueComboBox.Trim());
-            NavigationManager.NavigateTo("/find/" + valueComboBox);
+            NavigationManager.NavigateTo("/find/" + valueComboBox + "/" + SequenceNumber);
         }
     }
 

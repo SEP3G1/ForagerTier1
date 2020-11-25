@@ -7,6 +7,7 @@ namespace ForagerTier1.Models
     public interface ISocketService
     {
         SearchQuery Search(string message);
+        SearchQuery LazyFilterSearch(string message, string filter, int sequenceNumber);
         string SendReceive(string message);
         void Send(string message);
         string UploadImageTest(IList<IBrowserFile> imgs);
@@ -22,5 +23,6 @@ namespace ForagerTier1.Models
         Company GetCompany(string id);
         void SendMessage(string Message, int SendToUserId, int SendFromCompanyId);
         string UpdateCompany(Company company);
+
     }
 }
