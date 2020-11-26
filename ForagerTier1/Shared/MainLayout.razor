@@ -84,7 +84,10 @@
 
     <!-- "Syncfusion søgebar" -->
     <div class="content">
+        
+    <CascadingValue Value=EventName>
         @Body
+        </CascadingValue>
     </div>
     <div class="footer">
 
@@ -108,7 +111,21 @@
     public Dictionary<string, string> suggestionListForComboBox;
     List<Suggestion> DataForComboBox;
 
+    //EventCallback EventName => EventCallback.Factory.Create(this, GetNextSequence);
 
+    //To make sure you only create this object once, you can use the following:
+    EventCallback _eventName = EventCallback.Empty;
+    EventCallback EventName
+    {
+        get
+        {
+            if (_eventName.Equals(EventCallback.Empty))
+                _eventName = EventCallback.Factory.Create(this, GetNextSequence);
+            return _eventName;
+        }
+    }
+
+    //Det er det her jeg prøver på: https://stackoverflow.com/questions/58123063/call-method-in-mainlayout-from-a-page-component-in-blazor
 
     protected override async Task OnParametersSetAsync()
     {
@@ -126,26 +143,27 @@
             hidden = false;
         }
 
-       // valueComboBox = "";
+        // valueComboBox = "";
     }
 
     public void GetNextSequence()
     {
         SequenceNumber += 2;
-        Console.WriteLine("in GetNextSequence() - SequenceNumber = " + SequenceNumber);
-        search();
+        Console.WriteLine("in GetNextSequence() where SequenceNumber = " + SequenceNumber);
+        //search();
         NavigationManager.NavigateTo("/find/" + valueComboBox + "/" + SequenceNumber);
     }
 
     public void clearSequenceNumberAndsearch()
     {
-        SequenceNumber = 0;
         search();
     }
 
     public void search()
     {
-        if(listings == null)
+
+
+        if (listings == null)
         {
             // For ComboBox dropdown
 
@@ -171,6 +189,9 @@
         }
         if (suggestionListForComboBox.Keys.Contains(valueComboBox))
         {
+            SequenceNumber = 0; //hack #patrick
+            NavigationManager.NavigateTo("/"); //hack #patrick try this i stedet: https://stackoverflow.com/questions/55775060/blazor-component-refresh-parent-when-model-is-updated-from-child-component
+
             valueComboBox = UppercaseFirst(valueComboBox.Trim());
             NavigationManager.NavigateTo("/find/" + valueComboBox + "/" + SequenceNumber);
         }
