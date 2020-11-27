@@ -24,21 +24,6 @@
                          S0,62.08,0,138.667s62.08,138.667,138.667,138.667c34.453,0,65.92-12.587,90.133-33.387l5.867,5.867v16.853L341.333,373.12
                          l31.787-31.787L266.667,234.667z M138.667,234.667c-53.013,0-96-42.987-96-96c0-53.013,42.987-96,96-96c53.013,0,96,42.987,96,96
                          C234.667,191.68,191.68,234.667,138.667,234.667z" />
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
                  </g>
              </g>
          </svg>
@@ -46,7 +31,7 @@
                         DataSource="@DataForComboBox" @bind-Value="@valueComboBox" 
                         @onkeypress="@(e => KeyUp(e))" 
                         @onselect="@(e => clearSequenceNumberAndsearch())"
-                        @onclick="@(e => setComboBoxData())"
+                        @onclick="@(e => onClick())"
                         Autofill="true" AllowFiltering="true">
                 <ComboBoxTemplates TItem="Suggestion">
                     <ItemTemplate>
@@ -89,8 +74,9 @@
 
     <!-- "Syncfusion søgebar" -->
     <div class="content">
-        
-    <CascadingValue Value=EventName>
+       
+        <!-- For LazyLoad-->
+    <CascadingValue Value=LazyLoadEvent>
         @Body
         </CascadingValue>
     </div>
@@ -106,6 +92,7 @@
     bool hidden = false;
     string valueComboBox = "";
 
+    //For LazyLoad
     [Parameter]
     public int SequenceNumber { get; set; }
 
@@ -116,21 +103,18 @@
     public Dictionary<string, string> suggestionListForComboBox;
     List<Suggestion> DataForComboBox;
 
-    //EventCallback EventName => EventCallback.Factory.Create(this, GetNextSequence);
-
+    // https://stackoverflow.com/questions/58123063/call-method-in-mainlayout-from-a-page-component-in-blazor
     //To make sure you only create this object once, you can use the following:
-    EventCallback _eventName = EventCallback.Empty;
-    EventCallback EventName
+    EventCallback _lazyLoadEvent = EventCallback.Empty;
+    EventCallback LazyLoadEvent
     {
         get
         {
-            if (_eventName.Equals(EventCallback.Empty))
-                _eventName = EventCallback.Factory.Create(this, GetNextSequence);
-            return _eventName;
+            if (_lazyLoadEvent.Equals(EventCallback.Empty))
+                _lazyLoadEvent = EventCallback.Factory.Create(this, GetNextSequence);
+            return _lazyLoadEvent;
         }
     }
-
-    //Det er det her jeg prøver på: https://stackoverflow.com/questions/58123063/call-method-in-mainlayout-from-a-page-component-in-blazor
 
     protected override async Task OnParametersSetAsync()
     {
@@ -147,15 +131,11 @@
         {
             hidden = false;
         }
-
-        // valueComboBox = "";
     }
 
     public void GetNextSequence()
     {
-        SequenceNumber += 2;
-        Console.WriteLine("in GetNextSequence() where SequenceNumber = " + SequenceNumber);
-        //search();
+        SequenceNumber += 2; //hardcodeissue #patrick
         NavigationManager.NavigateTo("/find/" + valueComboBox + "/" + SequenceNumber);
     }
 
@@ -164,64 +144,50 @@
         search();
     }
 
-    public void setComboBoxData()
+    public void onClick()
     {
         if (listings == null)
         {
-            // For ComboBox dropdown
-
-            listings = ((SearchQuery)SocketService.Search(null)).Listings; // Get listings
-            suggestionListForComboBox = new Dictionary<string, string>();
-            DataForComboBox = new List<Suggestion>();
-
-            SocketService.GetProductCategories().ForEach(p
-            => suggestionListForComboBox.Add(p, "https://foodion.net/images/app/foodion_logo_square.png"));
-
-            Dictionary<string, string> productDictionary = new Dictionary<string, string>();
-
-            foreach (Listing l in listings)
-            {
-                productDictionary.Add(l.Product.Name, l.getCover());
-            }
-
-            productDictionary.Distinct().ToList().ForEach(p => suggestionListForComboBox.Add(p.Key, p.Value));
-
-            listings.Select(l => l.Postcode).Distinct().ToList().ForEach(p
-            => suggestionListForComboBox.Add(p, "https://img.icons8.com/ios/452/zip-code.png"));
-
-            suggestionListForComboBox.ToList().ForEach(s
-            => DataForComboBox.Add(new Suggestion() { Text = s.Key, Image = s.Value }));
+            setComboBoxData();
         }
         valueComboBox = "";
         NavigationManager.NavigateTo("/");
-        //NavigationManager.NavigateTo(NavigationManager.Uri);
+    }
+
+    public void setComboBoxData()
+    {
+        listings = ((SearchQuery)SocketService.Search(null)).Listings; // Get listings
+        suggestionListForComboBox = new Dictionary<string, string>();
+        DataForComboBox = new List<Suggestion>();
+
+        SocketService.GetProductCategories().ForEach(p
+        => suggestionListForComboBox.Add(p, "https://foodion.net/images/app/foodion_logo_square.png"));
+
+        Dictionary<string, string> productDictionary = new Dictionary<string, string>();
+
+        foreach (Listing l in listings)
+        {
+            productDictionary.Add(l.Product.Name, l.getCover());
+        }
+
+        productDictionary.Distinct().ToList().ForEach(p => suggestionListForComboBox.Add(p.Key, p.Value));
+
+        listings.Select(l => l.Postcode).Distinct().ToList().ForEach(p
+        => suggestionListForComboBox.Add(p, "https://img.icons8.com/ios/452/zip-code.png"));
+
+        suggestionListForComboBox.ToList().ForEach(s
+        => DataForComboBox.Add(new Suggestion() { Text = s.Key, Image = s.Value }));
     }
 
     public void search()
     {
         if(suggestionListForComboBox.Keys.Contains(valueComboBox))
         {
-            SequenceNumber = 0; //hack #patrick
-            //NavigationManager.NavigateTo("/"); //hack #patrick try this i stedet: https://stackoverflow.com/questions/55775060/blazor-component-refresh-parent-when-model-is-updated-from-child-component
+            SequenceNumber = 0;
             RefreshService.CallRequestRefresh();
 
             valueComboBox = UppercaseFirst(valueComboBox.Trim());
-            //NavigationManager.NavigateTo("/find/" + valueComboBox + "/" + SequenceNumber, true); //Force Reload
             NavigationManager.NavigateTo("/find/" + valueComboBox + "/" + SequenceNumber);
-        }
-    }
-
-    public void searchWithForce()
-    {
-        if (suggestionListForComboBox.Keys.Contains(valueComboBox))
-        {
-            SequenceNumber = 0; //hack #patrick
-                                //NavigationManager.NavigateTo("/"); //hack #patrick try this i stedet: https://stackoverflow.com/questions/55775060/blazor-component-refresh-parent-when-model-is-updated-from-child-component
-            RefreshService.CallRequestRefresh();
-
-            valueComboBox = UppercaseFirst(valueComboBox.Trim());
-            NavigationManager.NavigateTo("/find/" + valueComboBox + "/" + SequenceNumber); //Force Reload
-            //NavigationManager.NavigateTo("/find/" + valueComboBox + "/" + SequenceNumber);
         }
     }
 
@@ -229,11 +195,7 @@
     {
         if (e.Key == "Enter")
         {
-            searchWithForce();
-            //RefreshService.CallRequestRefresh();
-            //Console.WriteLine("NavigationManager.Uri: " + NavigationManager.Uri);
-            //NavigationManager.NavigateTo(NavigationManager.Uri);
-            //Console.WriteLine("NavigationManager.Uri: " + NavigationManager.Uri);
+            search();
         }
     }
 

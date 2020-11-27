@@ -55,7 +55,7 @@ namespace ForagerTier1.Models
                 clientSocket = new Socket(AddressFamily.InterNetwork, SocketType.Stream, ProtocolType.Tcp);
                 clientSocket.Connect(serverAddress);
             }
-            Console.WriteLine("in LazyFilterSearch(string message, string filter, int sequenceNumber) where sequenceNumber is now: " + sequenceNumber);
+            
             string[] r = { "lazyFilterSearch", message, filter, sequenceNumber+"" };
             message = JsonSerializer.Serialize(r);
 

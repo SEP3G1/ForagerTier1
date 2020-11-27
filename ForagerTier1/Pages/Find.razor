@@ -66,12 +66,10 @@
     public int sequenceNumber { get; set; }
 
     [CascadingParameter]
-    public EventCallback EventName { get; set; }
+    public EventCallback LazyLoadEvent { get; set; }
 
     private void RefreshMe()
     {
-        Console.WriteLine("RefreshMe()");
-        //StateHasChanged();
         SearchQuery = null;
         sequenceNumber = 0;
         LazyFilterSearch();
@@ -80,7 +78,7 @@
     public void Test()
     {
         sequenceNumber += 2; //hardcode issue #patrick //for at den kan søge inden sekvensnummer parametren bliver sat (i OnParametersSetAsync)
-        EventName.InvokeAsync();
+        LazyLoadEvent.InvokeAsync();
         LazyFilterSearch();
     }
 
@@ -92,19 +90,14 @@
 
     protected override async Task OnInitializedAsync()
     {
-        //RefreshService = new RefreshService();
         RefreshService.RefreshRequested += RefreshMe;
-        Console.WriteLine("In OnInitializedAsync() in Find.raxzor");
         await LazyFilterSearch();
     }
 
     protected override async Task OnParametersSetAsync()
     {
-        Console.WriteLine("in OnParametersSetAsync() in Find.razor");
         filter = "none";
 
-        // LazyFilterSearch();
-        //SearchQuery = (SearchQuery)SocketService.Search(search);
         await JSRuntime.InvokeVoidAsync("setTitle", "forager. | " + search);
         //await JSRuntime.InvokeVoidAsync(user.ToString());
     }
@@ -112,20 +105,13 @@
     public async Task LazyFilterSearch()
     {
 
-        // sequenceNumber = sequenceNumber + 2; //hardcode fix #patrick
-        Console.WriteLine("Now sequenceNumber is " + sequenceNumber + " greetings from Find.razor");
-
-
         if (SearchQuery == null)
         {
-            SearchQuery = new SearchQuery(); Console.WriteLine("SearchQuery was null");
+            SearchQuery = new SearchQuery();
         }
 
-        Console.WriteLine("in LazyFilterSearch() in Find.razor where sequencenumber is now " + sequenceNumber);
         NewSearchQuery = (SearchQuery)SocketService
                 .LazyFilterSearch(search, filter, sequenceNumber);
-
-        //sequenceNumber += 2; //TODO Patrick hardcode issue
 
         if (sequenceNumber > 0)
         {
@@ -161,7 +147,6 @@
 
     public void Dispose()
     {
-        //editContext.OnFieldChanged -= fieldChanged;
         RefreshService.RefreshRequested -= RefreshMe;
     }
 

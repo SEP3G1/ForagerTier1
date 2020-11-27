@@ -10,7 +10,6 @@ namespace ForagerTier1.Shared
         public event Action RefreshRequested;
         public void CallRequestRefresh()
         {
-            Console.WriteLine("CallRequestRefresh()");
             RefreshRequested?.Invoke();
         }
     }
