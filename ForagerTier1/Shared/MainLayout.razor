@@ -42,8 +42,11 @@
                  </g>
              </g>
          </svg>
-            <SfComboBox TValue="string" TItem="Suggestion" CssClass="searchIndex" Placeholder="Search..." @onclick="@(e => setComboBoxData())"
-                        DataSource="@DataForComboBox" @bind-Value="@valueComboBox" @onkeypress="@(e => KeyUp(e))" @onselect="@(e => clearSequenceNumberAndsearch())"
+            <SfComboBox TValue="string" TItem="Suggestion" CssClass="searchIndex" Placeholder="Search..." 
+                        DataSource="@DataForComboBox" @bind-Value="@valueComboBox" 
+                        @onkeypress="@(e => KeyUp(e))" 
+                        @onselect="@(e => clearSequenceNumberAndsearch())"
+                        @onclick="@(e => setComboBoxData())"
                         Autofill="true" AllowFiltering="true">
                 <ComboBoxTemplates TItem="Suggestion">
                     <ItemTemplate>
@@ -189,6 +192,9 @@
             suggestionListForComboBox.ToList().ForEach(s
             => DataForComboBox.Add(new Suggestion() { Text = s.Key, Image = s.Value }));
         }
+        valueComboBox = "";
+        NavigationManager.NavigateTo("/");
+        //NavigationManager.NavigateTo(NavigationManager.Uri);
     }
 
     public void search()
@@ -200,7 +206,22 @@
             RefreshService.CallRequestRefresh();
 
             valueComboBox = UppercaseFirst(valueComboBox.Trim());
+            //NavigationManager.NavigateTo("/find/" + valueComboBox + "/" + SequenceNumber, true); //Force Reload
             NavigationManager.NavigateTo("/find/" + valueComboBox + "/" + SequenceNumber);
+        }
+    }
+
+    public void searchWithForce()
+    {
+        if (suggestionListForComboBox.Keys.Contains(valueComboBox))
+        {
+            SequenceNumber = 0; //hack #patrick
+                                //NavigationManager.NavigateTo("/"); //hack #patrick try this i stedet: https://stackoverflow.com/questions/55775060/blazor-component-refresh-parent-when-model-is-updated-from-child-component
+            RefreshService.CallRequestRefresh();
+
+            valueComboBox = UppercaseFirst(valueComboBox.Trim());
+            NavigationManager.NavigateTo("/find/" + valueComboBox + "/" + SequenceNumber); //Force Reload
+            //NavigationManager.NavigateTo("/find/" + valueComboBox + "/" + SequenceNumber);
         }
     }
 
@@ -208,7 +229,11 @@
     {
         if (e.Key == "Enter")
         {
-            search();
+            searchWithForce();
+            //RefreshService.CallRequestRefresh();
+            //Console.WriteLine("NavigationManager.Uri: " + NavigationManager.Uri);
+            //NavigationManager.NavigateTo(NavigationManager.Uri);
+            //Console.WriteLine("NavigationManager.Uri: " + NavigationManager.Uri);
         }
     }
 
