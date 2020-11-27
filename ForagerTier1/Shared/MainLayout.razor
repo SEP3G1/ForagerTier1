@@ -7,6 +7,8 @@
 @inject AuthenticationStateProvider AuthenticationStateProvider
 @inject ISocketService SocketService
 @inject IUserService UserService
+@inject IRefreshService RefreshService
+
 
 <div class="main">
     <div id="headNav" class="@(hidden ? "hidden" : "")">
@@ -187,10 +189,11 @@
             suggestionListForComboBox.ToList().ForEach(s
             => DataForComboBox.Add(new Suggestion() { Text = s.Key, Image = s.Value }));
         }
-        if (suggestionListForComboBox.Keys.Contains(valueComboBox))
+        if(suggestionListForComboBox.Keys.Contains(valueComboBox))
         {
             SequenceNumber = 0; //hack #patrick
-            NavigationManager.NavigateTo("/"); //hack #patrick try this i stedet: https://stackoverflow.com/questions/55775060/blazor-component-refresh-parent-when-model-is-updated-from-child-component
+            //NavigationManager.NavigateTo("/"); //hack #patrick try this i stedet: https://stackoverflow.com/questions/55775060/blazor-component-refresh-parent-when-model-is-updated-from-child-component
+            RefreshService.CallRequestRefresh();
 
             valueComboBox = UppercaseFirst(valueComboBox.Trim());
             NavigationManager.NavigateTo("/find/" + valueComboBox + "/" + SequenceNumber);

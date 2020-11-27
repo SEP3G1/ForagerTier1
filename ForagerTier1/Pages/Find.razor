@@ -5,6 +5,7 @@
 @inject ISocketService SocketService
 @inject IJSRuntime JSRuntime;
 @inject NavigationManager NavigationManager
+@inject IRefreshService RefreshService
 @implements IDisposable
 <div class="page">
     <table class="searchMenu">
@@ -67,6 +68,13 @@
     [CascadingParameter]
     public EventCallback EventName { get; set; }
 
+    private void RefreshMe()
+    {
+        Console.WriteLine("RefreshMe()");
+        //StateHasChanged();
+        LazyFilterSearch();
+    }
+
     public void Test()
     {
         sequenceNumber += 2; //hardcode issue #patrick //for at den kan søge inden sekvensnummer parametren bliver sat (i OnParametersSetAsync)
@@ -82,6 +90,8 @@
 
     protected override async Task OnInitializedAsync()
     {
+        //RefreshService = new RefreshService();
+        RefreshService.RefreshRequested += RefreshMe;
         Console.WriteLine("In OnInitializedAsync() in Find.raxzor");
         await LazyFilterSearch();
     }
@@ -150,6 +160,7 @@
     public void Dispose()
     {
         //editContext.OnFieldChanged -= fieldChanged;
+        RefreshService.RefreshRequested -= RefreshMe;
     }
 
 }
