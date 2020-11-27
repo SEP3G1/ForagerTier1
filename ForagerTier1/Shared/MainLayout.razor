@@ -30,7 +30,7 @@
             <SfComboBox TValue="string" TItem="Suggestion" CssClass="searchIndex" Placeholder="Search..." 
                         DataSource="@DataForComboBox" @bind-Value="@valueComboBox" 
                         @onkeypress="@(e => KeyUp(e))" 
-                        @onselect="@(e => clearSequenceNumberAndsearch())"
+                        @onselect="@(e => search())"
                         @onclick="@(e => onClick())"
                         Autofill="true" AllowFiltering="true">
                 <ComboBoxTemplates TItem="Suggestion">
@@ -137,11 +137,6 @@
     {
         SequenceNumber += 2; //hardcodeissue #patrick
         NavigationManager.NavigateTo("/find/" + valueComboBox + "/" + SequenceNumber);
-    }
-
-    public void clearSequenceNumberAndsearch()
-    {
-        search();
     }
 
     public void onClick()
