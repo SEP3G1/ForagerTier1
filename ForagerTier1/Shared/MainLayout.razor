@@ -42,7 +42,7 @@
                  </g>
              </g>
          </svg>
-            <SfComboBox TValue="string" TItem="Suggestion" CssClass="searchIndex" Placeholder="Search..." @onclick="@(e => search())"
+            <SfComboBox TValue="string" TItem="Suggestion" CssClass="searchIndex" Placeholder="Search..." @onclick="@(e => setComboBoxData())"
                         DataSource="@DataForComboBox" @bind-Value="@valueComboBox" @onkeypress="@(e => KeyUp(e))" @onselect="@(e => clearSequenceNumberAndsearch())"
                         Autofill="true" AllowFiltering="true">
                 <ComboBoxTemplates TItem="Suggestion">
@@ -161,10 +161,8 @@
         search();
     }
 
-    public void search()
+    public void setComboBoxData()
     {
-
-
         if (listings == null)
         {
             // For ComboBox dropdown
@@ -178,8 +176,10 @@
 
             Dictionary<string, string> productDictionary = new Dictionary<string, string>();
 
-            foreach (Listing l in listings){
-                productDictionary.Add(l.Product.Name, l.getCover());}
+            foreach (Listing l in listings)
+            {
+                productDictionary.Add(l.Product.Name, l.getCover());
+            }
 
             productDictionary.Distinct().ToList().ForEach(p => suggestionListForComboBox.Add(p.Key, p.Value));
 
@@ -189,6 +189,10 @@
             suggestionListForComboBox.ToList().ForEach(s
             => DataForComboBox.Add(new Suggestion() { Text = s.Key, Image = s.Value }));
         }
+    }
+
+    public void search()
+    {
         if(suggestionListForComboBox.Keys.Contains(valueComboBox))
         {
             SequenceNumber = 0; //hack #patrick
