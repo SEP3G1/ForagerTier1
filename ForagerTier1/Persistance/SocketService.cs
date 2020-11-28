@@ -392,5 +392,23 @@ namespace ForagerTier1.Models
             List<Report> reports = Newtonsoft.Json.JsonConvert.DeserializeObject<List<Report>>(rcv);
             return reports;
         }
+
+        public void DeleteListing(int ListingId)
+        {
+            if (clientSocket == null)
+            {
+                IPEndPoint serverAddress = new IPEndPoint(IPAddress.Parse(IP), PORT);
+
+                clientSocket = new Socket(AddressFamily.InterNetwork, SocketType.Stream, ProtocolType.Tcp);
+                clientSocket.Connect(serverAddress);
+            }
+
+            string[] r = { "deletelisting", ListingId + "" };
+            string message = JsonSerializer.Serialize(r);
+
+            //Sends message to connected Rest web API and gets a response in json
+            string rcv = SendReceive(message);
+            Console.WriteLine(rcv);
+        }
     }
 }

@@ -3,64 +3,73 @@
 @inject ISocketService SocketService
 @inject IJSRuntime JSRuntime;
 @inject NavigationManager NavigationManager
-@attribute [Authorize (Policy = "Admin, Moderator")]
+<!-- attribute[Authorize(Policy = "Admin, Moderator")] DOESNT WORK YET
+-->
+<AuthorizeView>
+    <NotAuthorized>
+        <Login />
+    </NotAuthorized>
+    <Authorized>
+        <div class="page">
+            <div class="queryContainer">
+                <table>
+                    <tr>
+                        <td>ListingId</td>
+                        <td>Illegal goods</td>
+                        <td>Breaking the law</td>
+                        <td>Offensive picture</td>
+                        <td>Offensive description</td>
+                    </tr>
+                    @foreach (Report report in reports)
+                    {
+                        <!--Count amounts of type-->
 
-    <AuthorizeView>
-        <NotAuthorized>
-            <Login />
-        </NotAuthorized>
-        <Authorized>
-            <div class="page">
-                <div class="queryContainer">
-                    <table>
                         <tr>
-                            <td>ListingId</td>
-                            <td>Illegal goods</td>
-                            <td>Breaking the law</td>
-                            <td>Offensive picture</td>
-                            <td>Offensive description</td>
+                            <td>
+                                <p @onclick="@(() => openListing(@report.ListingId))">@report.ListingId</p>
+                            </td>
+                            <td>
+
+                                <p>@report.ReportType</p>
+                            </td>
+
                         </tr>
-                        @foreach (Report report in reports)
-                        {
-                            <!--Count amounts of type-->
-                            
-                            <tr>
-                                <td>
-                                    <p @onclick="@(() => openListing(@report.ListingId))">@report.ListingId</p>
-                                </td>
-                                <td>
 
-                                    <p>@report.ReportType</p>
-                                </td>
-
-                            </tr>
-
-                        }
-                    </table>
-                </div>
+                    }
+                </table>
             </div>
-        </Authorized>
-    </AuthorizeView>
+        </div>
+    </Authorized>
+</AuthorizeView>
 
-    @code {
+@code {
 
-        List<Report> reports = new List<Report>();
-        List<Report> sortedReports = new List<Report>();
+    List<Report> reports = new List<Report>();
+    List<Report> sortedReports = new List<Report>();
 
-        protected override async Task OnParametersSetAsync()
+    protected override async Task OnParametersSetAsync()
+    {
+
+        reports = (List<Report>)SocketService.GetAllReports();
+        if (reports != null)
         {
-            reports = (List<Report>)SocketService.GetAllReports();
-            Sort(reports);
+           // Sort(reports);
         }
-
-        public void Sort(List<Report> reports)
-        {
-            
-        }
-
-        public void openListing(int id)
-        {
-            NavigationManager.NavigateTo($"/listing/{id}");
-        }
-
     }
+
+//    public void Sort(List<Report> reports)
+//    {
+//        int maxListingId = reports.Max(x => x.ListingId);
+//
+//        for (int i = 0; i < maxListingId; i++)
+//        {
+//
+//        }
+//    }
+
+    public void openListing(int id)
+    {
+        NavigationManager.NavigateTo($"/listing/{id}");
+    }
+
+}

@@ -26,5 +26,7 @@ namespace ForagerTier1.Models
         string ReportListing(Report report);
 
         List<Report> GetAllReports();
+
+        void DeleteListing(int ListingId);
     }
 }

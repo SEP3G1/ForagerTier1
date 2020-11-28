@@ -41,6 +41,10 @@
                 {
                     <input type="button" class="edit" value="Edit listing" @onclick="Edit" />
                 }
+                @if (canIModerate)
+                {
+                    <input type="button" class="delete" value="Delete listing" @onclick="Delete" />
+                }
                 <p>Seller</p>
                 <h3>@Company.Name</h3>
                 <p>Address</p>
@@ -119,10 +123,13 @@
     string _authMessage = "";
     int fromCompanyId = -1;
     bool myListing = false;
+    bool canIModerate = false;
 
     protected override async Task OnParametersSetAsync()
     {
         listing = (Listing)SocketService.GetListing(id);
+        if (listing == null)
+            NavigationManager.NavigateTo($"/");
         imageInView = listing.getCover();
         await JSRuntime.InvokeVoidAsync("setTitle", "forager. | " + listing.Product.Name);
         RecommendedListings = (List<Listing>)SocketService.Search(listing.Product.ProductCategory).Listings;
@@ -134,6 +141,8 @@
         {
             fromCompanyId = ((User)((CustomAuthenticationStateProvider)AuthenticationStateProvider).GetCashedUser()).CompanyId;
             myListing = fromCompanyId == Company.CompanyId;
+            if (((User)((CustomAuthenticationStateProvider)AuthenticationStateProvider).GetCashedUser()).SecurityLevel >= 3)
+                canIModerate = true;
         }
     }
 
@@ -149,6 +158,14 @@
     public void Edit()
     {
         NavigationManager.NavigateTo($"/sell/{id}");
+    }
+
+    public void Delete()
+    {
+        NavigationManager.NavigateTo($"/");
+        // Listing slettes med success, dog dør blazor siden. Dette sker formentlig fordi at den ikke redirecter til index korrekt. Der bliver i hvert
+        // fald efter sletningen kørt følgende metode på Tier3. public async Task<Listing> GetListing(string id) i ListingService.
+        SocketService.DeleteListing(listing.ListingId);
     }
 
     public void Report()
