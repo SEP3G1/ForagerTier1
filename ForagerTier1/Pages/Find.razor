@@ -15,6 +15,12 @@
                 <p>Showing @SearchQuery.Listings.Count of @SearchQuery.Results:</p>
             </td>
             <td>
+                <div>
+                    <RadzenDropDown AllowClear="true" TValue="string" FilterCaseSensitivity="FilterCaseSensitivity.CaseInsensitive" AllowFiltering="true"
+                                    Placeholder="Filter" 
+                                    Data=@filterOptions TextProperty="TextProperty" ValueProperty="ValueProperty" 
+                                    Change=@(args => FilterResults(args)) />
+                </div>
                 <button class="listButton @(grid?"":"active")" @onclick="displayList"></button>
                 <button class="gridButton @(grid?"active":"")" @onclick="displayGrid"></button>
             </td>
@@ -67,6 +73,27 @@
 
     [CascadingParameter]
     public EventCallback LazyLoadEvent { get; set; }
+
+    IEnumerable<FilterOption> filterOptions = new List<FilterOption>() {
+    new FilterOption{TextProperty = "Price - low to high", ValueProperty = "priceAscending"},
+    new FilterOption{TextProperty = "Best before - low to high", ValueProperty = "bestBeforeAscending"},
+    new FilterOption{TextProperty = "Best before - high to low", ValueProperty = "bestBeforeDecending"},
+    new FilterOption{TextProperty = "Distance - low to high", ValueProperty = "distanceAscending"},
+    };
+
+    private void FilterResults(object value)
+    {
+        filter = value.ToString();
+        Console.WriteLine("FilterResults(object value), filter: " + filter);
+        sequenceNumber = 0;
+        LazyFilterSearch();
+    }
+
+    public class FilterOption
+    {
+        public string TextProperty { get; set; }
+        public string ValueProperty { get; set; }
+    }
 
     private void RefreshMe()
     {
