@@ -6,6 +6,7 @@ using System.Net.Sockets;
 using System.Text.Json;
 using System.Text.Json.Serialization;
 using System.Threading.Tasks;
+using System.Timers;
 
 namespace ForagerTier1.Models
 {
@@ -14,22 +15,23 @@ namespace ForagerTier1.Models
         private static string IP = "192.168.87.168";
         private static int PORT = 4343;
         private static Socket clientSocket;
+        private static Timer notificationTimer;
+        private int notifications = 0;
+        private int? Chash { get; set; }
+        public event EventHandler SomethingHappened;
 
         public SocketService()
         {
+            IPEndPoint serverAddress = new IPEndPoint(IPAddress.Parse(IP), PORT);
+
+            clientSocket = new Socket(AddressFamily.InterNetwork, SocketType.Stream, ProtocolType.Tcp);
+            clientSocket.Connect(serverAddress);
+            //SetTimer();
 
         }
 
         public SearchQuery Search(string message)
-        {
-            if (clientSocket == null)
-            {
-                IPEndPoint serverAddress = new IPEndPoint(IPAddress.Parse(IP), PORT);
-
-                clientSocket = new Socket(AddressFamily.InterNetwork, SocketType.Stream, ProtocolType.Tcp);
-                clientSocket.Connect(serverAddress);
-            }
-            
+        { 
             string[] r = { "search", message };
             message = JsonSerializer.Serialize(r);
 
@@ -49,13 +51,6 @@ namespace ForagerTier1.Models
 
         public User Login(string username, string password)
         {
-            if (clientSocket == null)
-            {
-                IPEndPoint serverAddress = new IPEndPoint(IPAddress.Parse(IP), PORT);
-
-                clientSocket = new Socket(AddressFamily.InterNetwork, SocketType.Stream, ProtocolType.Tcp);
-                clientSocket.Connect(serverAddress);
-            }
             string[] u = { username, password };
             string[] r = { "login", JsonSerializer.Serialize(u) };
             string message = JsonSerializer.Serialize(r);
@@ -76,14 +71,6 @@ namespace ForagerTier1.Models
 
         public string CreateListing(Listing listing)
         {
-            if (clientSocket == null)
-            {
-                IPEndPoint serverAddress = new IPEndPoint(IPAddress.Parse(IP), PORT);
-
-                clientSocket = new Socket(AddressFamily.InterNetwork, SocketType.Stream, ProtocolType.Tcp);
-                clientSocket.Connect(serverAddress);
-            }
-
             string[] r = {"createlisting", JsonSerializer.Serialize(listing)};
             string message = JsonSerializer.Serialize(r);
             
@@ -92,16 +79,42 @@ namespace ForagerTier1.Models
             return rcv;
         }
 
+        private void SetTimer()
+        {
+            // Create a timer with a two second interval.
+            notificationTimer = new Timer(1000);
+            // Hook up the Elapsed event for the timer. 
+            notificationTimer.Elapsed += OnTimedEvent;
+            notificationTimer.AutoReset = true;
+            notificationTimer.Enabled = true;
+        }
+
+        private void OnTimedEvent(Object source, ElapsedEventArgs e)
+        {
+            if (Chash == null)
+                Chash = GetUnreadMessages();
+            else
+            {
+                if (Chash != GetUnreadMessages())
+                {
+                    notifications++;
+                    SomethingHappened?.Invoke(this, EventArgs.Empty);
+                }
+            }
+        }
+        
+        public int GetUnreadMessages()
+        {
+            string[] r = { "unread", "unread" };
+            string message = JsonSerializer.Serialize(r);
+
+            //Sends message to connected Rest web API and gets a response in json
+            string rcv = SendReceive(message);
+            return int.Parse(rcv);
+        }
+
         public string AddCompany(Company company)
         {
-            if (clientSocket == null)
-            {
-                IPEndPoint serverAddress = new IPEndPoint(IPAddress.Parse(IP), PORT);
-
-                clientSocket = new Socket(AddressFamily.InterNetwork, SocketType.Stream, ProtocolType.Tcp);
-                clientSocket.Connect(serverAddress);
-            }
-
             string[] r = { "createcompany", JsonSerializer.Serialize(company) };
             string message = JsonSerializer.Serialize(r);
 
@@ -112,14 +125,6 @@ namespace ForagerTier1.Models
 
         public string UploadImageTest(IList<IBrowserFile> imgs)
         {
-            if (clientSocket == null)
-            {
-                IPEndPoint serverAddress = new IPEndPoint(IPAddress.Parse(IP), PORT);
-
-                clientSocket = new Socket(AddressFamily.InterNetwork, SocketType.Stream, ProtocolType.Tcp);
-                clientSocket.Connect(serverAddress);
-            }
-
             string[] r = { "uploadImage", JsonSerializer.Serialize(imgs) };
             string message = JsonSerializer.Serialize(r);
 
@@ -155,14 +160,12 @@ namespace ForagerTier1.Models
             clientSocket.Send(toSendLenBytes);
             clientSocket.Send(toSendBytes);
         }
+        public int GetNotifications()
+        {
+            return notifications;
+        }
         public Listing GetListing(string id)
         {
-            if (clientSocket == null)
-            {
-                IPEndPoint serverAddress = new IPEndPoint(IPAddress.Parse(IP), PORT);
-                clientSocket = new Socket(AddressFamily.InterNetwork, SocketType.Stream, ProtocolType.Tcp);
-                clientSocket.Connect(serverAddress);
-            }
 
             string[] r = { "getlisting", id };
             string message = JsonSerializer.Serialize(r);
@@ -181,13 +184,6 @@ namespace ForagerTier1.Models
 
         public Company GetCompany(string id)
         {
-            if (clientSocket == null)
-            {
-                IPEndPoint serverAddress = new IPEndPoint(IPAddress.Parse(IP), PORT);
-
-                clientSocket = new Socket(AddressFamily.InterNetwork, SocketType.Stream, ProtocolType.Tcp);
-                clientSocket.Connect(serverAddress);
-            }
 
             string[] r = { "getcompany", id };
             string message = JsonSerializer.Serialize(r);
@@ -207,14 +203,6 @@ namespace ForagerTier1.Models
         public Company GetCompanyFromUserId(int id)
         {
 
-            if (clientSocket == null)
-            {
-                IPEndPoint serverAddress = new IPEndPoint(IPAddress.Parse(IP), PORT);
-
-                clientSocket = new Socket(AddressFamily.InterNetwork, SocketType.Stream, ProtocolType.Tcp);
-                clientSocket.Connect(serverAddress);
-            }
-
             string[] r = { "getcompanyFromUserId", id + ""};
             string message = JsonSerializer.Serialize(r);
 
@@ -231,13 +219,6 @@ namespace ForagerTier1.Models
         }
         public List<Product> GetProducts()
         {
-            if (clientSocket == null)
-            {
-                IPEndPoint serverAddress = new IPEndPoint(IPAddress.Parse(IP), PORT);
-
-                clientSocket = new Socket(AddressFamily.InterNetwork, SocketType.Stream, ProtocolType.Tcp);
-                clientSocket.Connect(serverAddress);
-            }
 
             string[] r = { "getproducts", "" };
             string message = JsonSerializer.Serialize(r);
@@ -255,13 +236,6 @@ namespace ForagerTier1.Models
 
         public List<string> GetProductCategories()
         {
-            if (clientSocket == null)
-            {
-                IPEndPoint serverAddress = new IPEndPoint(IPAddress.Parse(IP), PORT);
-
-                clientSocket = new Socket(AddressFamily.InterNetwork, SocketType.Stream, ProtocolType.Tcp);
-                clientSocket.Connect(serverAddress);
-            }
 
             string[] r = { "getproductcategories", "" };
             string message = JsonSerializer.Serialize(r);
@@ -277,32 +251,25 @@ namespace ForagerTier1.Models
             return listing;
         }
 
-        public void SendMessage(string Message, int SendToUserId, int SendFromCompanyId, int ListingId)
+        public List<Message> SendMessage(string Message, int SendToUserId, int SendFromCompanyId, int ListingId)
         {
-            if (clientSocket == null)
-            {
-                IPEndPoint serverAddress = new IPEndPoint(IPAddress.Parse(IP), PORT);
-
-                clientSocket = new Socket(AddressFamily.InterNetwork, SocketType.Stream, ProtocolType.Tcp);
-                clientSocket.Connect(serverAddress);
-            }
             string[] a = {Message, SendToUserId + "", SendFromCompanyId + "", ListingId + ""};
             string[] r = { "sendMessage", JsonSerializer.Serialize(a) };
             string message = JsonSerializer.Serialize(r);
 
-            //Sends message to connected Rest web API
-            Send(message);
+            //Sends message to connected Rest web API and gets a response in json
+            string rcv = SendReceive(message);
+            //Makes json deserializor case-insencitive
+            var options = new JsonSerializerOptions();
+            options.PropertyNameCaseInsensitive = true;
+            options.Converters.Add(new JsonStringEnumConverter());
+
+            List<Message> Conversation = JsonSerializer.Deserialize<List<Message>>(rcv, options);
+            return Conversation;
         }
 
         public User GetUser(int id)
         {
-            if (clientSocket == null)
-            {
-                IPEndPoint serverAddress = new IPEndPoint(IPAddress.Parse(IP), PORT);
-
-                clientSocket = new Socket(AddressFamily.InterNetwork, SocketType.Stream, ProtocolType.Tcp);
-                clientSocket.Connect(serverAddress);
-            }
 
             string[] r = { "getUser", id + ""};
             string message = JsonSerializer.Serialize(r);
@@ -321,13 +288,6 @@ namespace ForagerTier1.Models
 
         public string UpdateListing(Listing listing)
         {
-            if (clientSocket == null)
-            {
-                IPEndPoint serverAddress = new IPEndPoint(IPAddress.Parse(IP), PORT);
-
-                clientSocket = new Socket(AddressFamily.InterNetwork, SocketType.Stream, ProtocolType.Tcp);
-                clientSocket.Connect(serverAddress);
-            }
 
             string[] r = { "updatelisting", JsonSerializer.Serialize(listing) };
             string message = JsonSerializer.Serialize(r);
@@ -339,13 +299,6 @@ namespace ForagerTier1.Models
 
         public string UpdateCompany(Company company)
         {
-            if (clientSocket == null)
-            {
-                IPEndPoint serverAddress = new IPEndPoint(IPAddress.Parse(IP), PORT);
-
-                clientSocket = new Socket(AddressFamily.InterNetwork, SocketType.Stream, ProtocolType.Tcp);
-                clientSocket.Connect(serverAddress);
-            }
 
             string[] r = { "updatecompany", JsonSerializer.Serialize(company) };
             string message = JsonSerializer.Serialize(r);
@@ -353,6 +306,22 @@ namespace ForagerTier1.Models
             //Sends message to connected Rest web API and gets a response in json
             string rcv = SendReceive(message);
             return rcv;
+        }
+
+        public List<Message> GetConversation(int ListingId)
+        {
+            string[] r = { "getConversation", ListingId + "" };
+            string message = JsonSerializer.Serialize(r);
+
+            //Sends message to connected Rest web API and gets a response in json
+            string rcv = SendReceive(message);
+            //Makes json deserializor case-insencitive
+            var options = new JsonSerializerOptions();
+            options.PropertyNameCaseInsensitive = true;
+            options.Converters.Add(new JsonStringEnumConverter());
+
+            List<Message> Conversation = JsonSerializer.Deserialize<List<Message>>(rcv, options);
+            return Conversation;
         }
     }
 }

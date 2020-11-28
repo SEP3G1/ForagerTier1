@@ -53,12 +53,16 @@
                 <Authorized>
                     @if (GetUser() != null)
                     {
-                    <RadzenMenu>
-                        <RadzenMenuItem Text="@GetUser().Name" Icon="account_box">
-                            <RadzenMenuItem Text="Profile" Path="addcompany" Icon="perm_identity"></RadzenMenuItem>
-                            <RadzenMenuItem Text="Add Company" Path="addcompany" Icon="domain"></RadzenMenuItem>
-                        </RadzenMenuItem>
-                    </RadzenMenu>
+                        @if (notifications > 0)
+                        {
+                            <p class="notification">@notifications</p>
+                        }
+                        <RadzenMenu>
+                            <RadzenMenuItem Text="@GetUser().Name" Icon="account_box">
+                                <RadzenMenuItem Text="Profile" Path="profile" Icon="perm_identity"></RadzenMenuItem>
+                                <RadzenMenuItem Text="Add Company" Path="addcompany" Icon="domain"></RadzenMenuItem>
+                            </RadzenMenuItem>
+                        </RadzenMenu>
                     }
                     <a class="login" @onclick="@logout">Logout</a>
                 </Authorized>
@@ -95,6 +99,7 @@
     // For ComboBox dropdown
     private IList<Listing> listings;
     public Dictionary<string, string> suggestionListForComboBox;
+    public int notifications = 0;
     List<Suggestion> DataForComboBox;
 
 
@@ -115,6 +120,7 @@
             hidden = false;
         }
 
+        ((SocketService)SocketService).SomethingHappened += HandleNotifikation;
         valueComboBox = null;
     }
     private User GetUser()
@@ -183,6 +189,12 @@
         return char.ToUpper(s[0]) + s.Substring(1);
     }
 
+
+    public void HandleNotifikation(object sender, EventArgs args)
+    {
+        notifications = SocketService.GetUnreadMessages();
+        InvokeAsync(StateHasChanged);
+    }
 
     public class Suggestion
     {

@@ -17,10 +17,13 @@ namespace ForagerTier1.Models
         Listing GetListing(string id);
         List<Product> GetProducts();
         List<string> GetProductCategories();
+        int GetUnreadMessages();
+        int GetNotifications();
+        List<Message> GetConversation(int ListingId);
         User GetUser(int id);
         Company GetCompanyFromUserId(int id);
         Company GetCompany(string id);
-        void SendMessage(string Message, int SendToUserId, int SendFromCompanyId, int ListingId);
+        List<Message> SendMessage(string Message, int SendToUserId, int SendFromCompanyId, int ListingId);
         string UpdateCompany(Company company);
     }
 }
