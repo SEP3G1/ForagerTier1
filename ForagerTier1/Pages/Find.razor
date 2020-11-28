@@ -60,7 +60,7 @@
 
             </div>
         }
-        <button @onclick="@Test">Load more Listings</button>
+        <button @onclick="@LoadMoreListings">Load more Listings</button>
     </div>
 </div>
 
@@ -85,6 +85,7 @@
     {
         filter = value.ToString();
         Console.WriteLine("FilterResults(object value), filter: " + filter);
+        SearchQuery = null;
         sequenceNumber = 0;
         LazyFilterSearch();
     }
@@ -95,14 +96,14 @@
         public string ValueProperty { get; set; }
     }
 
-    private void RefreshMe()
+    private void RefreshMe() //#patrick //er denne stadig relevant?
     {
         SearchQuery = null;
         sequenceNumber = 0;
         LazyFilterSearch();
     }
 
-    public void Test()
+    public void LoadMoreListings()
     {
         sequenceNumber += 2; //hardcode issue #patrick //for at den kan søge inden sekvensnummer parametren bliver sat (i OnParametersSetAsync)
         LazyLoadEvent.InvokeAsync();
@@ -123,8 +124,6 @@
 
     protected override async Task OnParametersSetAsync()
     {
-        filter = "none";
-
         await JSRuntime.InvokeVoidAsync("setTitle", "forager. | " + search);
         //await JSRuntime.InvokeVoidAsync(user.ToString());
     }

@@ -43,7 +43,6 @@
                 </ComboBoxTemplates>
                 <ComboBoxFieldSettings Text="Text"></ComboBoxFieldSettings>
             </SfComboBox>
-            <button @onclick="@GetNextSequence">Load more Listings</button>
         </div>
 
 
@@ -162,7 +161,14 @@
 
         foreach (Listing l in listings)
         {
-            productDictionary.Add(l.Product.Name, l.getCover());
+            try
+            {
+                productDictionary.Add(l.Product.Name, l.getCover());
+            }
+            catch(System.ArgumentException) // Catches exception when 'An item with the same key has already been added.'
+            {
+                continue;
+            }
         }
 
         productDictionary.Distinct().ToList().ForEach(p => suggestionListForComboBox.Add(p.Key, p.Value));
