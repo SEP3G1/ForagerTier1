@@ -12,19 +12,19 @@
         <tr>
             <td>
                 <h2>@SearchQuery.Query</h2>
-                <p>Showing @SearchQuery.Listings.Count of @SearchQuery.Results:</p>
+                <p>Showing @SearchQuery.Listings.Count of @numberOfResults:</p>
             </td>
             <td>
                 <div>
                     <RadzenDropDown AllowClear="true" TValue="string" FilterCaseSensitivity="FilterCaseSensitivity.CaseInsensitive" AllowFiltering="true"
-                                    Placeholder="Filter" 
-                                    Data=@filterOptions TextProperty="TextProperty" ValueProperty="ValueProperty" 
+                                    Placeholder="Filter"
+                                    Data=@filterOptions TextProperty="TextProperty" ValueProperty="ValueProperty"
                                     Change=@(args => FilterResults(args)) />
                 </div>
                 <button class="listButton @(grid?"":"active")" @onclick="displayList"></button>
                 <button class="gridButton @(grid?"active":"")" @onclick="displayGrid"></button>
             </td>
-        </tr>   
+        </tr>
     </table>
     <div class="queryContainer">
         @foreach (Listing Listing in SearchQuery.Listings)
@@ -60,17 +60,19 @@
 
             </div>
         }
-        <button @onclick="@LoadMoreListings">Load more Listings</button>
+        <button hidden="@hideLoadMoreListingsButton" @onclick="@LoadMoreListings">Load more Listings</button>
     </div>
 </div>
 
 @code {
     [Parameter]
     public string search { get; init; }
-
     [Parameter]
     public int sequenceNumber { get; set; }
-    public int lazyLoadSequenceValue = 2; //hardcode #patrick
+
+    public int lazyLoadSequenceValue = 9; //hardcode #patrick
+    public int numberOfResults { get; set; }
+    public bool hideLoadMoreListingsButton = false;
 
     [CascadingParameter(Name = "LazyLoadEventName")]
     public EventCallback LazyLoadEvent { get; set; }
@@ -130,6 +132,7 @@
     protected override async Task OnParametersSetAsync()
     {
         await JSRuntime.InvokeVoidAsync("setTitle", "forager. | " + search);
+        hideLoadMoreListingsButton = SearchQuery.Listings.Count >= numberOfResults;
         //await JSRuntime.InvokeVoidAsync(user.ToString());
     }
 
@@ -148,6 +151,8 @@
         {
             SearchQuery = NewSearchQuery;
         }
+
+        numberOfResults = SocketService.GetNumberOfResults(search); // burde man ikke gå via en ListingService her? ... parker evt implementering til efter næste merge #patrick
     }
 
     public async void Filter()

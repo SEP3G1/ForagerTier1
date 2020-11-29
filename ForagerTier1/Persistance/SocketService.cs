@@ -73,6 +73,33 @@ namespace ForagerTier1.Models
             return sq;
         }
 
+        public int GetNumberOfResults(string message)
+        {
+            if (clientSocket == null)
+            {
+                IPEndPoint serverAddress = new IPEndPoint(IPAddress.Parse(IP), PORT);
+
+                clientSocket = new Socket(AddressFamily.InterNetwork, SocketType.Stream, ProtocolType.Tcp);
+                clientSocket.Connect(serverAddress);
+            }
+
+            string[] r = { "getNumberOfResults", message };
+            message = JsonSerializer.Serialize(r);
+
+            //Sends message to connected Rest web API and gets a response in json
+            string rcv = SendReceive(message);
+
+            //Makes json deserializor case insensitive
+            var options = new JsonSerializerOptions();
+            options.PropertyNameCaseInsensitive = true;
+            options.Converters.Add(new JsonStringEnumConverter());
+
+            //Deserializing received query
+            int numberOfResults = JsonSerializer.Deserialize<int>(rcv, options);
+
+            return numberOfResults;
+        }
+
         public User Login(string username, string password)
         {
             if (clientSocket == null)

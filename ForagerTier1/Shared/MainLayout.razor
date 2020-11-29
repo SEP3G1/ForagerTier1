@@ -96,12 +96,11 @@
         //For LazyLoad
         [Parameter]
         public int SequenceNumber { get; set; }
-        public int lazyLoadSequenceValue = 2; //hardcode #patrick
+        public int lazyLoadSequenceValue = 9; //hardcode #patrick
 
         User user;
 
         // For ComboBox dropdown
-        private IList<Listing> listings;
         public Dictionary<string, string> suggestionListForComboBox;
         List<Suggestion> DataForComboBox;
 
@@ -146,6 +145,13 @@
             }
         }
 
+        protected override async Task OnInitializedAsync()
+        {
+            //Henter opdateret data én gang for hver initialisering. Giver bedre brugeroplevelse (pga. loadtid), men betyder at data ikke opdateres hver gang man søger. 
+            //Evt lav en timer til at opdatere ComboBoxData med et interval. #patrick
+            setComboBoxData();
+        }
+
         public void GetNextSequence()
         {
             SequenceNumber += lazyLoadSequenceValue;
@@ -160,10 +166,7 @@
 
         public void onClick()
         {
-            if (listings == null)
-            {
-                setComboBoxData();
-            }
+
             valueComboBox = "";
             NavigationManager.NavigateTo("/");
         }
@@ -173,8 +176,8 @@
 
         public void setComboBoxData()
         {
-            productDictionary = SocketService.GetListingNamesAndCover(); // #patrick burde man ikke gå via en ListingService her?
-            listingPostCodes = SocketService.GetListingPostCodes(); // #patrick burde man ikke gå via en ListingService her?
+            productDictionary = SocketService.GetListingNamesAndCover(); // burde man ikke gå via en ListingService her? ... parker evt implementering til efter næste merge #patrick
+            listingPostCodes = SocketService.GetListingPostCodes(); // burde man ikke gå via en ListingService her? ... parker evt implementering til efter næste merge #patrick
 
             suggestionListForComboBox = new Dictionary<string, string>();
             DataForComboBox = new List<Suggestion>();
@@ -182,10 +185,10 @@
             SocketService.GetProductCategories().ForEach(p
             => suggestionListForComboBox.Add(p, "https://foodion.net/images/app/foodion_logo_square.png"));
 
-            productDictionary.ToList().ForEach(p => suggestionListForComboBox.Add(p.Key, p.Value)); //#patrick kan dette step udelades?
+            productDictionary.ToList().ForEach(p => suggestionListForComboBox.Add(p.Key, p.Value));
 
             listingPostCodes.ForEach(p
-            => suggestionListForComboBox.Add(p, "https://img.icons8.com/ios/452/zip-code.png")); //#patrick kan dette step udelades?
+            => suggestionListForComboBox.Add(p, "https://img.icons8.com/ios/452/zip-code.png"));
 
             suggestionListForComboBox.ToList().ForEach(s
             => DataForComboBox.Add(new Suggestion() { Text = s.Key, Image = s.Value }));
