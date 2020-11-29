@@ -383,8 +383,28 @@ namespace ForagerTier1.Models
 
         public Dictionary<string, string> GetListingNamesAndCover()
         {
+            if (clientSocket == null)
+            {
+                IPEndPoint serverAddress = new IPEndPoint(IPAddress.Parse(IP), PORT);
 
-            throw new NotImplementedException();
+                clientSocket = new Socket(AddressFamily.InterNetwork, SocketType.Stream, ProtocolType.Tcp);
+                clientSocket.Connect(serverAddress);
+            }
+
+            string[] r = { "getListingNamesAndCovers", null };
+            string message = JsonSerializer.Serialize(r);
+
+            //Sends message to connected Rest web API and gets a response in json
+            string rcv = SendReceive(message);
+
+            //Makes json deserializor case insensitive
+            var options = new JsonSerializerOptions();
+            options.PropertyNameCaseInsensitive = true;
+            options.Converters.Add(new JsonStringEnumConverter());
+
+            //Deserializing received query
+            Dictionary<string, string> listingNamesAndCovers = JsonSerializer.Deserialize<Dictionary<string, string>>(rcv, options);
+            return listingNamesAndCovers;
         }
 
         public List<string> GetListingPostCodes()

@@ -154,7 +154,7 @@
     public void setComboBoxData()
     {
         //listings = ((SearchQuery)SocketService.Search(null)).Listings; // Get listings  #patrick burde man ikke gå via en ListingService her?
-        //productDictionary = SocketService.GetListingNamesAndCover(); // #patrick burde man ikke gå via en ListingService her?
+        productDictionary = SocketService.GetListingNamesAndCover(); // #patrick burde man ikke gå via en ListingService her?
         listingPostCodes = SocketService.GetListingPostCodes(); // #patrick burde man ikke gå via en ListingService her?
 
         suggestionListForComboBox = new Dictionary<string, string>();
@@ -163,7 +163,7 @@
         SocketService.GetProductCategories().ForEach(p
         => suggestionListForComboBox.Add(p, "https://foodion.net/images/app/foodion_logo_square.png"));
 
-        //productDictionary.ToList().ForEach(p => suggestionListForComboBox.Add(p.Key, p.Value));
+        productDictionary.ToList().ForEach(p => suggestionListForComboBox.Add(p.Key, p.Value)); //#patrick kan dette step udelades?
 
         listingPostCodes.ForEach(p
         => suggestionListForComboBox.Add(p, "https://img.icons8.com/ios/452/zip-code.png")); //#patrick kan dette step udelades?
@@ -174,7 +174,9 @@
 
     public void search()
     {
-        if(suggestionListForComboBox.Keys.Contains(valueComboBox))
+        if (valueComboBox == null) { return;  }
+
+        if (suggestionListForComboBox.Keys.Contains(valueComboBox))
         {
             SequenceNumber = 0;
             RefreshService.CallRequestRefresh();
@@ -182,6 +184,7 @@
             valueComboBox = UppercaseFirst(valueComboBox.Trim());
             NavigationManager.NavigateTo("/find/" + valueComboBox + "/" + SequenceNumber);
         }
+
     }
 
     void KeyUp(KeyboardEventArgs e)
