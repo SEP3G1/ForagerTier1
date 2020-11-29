@@ -35,6 +35,12 @@
                 <div class="comment">
                     @listing.Comment
                 </div>
+
+                <div class="priceListing">
+                    <h2>$ @listing.Price</h2>
+                    <p>pr. @listing.Unit</p>
+                    <p>$ @listing.pricePrUnit()</p>
+                </div>
             </div>
             <div class="listingInfoTabelItem">
                 @if (myListing)
@@ -53,49 +59,67 @@
                 {
                     <div class="breadcrumbs">Pickup only</div>
                 }
-                @if (Conversation.Count > 0)
-                {
-                    <RadzenTabs style="height: 20rem">
-                        <Tabs>
-                            @foreach (Company c in Conversations)
-                            {
-                                    <RadzenTabsItem Text="@c.Name">
 
+                <br />
+                <AuthorizeView>
+                    <Authorized>
+                        <h3>Contact: </h3>
+                        <RadzenTabs style="height: 20rem">
+                            <Tabs>
+                                @if (myListing)
+                                {
+                                    @if (Conversation.Count > 0)
+                                    {
+                                        @foreach (Company c in Conversations)
+                                        {
+                                            <RadzenTabsItem Text="@c.Name">
+
+                                                <div class="conversation">
+                                                    @foreach (Message m in GetConversations(c.Name))
+                                                    {
+                                                        <p class="chatMessage @(m.fromCompany.Name.Equals(c.Name)?"recieved":"")">@m.message</p>
+                                                    }
+                                                </div>
+                                                <textarea class="messageInput" @bind="message"></textarea>
+                                                <input type="button" class="sendMessage" @onclick="@(() => Respond(GetConversations(c.Name)[GetConversations(c.Name).Count - 1]))" value="Send" />
+                                                
+                                                <a @onclick="UpdateConversations">&#x27F3; Update</a>
+                                            </RadzenTabsItem>
+                                        }
+                                    }
+                                    else
+                                    {
+                                        <RadzenTabsItem Text="">
+                                            <h3>
+                                                No messages yet...
+                                            </h3>
+                                        </RadzenTabsItem>
+                                    }
+                                }
+                                else
+                                {
+                                    <RadzenTabsItem Text="@Company.Name">
                                         <div class="conversation">
-                                            @foreach (Message m in GetConversations(c.Name))
+                                            @foreach (Message m in GetConversations(Company.Name))
                                             {
-                                                <p class="chatMessage @(m.fromCompany.Name.Equals(c.Name)?"recieved":"")">@m.message</p>
+                                                <p class="chatMessage @(m.fromCompany.Name.Equals(Company.Name)?"recieved":"")">@m.message</p>
                                             }
                                         </div>
                                         <textarea class="messageInput" @bind="message"></textarea>
-                                        <input type="button" class="sendMessage" @onclick="@(() => Respond(GetConversations(c.Name)[GetConversations(c.Name).Count - 1]))" value="Send" />
-
+                                        <input type="button" class="sendMessage" @onclick="@(() => SendMessage(listing.UserId, fromCompanyId))" value="Send" />
+                                        
+                                        <a @onclick="UpdateConversations">&#x27F3; Update</a>
                                     </RadzenTabsItem>
-                            }
-                        </Tabs>
-                    </RadzenTabs>
-                }
-
-                    @if (!myListing)
-                    {
-                        <p style="margin-top: 2rem;">Contact</p>
-                        <AuthorizeView>
-                            <Authorized>
-                                <textarea class="messageInput" @bind="message"></textarea>
-                                <input type="button" class="sendMessage" @onclick="@(() => SendMessage(listing.UserId, fromCompanyId))" value="Send message to @Company.Name" />
-                            </Authorized>
-                            <NotAuthorized>
-                                <h3>Login to contact seller</h3>
-                            </NotAuthorized>
-                        </AuthorizeView>
-                    }
-                </div>
-        </div>
-
-        <div class="priceListing">
-            <h2>$ @listing.Price</h2>
-            <p>pr. @listing.Unit</p>
-            <p>$ @listing.pricePrUnit()</p>
+                                }
+                            </Tabs>
+                        </RadzenTabs>
+                    </Authorized>
+                    <NotAuthorized>
+                        <p>Contact: </p>
+                        <h3>Login to contact seller</h3>
+                    </NotAuthorized>
+                </AuthorizeView>
+            </div>
         </div>
     </div>
 </div>
@@ -150,7 +174,6 @@
         await JSRuntime.InvokeVoidAsync("setTitle", "forager. | " + listing.Product.Name);
         RecommendedListings = (List<Listing>)SocketService.Search(listing.Product.ProductCategory).Listings;
         Company = CompanyService.GetCompanyFromUserId(listing.UserId);
-        Conversation = SocketService.GetConversation(listing.ListingId);
         var authState = await authenticationStateTask;
         var user = authState.User;
 
@@ -158,10 +181,7 @@
         {
             fromCompanyId = ((User)((CustomAuthenticationStateProvider)AuthenticationStateProvider).GetCashedUser()).CompanyId;
             myListing = fromCompanyId == Company.CompanyId;
-            if (myListing)
-            {
-                GetConversations();
-            }
+            UpdateConversations();
         }
     }
 
@@ -171,9 +191,15 @@
         {
             Conversation.Clear();
             Conversation = SocketService.SendMessage(message, toUserId, fromCompanyId, listing.ListingId);
+            message = "";
         }
     }
 
+    private void UpdateConversations()
+    {
+        Conversation = SocketService.GetConversation(listing.ListingId);
+        GetConversations();
+    }
 
     private void Respond(Message m)
     {
@@ -181,6 +207,7 @@
         {
             Conversation.Clear();
             Conversation = SocketService.Respond(message, m);
+            message = "";
         }
     }
 
@@ -208,7 +235,7 @@
         Conversations = new List<Company>();
         foreach (Message message in Conversation)
         {
-            if (!Conversations.Contains(message.fromCompany) && !message.fromCompany.Name.Equals(Company.Name))
+            if (!Conversations.Contains(message.fromCompany) && message.fromCompany.CompanyId != fromCompanyId)
                 Conversations.Add(message.fromCompany);
         }
     }
