@@ -616,3 +616,34 @@ input, textarea {
 .breadcrumbs a{
     color: #555;
 }
+
+
+.conversation{
+    height: 10rem;
+    overflow-y: auto;
+    display: flex;
+    flex-direction: column-reverse;
+}
+.ui-tabview .messageInput {
+    width: 70%;
+    margin: 1rem;
+    margin-left: 0;
+    height: 3rem;
+    float: left;
+}
+.ui-tabview .sendMessage{
+    width: 20%;
+    margin: 1rem;
+}
+.chatMessage {
+    text-align: right;
+    width: unset;
+    max-width: 80%;
+    padding: .2rem .5rem;
+    border-radius: .5rem;
+}
+.chatMessage.recieved {
+    text-align: left;
+    background: var(--logo-acc);
+    color: white;
+}

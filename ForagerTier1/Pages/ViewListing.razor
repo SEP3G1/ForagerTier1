@@ -53,20 +53,36 @@
                 {
                     <div class="breadcrumbs">Pickup only</div>
                 }
-                @if (Conversation.Count > 0)
-                {
-                    @foreach (Message m in Conversation)
-                    {
-                        <p>@m.fromCompany.Name: @m.message</p>
-                    }
-                }
+                <RadzenTabs style="height: 20rem">
+                    <Tabs>
+                        @if (Conversation.Count > 0)
+                        {
+                            @foreach (Message c in Conversations)
+                            {
+                                <RadzenTabsItem Text="@c.fromCompany.Name">
+
+                                    <div class="conversation">
+                                        @foreach (Message m in GetConversations(c.fromCompany.Name))
+                                        {
+                                            <p class="chatMessage @(m.fromCompany.Name.Equals(c.fromCompany.Name)?"recieved":"")">@m.message</p>
+                                        }
+                                    </div>
+                                    <textarea class="messageInput" @bind="message"></textarea>
+                                    <input type="button" class="sendMessage" @onclick="@(() => SendMessage(listing.UserId, fromCompanyId))" value="Send" />
+
+                                </RadzenTabsItem>
+                            }
+                        }
+                    </Tabs>
+                </RadzenTabs>
+
                 @if (!myListing)
                 {
                     <p style="margin-top: 2rem;">Contact</p>
                     <AuthorizeView>
                         <Authorized>
                             <textarea class="messageInput" @bind="message"></textarea>
-                            <input type="button" class="sendMessage" @onclick="SendMessage" value="Send message to @Company.Name" />
+                            <input type="button" class="sendMessage" @onclick="@(() => SendMessage(listing.UserId, fromCompanyId))" value="Send message to @Company.Name" />
                         </Authorized>
                         <NotAuthorized>
                             <h3>Login to contact seller</h3>
@@ -119,6 +135,8 @@
     Company Company = new Company();
     List<Listing> RecommendedListings = new List<Listing>();
     List<Message> Conversation = new List<Message>();
+    List<Message> Conversations = new List<Message>();
+
     string imageInView = "";
     string message = "";
     string _authMessage = "";
@@ -140,13 +158,17 @@
         {
             fromCompanyId = ((User)((CustomAuthenticationStateProvider)AuthenticationStateProvider).GetCashedUser()).CompanyId;
             myListing = fromCompanyId == Company.CompanyId;
+            if (myListing)
+            {
+                GetConversations();
+            }
         }
     }
 
-    private void SendMessage()
+    private void SendMessage(int toUserId, int fromCompanyId)
     {
         if (!message.Equals(""))
-            Conversation = SocketService.SendMessage(message, listing.UserId, fromCompanyId, listing.ListingId);
+            Conversation = SocketService.SendMessage(message, toUserId, fromCompanyId, listing.ListingId);
     }
     public void openListing(int id)
     {
@@ -155,5 +177,31 @@
     public void Edit()
     {
         NavigationManager.NavigateTo($"/sell/{id}");
+    }
+    private List<Message> GetConversations(string CompanyName)
+    {
+        List<Message> C = new List<Message>();
+
+        foreach (Message m in Conversation)
+        {
+            if (m.fromCompany.Name.Equals(CompanyName) || m.toCompany.Name.Equals(CompanyName))
+                C.Add(m);
+        }
+        return C;
+    }
+    private void GetConversations()
+    {
+        Conversations = new List<Message>();
+        foreach(Message m in Conversation)
+        {
+            Boolean seen = false;
+            foreach (Message c in Conversations)
+            {
+                if (m.fromCompany.Name.Equals(c.fromCompany.Name))
+                    seen = true;
+            }
+            if (!seen)
+                Conversations.Add(m);
+        }
     }
 }

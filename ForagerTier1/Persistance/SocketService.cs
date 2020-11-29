@@ -19,10 +19,11 @@ namespace ForagerTier1.Models
         private int notifications = 0;
         private int? Chash { get; set; }
         public event EventHandler SomethingHappened;
+        IPEndPoint serverAddress;
 
         public SocketService()
         {
-            IPEndPoint serverAddress = new IPEndPoint(IPAddress.Parse(IP), PORT);
+            serverAddress = new IPEndPoint(IPAddress.Parse(IP), PORT);
 
             clientSocket = new Socket(AddressFamily.InterNetwork, SocketType.Stream, ProtocolType.Tcp);
             clientSocket.Connect(serverAddress);
@@ -153,12 +154,14 @@ namespace ForagerTier1.Models
         }
         public void Send(string message)
         {
+            clientSocket.Connect(serverAddress);
             // Sending
             int toSendLen = System.Text.Encoding.ASCII.GetByteCount(message);
             byte[] toSendBytes = System.Text.Encoding.ASCII.GetBytes(message);
             byte[] toSendLenBytes = System.BitConverter.GetBytes(toSendLen);
             clientSocket.Send(toSendLenBytes);
             clientSocket.Send(toSendBytes);
+            clientSocket.Close();
         }
         public int GetNotifications()
         {
