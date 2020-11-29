@@ -148,14 +148,12 @@
 
         public void GetNextSequence()
         {
-            Console.WriteLine("MainLayout.razor \t\t GetNEXTSequence(). SequenceNumber goes from " + SequenceNumber + " to " + (SequenceNumber+2));
-            SequenceNumber += 2; //hardcodeissue #patrick
+            SequenceNumber += lazyLoadSequenceValue;
             NavigationManager.NavigateTo("/find/" + valueComboBox + "/" + SequenceNumber);
         }
 
         public void BeginNewSequence()
         {
-            Console.WriteLine("MainLayout.razor \t\t BeginNEWSequence(). SequenceNumber goes from " + SequenceNumber + " to 0");
             SequenceNumber = 0;
             NavigationManager.NavigateTo("/find/" + valueComboBox + "/" + SequenceNumber);
         }
@@ -175,7 +173,6 @@
 
         public void setComboBoxData()
         {
-            //listings = ((SearchQuery)SocketService.Search(null)).Listings; // Get listings  #patrick burde man ikke gå via en ListingService her?
             productDictionary = SocketService.GetListingNamesAndCover(); // #patrick burde man ikke gå via en ListingService her?
             listingPostCodes = SocketService.GetListingPostCodes(); // #patrick burde man ikke gå via en ListingService her?
 

@@ -88,7 +88,6 @@
     public void FilterResults(object value)
     {
         filter = value.ToString();
-        Console.WriteLine("Find.razor \t\t FilterResults(object value), object value: " + value);
         SearchQuery = null;
         sequenceNumber = 0;
         LazyFilterSearch();
@@ -136,19 +135,10 @@
 
     public async Task LazyFilterSearch()
     {
-        Console.WriteLine("Find.razor \t\t LazyFilterSearch()");
-      //  if (SearchQuery == null)
-      //  {
-      //      Console.WriteLine("Find.razor \t\t SearchQuery was null");
-      //      SearchQuery = new SearchQuery();
-      //  }
-
-        NewSearchQuery = (SearchQuery)SocketService
-                .LazyFilterSearch(search, filter, sequenceNumber);
+        NewSearchQuery = (SearchQuery)SocketService.LazyFilterSearch(search, filter, sequenceNumber);
 
         if (sequenceNumber > 0)
         {
-            Console.WriteLine("Find.razor \t\t sequenceNumber > 0 => therefore Add stuff");
             foreach (Listing listing in NewSearchQuery.Listings)
             {
                 SearchQuery.Listings.Add(listing);
@@ -156,7 +146,6 @@
         }
         else
         {
-            Console.WriteLine("Find.razor \t\t sequenceNumber !> 0 => therefore New stuff");
             SearchQuery = NewSearchQuery;
         }
     }
