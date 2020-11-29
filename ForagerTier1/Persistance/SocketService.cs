@@ -15,9 +15,6 @@ namespace ForagerTier1.Models
         private static string IP = "192.168.87.168";
         private static int PORT = 4343;
         private static Socket clientSocket;
-        private static Timer notificationTimer;
-        private int notifications = 0;
-        private int? Chash { get; set; }
         public event EventHandler SomethingHappened;
         IPEndPoint serverAddress;
 
@@ -27,8 +24,6 @@ namespace ForagerTier1.Models
 
             clientSocket = new Socket(AddressFamily.InterNetwork, SocketType.Stream, ProtocolType.Tcp);
             clientSocket.Connect(serverAddress);
-            //SetTimer();
-
         }
 
         public SearchQuery Search(string message)
@@ -78,30 +73,6 @@ namespace ForagerTier1.Models
             //Sends message to connected Rest web API and gets a response in json
             string rcv = SendReceive(message);
             return rcv;
-        }
-
-        private void SetTimer()
-        {
-            // Create a timer with a two second interval.
-            notificationTimer = new Timer(1000);
-            // Hook up the Elapsed event for the timer. 
-            notificationTimer.Elapsed += OnTimedEvent;
-            notificationTimer.AutoReset = true;
-            notificationTimer.Enabled = true;
-        }
-
-        private void OnTimedEvent(Object source, ElapsedEventArgs e)
-        {
-            if (Chash == null)
-                Chash = GetUnreadMessages();
-            else
-            {
-                if (Chash != GetUnreadMessages())
-                {
-                    notifications++;
-                    SomethingHappened?.Invoke(this, EventArgs.Empty);
-                }
-            }
         }
         
         public int GetUnreadMessages()
@@ -162,10 +133,6 @@ namespace ForagerTier1.Models
             clientSocket.Send(toSendLenBytes);
             clientSocket.Send(toSendBytes);
             clientSocket.Close();
-        }
-        public int GetNotifications()
-        {
-            return notifications;
         }
         public Listing GetListing(string id)
         {

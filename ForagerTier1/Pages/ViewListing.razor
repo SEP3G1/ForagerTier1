@@ -45,6 +45,7 @@
             <div class="listingInfoTabelItem">
                 @if (myListing)
                 {
+                    <h3>Views: @listing.NumberOfViews</h3>
                     <input type="button" class="edit" value="Edit listing" @onclick="Edit" />
                 }
                 <p>Seller</p>
@@ -235,7 +236,20 @@
         Conversations = new List<Company>();
         foreach (Message message in Conversation)
         {
-            if (!Conversations.Contains(message.fromCompany) && message.fromCompany.CompanyId != fromCompanyId)
+            Boolean seen = false;
+            if (message.fromCompany.CompanyId == fromCompanyId)
+                continue;
+
+            foreach(Company company in Conversations)
+            {
+                if (message.fromCompany.Name.Equals(company.Name))
+                {
+                    seen = true;
+                    break;
+                }
+            }
+
+            if (!seen)
                 Conversations.Add(message.fromCompany);
         }
     }

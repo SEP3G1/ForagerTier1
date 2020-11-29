@@ -18,7 +18,6 @@ namespace ForagerTier1.Models
         List<Product> GetProducts();
         List<string> GetProductCategories();
         int GetUnreadMessages();
-        int GetNotifications();
         List<Message> GetConversation(int ListingId);
         User GetUser(int id);
         Company GetCompanyFromUserId(int id);
