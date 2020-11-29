@@ -53,43 +53,43 @@
                 {
                     <div class="breadcrumbs">Pickup only</div>
                 }
-                <RadzenTabs style="height: 20rem">
-                    <Tabs>
-                        @if (Conversation.Count > 0)
-                        {
-                            @foreach (Message c in Conversations)
-                            {
-                                <RadzenTabsItem Text="@c.fromCompany.Name">
-
-                                    <div class="conversation">
-                                        @foreach (Message m in GetConversations(c.fromCompany.Name))
-                                        {
-                                            <p class="chatMessage @(m.fromCompany.Name.Equals(c.fromCompany.Name)?"recieved":"")">@m.message</p>
-                                        }
-                                    </div>
-                                    <textarea class="messageInput" @bind="message"></textarea>
-                                    <input type="button" class="sendMessage" @onclick="@(() => SendMessage(listing.UserId, fromCompanyId))" value="Send" />
-
-                                </RadzenTabsItem>
-                            }
-                        }
-                    </Tabs>
-                </RadzenTabs>
-
-                @if (!myListing)
+                @if (Conversation.Count > 0)
                 {
-                    <p style="margin-top: 2rem;">Contact</p>
-                    <AuthorizeView>
-                        <Authorized>
-                            <textarea class="messageInput" @bind="message"></textarea>
-                            <input type="button" class="sendMessage" @onclick="@(() => SendMessage(listing.UserId, fromCompanyId))" value="Send message to @Company.Name" />
-                        </Authorized>
-                        <NotAuthorized>
-                            <h3>Login to contact seller</h3>
-                        </NotAuthorized>
-                    </AuthorizeView>
+                    <RadzenTabs style="height: 20rem">
+                        <Tabs>
+                            @foreach (Company c in Conversations)
+                            {
+                                    <RadzenTabsItem Text="@c.Name">
+
+                                        <div class="conversation">
+                                            @foreach (Message m in GetConversations(c.Name))
+                                            {
+                                                <p class="chatMessage @(m.fromCompany.Name.Equals(c.Name)?"recieved":"")">@m.message</p>
+                                            }
+                                        </div>
+                                        <textarea class="messageInput" @bind="message"></textarea>
+                                        <input type="button" class="sendMessage" @onclick="@(() => Respond(GetConversations(c.Name)[GetConversations(c.Name).Count - 1]))" value="Send" />
+
+                                    </RadzenTabsItem>
+                            }
+                        </Tabs>
+                    </RadzenTabs>
                 }
-            </div>
+
+                    @if (!myListing)
+                    {
+                        <p style="margin-top: 2rem;">Contact</p>
+                        <AuthorizeView>
+                            <Authorized>
+                                <textarea class="messageInput" @bind="message"></textarea>
+                                <input type="button" class="sendMessage" @onclick="@(() => SendMessage(listing.UserId, fromCompanyId))" value="Send message to @Company.Name" />
+                            </Authorized>
+                            <NotAuthorized>
+                                <h3>Login to contact seller</h3>
+                            </NotAuthorized>
+                        </AuthorizeView>
+                    }
+                </div>
         </div>
 
         <div class="priceListing">
@@ -135,7 +135,7 @@
     Company Company = new Company();
     List<Listing> RecommendedListings = new List<Listing>();
     List<Message> Conversation = new List<Message>();
-    List<Message> Conversations = new List<Message>();
+    List<Company> Conversations = new List<Company>();
 
     string imageInView = "";
     string message = "";
@@ -168,8 +168,22 @@
     private void SendMessage(int toUserId, int fromCompanyId)
     {
         if (!message.Equals(""))
+        {
+            Conversation.Clear();
             Conversation = SocketService.SendMessage(message, toUserId, fromCompanyId, listing.ListingId);
+        }
     }
+
+
+    private void Respond(Message m)
+    {
+        if (!message.Equals(""))
+        {
+            Conversation.Clear();
+            Conversation = SocketService.Respond(message, m);
+        }
+    }
+
     public void openListing(int id)
     {
         NavigationManager.NavigateTo($"/listing/{id}");
@@ -191,17 +205,11 @@
     }
     private void GetConversations()
     {
-        Conversations = new List<Message>();
-        foreach(Message m in Conversation)
+        Conversations = new List<Company>();
+        foreach (Message message in Conversation)
         {
-            Boolean seen = false;
-            foreach (Message c in Conversations)
-            {
-                if (m.fromCompany.Name.Equals(c.fromCompany.Name))
-                    seen = true;
-            }
-            if (!seen)
-                Conversations.Add(m);
+            if (!Conversations.Contains(message.fromCompany) && !message.fromCompany.Name.Equals(Company.Name))
+                Conversations.Add(message.fromCompany);
         }
     }
 }

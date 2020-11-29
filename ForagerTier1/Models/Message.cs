@@ -13,6 +13,5 @@ namespace ForagerTier1.Models
         public Company toCompany { get; set; }
         public String timestamp { get; set; }
         public int ListingId { get; set; }
-        public bool isRead { get; set; }
     }
 }

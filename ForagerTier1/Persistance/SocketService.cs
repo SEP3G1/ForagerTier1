@@ -271,6 +271,26 @@ namespace ForagerTier1.Models
             return Conversation;
         }
 
+        public List<Message> Respond(string Message, Message m)
+        {
+            m.message = Message;
+            m.timestamp = DateTime.Now.Ticks + "";
+            Company c = m.fromCompany;
+            m.fromCompany = m.toCompany;
+            m.toCompany = c;
+            string[] r = { "sendMessageWM", JsonSerializer.Serialize(m) };
+            string message = JsonSerializer.Serialize(r);
+
+            //Sends message to connected Rest web API and gets a response in json
+            string rcv = SendReceive(message);
+            //Makes json deserializor case-insencitive
+            var options = new JsonSerializerOptions();
+            options.PropertyNameCaseInsensitive = true;
+            options.Converters.Add(new JsonStringEnumConverter());
+
+            List<Message> Conversation = JsonSerializer.Deserialize<List<Message>>(rcv, options);
+            return Conversation; ;
+        }
         public User GetUser(int id)
         {
 
@@ -326,5 +346,6 @@ namespace ForagerTier1.Models
             List<Message> Conversation = JsonSerializer.Deserialize<List<Message>>(rcv, options);
             return Conversation;
         }
+
     }
 }
