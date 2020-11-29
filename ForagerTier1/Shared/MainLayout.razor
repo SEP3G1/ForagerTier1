@@ -73,153 +73,175 @@
 
     <!-- "Syncfusion søgebar" -->
     <div class="content">
-       
+
         <!-- For LazyLoad-->
-    <CascadingValue Value=LazyLoadEvent>
-        @Body
+        <CascadingValue Value=@LazyLoadEvent Name="LazyLoadEventName">
+            <CascadingValue Value=@BeginNewSequenceEvent Name="BeginNewSequenceEventName">
+            @Body
+        </CascadingValue>
         </CascadingValue>
     </div>
-    <div class="footer">
+        <div class="footer">
 
+        </div>
     </div>
-</div>
 
 
 
 
-@code{
-    bool hidden = false;
-    string valueComboBox = "";
+    @code{
+        bool hidden = false;
+        string valueComboBox = "";
 
-    //For LazyLoad
-    [Parameter]
-    public int SequenceNumber { get; set; }
+        //For LazyLoad
+        [Parameter]
+        public int SequenceNumber { get; set; }
+        public int lazyLoadSequenceValue = 2; //hardcode #patrick
 
-    User user;
+        User user;
 
-    // For ComboBox dropdown
-    private IList<Listing> listings;
-    public Dictionary<string, string> suggestionListForComboBox;
-    List<Suggestion> DataForComboBox;
+        // For ComboBox dropdown
+        private IList<Listing> listings;
+        public Dictionary<string, string> suggestionListForComboBox;
+        List<Suggestion> DataForComboBox;
 
-    // https://stackoverflow.com/questions/58123063/call-method-in-mainlayout-from-a-page-component-in-blazor
-    //To make sure you only create this object once, you can use the following:
-    EventCallback _lazyLoadEvent = EventCallback.Empty;
-    EventCallback LazyLoadEvent
-    {
-        get
+        // https://stackoverflow.com/questions/58123063/call-method-in-mainlayout-from-a-page-component-in-blazor
+        //To make sure you only create this object once, you can use the following:
+        EventCallback _lazyLoadEvent = EventCallback.Empty;
+        EventCallback LazyLoadEvent
         {
-            if (_lazyLoadEvent.Equals(EventCallback.Empty))
-                _lazyLoadEvent = EventCallback.Factory.Create(this, GetNextSequence);
-            return _lazyLoadEvent;
+            get
+            {
+                if (_lazyLoadEvent.Equals(EventCallback.Empty))
+                    _lazyLoadEvent = EventCallback.Factory.Create(this, GetNextSequence);
+                return _lazyLoadEvent;
+            }
         }
-    }
 
-    protected override async Task OnParametersSetAsync()
-    {
-        if (user == null)
+        EventCallback _beginNewSequenceEvent = EventCallback.Empty;
+        EventCallback BeginNewSequenceEvent
         {
-            user = ((CustomAuthenticationStateProvider)AuthenticationStateProvider).GetCashedUser();
+            get
+            {
+                if (_beginNewSequenceEvent.Equals(EventCallback.Empty))
+                    _beginNewSequenceEvent = EventCallback.Factory.Create(this, BeginNewSequence);
+                return _beginNewSequenceEvent;
+            }
         }
-        //Console.WriteLine(user.ToString());
-        if (NavigationManager.Uri.Split('/').ToList<string>()[3].Equals("listing"))
+
+        protected override async Task OnParametersSetAsync()
         {
-            hidden = true;
+            if (user == null)
+            {
+                user = ((CustomAuthenticationStateProvider)AuthenticationStateProvider).GetCashedUser();
+            }
+            //Console.WriteLine(user.ToString());
+            if (NavigationManager.Uri.Split('/').ToList<string>()[3].Equals("listing"))
+            {
+                hidden = true;
+            }
+            else
+            {
+                hidden = false;
+            }
         }
-        else
+
+        public void GetNextSequence()
         {
-            hidden = false;
-        }
-    }
-
-    public void GetNextSequence()
-    {
-        SequenceNumber += 2; //hardcodeissue #patrick
-        NavigationManager.NavigateTo("/find/" + valueComboBox + "/" + SequenceNumber);
-    }
-
-    public void onClick()
-    {
-        if (listings == null)
-        {
-            setComboBoxData();
-        }
-        valueComboBox = "";
-        NavigationManager.NavigateTo("/");
-    }
-
-    Dictionary<string, string> productDictionary = new Dictionary<string, string>();
-    private List<string> listingPostCodes = new List<string>();
-
-    public void setComboBoxData()
-    {
-        //listings = ((SearchQuery)SocketService.Search(null)).Listings; // Get listings  #patrick burde man ikke gå via en ListingService her?
-        productDictionary = SocketService.GetListingNamesAndCover(); // #patrick burde man ikke gå via en ListingService her?
-        listingPostCodes = SocketService.GetListingPostCodes(); // #patrick burde man ikke gå via en ListingService her?
-
-        suggestionListForComboBox = new Dictionary<string, string>();
-        DataForComboBox = new List<Suggestion>();
-
-        SocketService.GetProductCategories().ForEach(p
-        => suggestionListForComboBox.Add(p, "https://foodion.net/images/app/foodion_logo_square.png"));
-
-        productDictionary.ToList().ForEach(p => suggestionListForComboBox.Add(p.Key, p.Value)); //#patrick kan dette step udelades?
-
-        listingPostCodes.ForEach(p
-        => suggestionListForComboBox.Add(p, "https://img.icons8.com/ios/452/zip-code.png")); //#patrick kan dette step udelades?
-
-        suggestionListForComboBox.ToList().ForEach(s
-        => DataForComboBox.Add(new Suggestion() { Text = s.Key, Image = s.Value }));
-    }
-
-    public void search()
-    {
-        if (valueComboBox == null) { return;  }
-
-        if (suggestionListForComboBox.Keys.Contains(valueComboBox))
-        {
-            SequenceNumber = 0;
-            RefreshService.CallRequestRefresh();
-
-            valueComboBox = UppercaseFirst(valueComboBox.Trim());
+            Console.WriteLine("MainLayout.razor \t\t GetNEXTSequence(). SequenceNumber goes from " + SequenceNumber + " to " + (SequenceNumber+2));
+            SequenceNumber += 2; //hardcodeissue #patrick
             NavigationManager.NavigateTo("/find/" + valueComboBox + "/" + SequenceNumber);
         }
 
-    }
-
-    void KeyUp(KeyboardEventArgs e)
-    {
-        if (e.Key == "Enter")
+        public void BeginNewSequence()
         {
-            search();
+            Console.WriteLine("MainLayout.razor \t\t BeginNEWSequence(). SequenceNumber goes from " + SequenceNumber + " to 0");
+            SequenceNumber = 0;
+            NavigationManager.NavigateTo("/find/" + valueComboBox + "/" + SequenceNumber);
+        }
+
+        public void onClick()
+        {
+            if (listings == null)
+            {
+                setComboBoxData();
+            }
+            valueComboBox = "";
+            NavigationManager.NavigateTo("/");
+        }
+
+        Dictionary<string, string> productDictionary = new Dictionary<string, string>();
+        private List<string> listingPostCodes = new List<string>();
+
+        public void setComboBoxData()
+        {
+            //listings = ((SearchQuery)SocketService.Search(null)).Listings; // Get listings  #patrick burde man ikke gå via en ListingService her?
+            productDictionary = SocketService.GetListingNamesAndCover(); // #patrick burde man ikke gå via en ListingService her?
+            listingPostCodes = SocketService.GetListingPostCodes(); // #patrick burde man ikke gå via en ListingService her?
+
+            suggestionListForComboBox = new Dictionary<string, string>();
+            DataForComboBox = new List<Suggestion>();
+
+            SocketService.GetProductCategories().ForEach(p
+            => suggestionListForComboBox.Add(p, "https://foodion.net/images/app/foodion_logo_square.png"));
+
+            productDictionary.ToList().ForEach(p => suggestionListForComboBox.Add(p.Key, p.Value)); //#patrick kan dette step udelades?
+
+            listingPostCodes.ForEach(p
+            => suggestionListForComboBox.Add(p, "https://img.icons8.com/ios/452/zip-code.png")); //#patrick kan dette step udelades?
+
+            suggestionListForComboBox.ToList().ForEach(s
+            => DataForComboBox.Add(new Suggestion() { Text = s.Key, Image = s.Value }));
+        }
+
+        public void search()
+        {
+            if (valueComboBox == null) { return;  }
+
+            if (suggestionListForComboBox.Keys.Contains(valueComboBox))
+            {
+                SequenceNumber = 0;
+                RefreshService.CallRequestRefresh();
+
+                valueComboBox = UppercaseFirst(valueComboBox.Trim());
+                NavigationManager.NavigateTo("/find/" + valueComboBox + "/" + SequenceNumber);
+            }
+
+        }
+
+        void KeyUp(KeyboardEventArgs e)
+        {
+            if (e.Key == "Enter")
+            {
+                search();
+            }
+        }
+
+        public void login()
+        {
+            NavigationManager.NavigateTo("/Login");
+        }
+        public void logout()
+        {
+            ((CustomAuthenticationStateProvider)AuthenticationStateProvider).Logout();
+        }
+
+        static string UppercaseFirst(string s)
+        {
+            // Check for empty string.
+            if (string.IsNullOrEmpty(s))
+            {
+                return string.Empty;
+            }
+            // Return char and concat substring.
+            return char.ToUpper(s[0]) + s.Substring(1);
+        }
+
+
+        public class Suggestion
+        {
+            public string Text { get; set; }
+            public string Image { get; set; }
         }
     }
-
-    public void login()
-    {
-        NavigationManager.NavigateTo("/Login");
-    }
-    public void logout()
-    {
-        ((CustomAuthenticationStateProvider)AuthenticationStateProvider).Logout();
-    }
-
-    static string UppercaseFirst(string s)
-    {
-        // Check for empty string.
-        if (string.IsNullOrEmpty(s))
-        {
-            return string.Empty;
-        }
-        // Return char and concat substring.
-        return char.ToUpper(s[0]) + s.Substring(1);
-    }
-
-
-    public class Suggestion
-    {
-        public string Text { get; set; }
-        public string Image { get; set; }
-    }
-}
 

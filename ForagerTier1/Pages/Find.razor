@@ -70,9 +70,13 @@
 
     [Parameter]
     public int sequenceNumber { get; set; }
+    public int lazyLoadSequenceValue = 2; //hardcode #patrick
 
-    [CascadingParameter]
+    [CascadingParameter(Name = "LazyLoadEventName")]
     public EventCallback LazyLoadEvent { get; set; }
+
+    [CascadingParameter(Name = "BeginNewSequenceEventName")]
+    public EventCallback BeginNewSequenceEvent { get; set; }
 
     IEnumerable<FilterOption> filterOptions = new List<FilterOption>() {
     new FilterOption{TextProperty = "Price - low to high", ValueProperty = "priceAscending"},
@@ -81,13 +85,15 @@
     new FilterOption{TextProperty = "Distance - low to high", ValueProperty = "distanceAscending"},
     };
 
-    private void FilterResults(object value)
+    public void FilterResults(object value)
     {
         filter = value.ToString();
-        Console.WriteLine("FilterResults(object value), filter: " + filter);
+        Console.WriteLine("Find.razor \t\t FilterResults(object value), object value: " + value);
         SearchQuery = null;
         sequenceNumber = 0;
         LazyFilterSearch();
+        BeginNewSequenceEvent.InvokeAsync();
+        //LazyFilterSearch();
     }
 
     public class FilterOption
@@ -105,7 +111,7 @@
 
     public void LoadMoreListings()
     {
-        sequenceNumber += 2; //hardcode issue #patrick //for at den kan søge inden sekvensnummer parametren bliver sat (i OnParametersSetAsync)
+        sequenceNumber += lazyLoadSequenceValue;
         LazyLoadEvent.InvokeAsync();
         LazyFilterSearch();
     }
@@ -130,17 +136,19 @@
 
     public async Task LazyFilterSearch()
     {
-
-        if (SearchQuery == null)
-        {
-            SearchQuery = new SearchQuery();
-        }
+        Console.WriteLine("Find.razor \t\t LazyFilterSearch()");
+      //  if (SearchQuery == null)
+      //  {
+      //      Console.WriteLine("Find.razor \t\t SearchQuery was null");
+      //      SearchQuery = new SearchQuery();
+      //  }
 
         NewSearchQuery = (SearchQuery)SocketService
                 .LazyFilterSearch(search, filter, sequenceNumber);
 
         if (sequenceNumber > 0)
         {
+            Console.WriteLine("Find.razor \t\t sequenceNumber > 0 => therefore Add stuff");
             foreach (Listing listing in NewSearchQuery.Listings)
             {
                 SearchQuery.Listings.Add(listing);
@@ -148,6 +156,7 @@
         }
         else
         {
+            Console.WriteLine("Find.razor \t\t sequenceNumber !> 0 => therefore New stuff");
             SearchQuery = NewSearchQuery;
         }
     }
