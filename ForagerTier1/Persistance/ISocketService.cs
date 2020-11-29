@@ -18,6 +18,8 @@ namespace ForagerTier1.Models
         Listing GetListing(string id);
         List<Product> GetProducts();
         List<string> GetProductCategories();
+        Dictionary<string, string> GetListingNamesAndCover();
+        List<string> GetListingPostCodes();
         User GetUser(int id);
         Company GetCompanyFromUserId(int id);
         Company GetCompany(string id);

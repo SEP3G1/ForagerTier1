@@ -148,33 +148,25 @@
         NavigationManager.NavigateTo("/");
     }
 
+    Dictionary<string, string> productDictionary = new Dictionary<string, string>();
+    private List<string> listingPostCodes = new List<string>();
+
     public void setComboBoxData()
     {
-        listings = ((SearchQuery)SocketService.Search(null)).Listings; // Get listings
+        //listings = ((SearchQuery)SocketService.Search(null)).Listings; // Get listings  #patrick burde man ikke gå via en ListingService her?
+        //productDictionary = SocketService.GetListingNamesAndCover(); // #patrick burde man ikke gå via en ListingService her?
+        listingPostCodes = SocketService.GetListingPostCodes(); // #patrick burde man ikke gå via en ListingService her?
+
         suggestionListForComboBox = new Dictionary<string, string>();
         DataForComboBox = new List<Suggestion>();
 
         SocketService.GetProductCategories().ForEach(p
         => suggestionListForComboBox.Add(p, "https://foodion.net/images/app/foodion_logo_square.png"));
 
-        Dictionary<string, string> productDictionary = new Dictionary<string, string>();
+        //productDictionary.ToList().ForEach(p => suggestionListForComboBox.Add(p.Key, p.Value));
 
-        foreach (Listing l in listings)
-        {
-            try
-            {
-                productDictionary.Add(l.Product.Name, l.getCover());
-            }
-            catch(System.ArgumentException) // Catches exception when 'An item with the same key has already been added.'
-            {
-                continue;
-            }
-        }
-
-        productDictionary.Distinct().ToList().ForEach(p => suggestionListForComboBox.Add(p.Key, p.Value));
-
-        listings.Select(l => l.Postcode).Distinct().ToList().ForEach(p
-        => suggestionListForComboBox.Add(p, "https://img.icons8.com/ios/452/zip-code.png"));
+        listingPostCodes.ForEach(p
+        => suggestionListForComboBox.Add(p, "https://img.icons8.com/ios/452/zip-code.png")); //#patrick kan dette step udelades?
 
         suggestionListForComboBox.ToList().ForEach(s
         => DataForComboBox.Add(new Suggestion() { Text = s.Key, Image = s.Value }));
