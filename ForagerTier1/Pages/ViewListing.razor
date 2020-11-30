@@ -130,7 +130,7 @@
     @foreach (Listing Listing in RecommendedListings)
     {
         <div class="listing @(Listing.HasDelivery ? "Delivery" : "")" @onclick="@(e => openListing(@Listing.ListingId))">
-            <div class="listingImage" style="background-image: url(@Listing.getCover());"></div>
+            <div class="listingImage @(CompanyService.GetCompanyFromUserId(Listing.UserId).CompanyId == fromCompanyId?"MyListing":"")" style="background-image: url(@Listing.getCover());"></div>
             <p class="type">@Listing.Product.Name</p>
             <table>
                 <tr>

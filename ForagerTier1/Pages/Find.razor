@@ -2,10 +2,13 @@
 @page "/find/{search}"
 @page "/find/{search}/{sequenceNumber:int}"
 @using ForagerTier1.Models
+@using ForagerTier1.Persistance
 @inject ISocketService SocketService
 @inject IJSRuntime JSRuntime;
 @inject NavigationManager NavigationManager
+@inject AuthenticationStateProvider AuthenticationStateProvider
 @inject IRefreshService RefreshService
+@inject ICompanyService CompanyService
 @implements IDisposable
 <div class="page">
     <table class="searchMenu">
@@ -30,7 +33,7 @@
         @foreach (Listing Listing in SearchQuery.Listings)
         {
             <div class="@(grid?"":"list") listing @(Listing.HasDelivery ? "Delivery" : "")" @onclick="@(e => openListing(@Listing.ListingId))">
-                <div class="listingImage" style="background-image: url(@Listing.getCover());"></div>
+                <div class="listingImage @(CompanyService.GetCompanyFromUserId(Listing.UserId).CompanyId == CompanyId?"MyListing":"")" style="background-image: url(@Listing.getCover());"></div>
                 <p class="type">@Listing.Product.Name</p>
                 <table>
                     <tr>
@@ -67,13 +70,16 @@
 @code {
     [Parameter]
     public string? Search { get; set; }
-    
+
     [Parameter]
     public int? SequenceNumber { get; set; }
 
     public int lazyLoadSequenceValue = 9; //hardcode #patrick
     public int numberOfResults { get; set; }
     public bool hideLoadMoreListingsButton = false;
+    [CascadingParameter]
+    private Task<AuthenticationState> authenticationStateTask { get; set; }
+    int CompanyId = -1;
 
     [CascadingParameter(Name = "LazyLoadEventName")]
     public EventCallback LazyLoadEvent { get; set; }
@@ -126,6 +132,13 @@
 
     protected override async Task OnInitializedAsync()
     {
+        var authState = await authenticationStateTask;
+        var user = authState.User;
+
+        if (user.Identity.IsAuthenticated)
+            CompanyId = ((User)((CustomAuthenticationStateProvider)AuthenticationStateProvider).GetCashedUser()).CompanyId;
+
+
         SequenceNumber = SequenceNumber ?? 0;
         RefreshService.RefreshRequested += RefreshMe;
         await LazyFilterSearch();
