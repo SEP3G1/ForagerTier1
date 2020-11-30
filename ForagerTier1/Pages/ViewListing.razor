@@ -130,7 +130,7 @@
     @foreach (Listing Listing in RecommendedListings)
     {
         <div class="listing @(Listing.HasDelivery ? "Delivery" : "")" @onclick="@(e => openListing(@Listing.ListingId))">
-            <div class="listingImage @(CompanyService.GetCompanyFromUserId(Listing.UserId).CompanyId == fromCompanyId?"MyListing":"")" style="background-image: url(@Listing.getCover());"></div>
+            <div class="listingImage" style="background-image: url(@Listing.getCover());"></div>
             <p class="type">@Listing.Product.Name</p>
             <table>
                 <tr>
@@ -190,7 +190,7 @@
     {
         if (!message.Equals(""))
         {
-            Conversation.Clear();
+            Conversation = new List<Message>();
             Conversation = SocketService.SendMessage(message, toUserId, fromCompanyId, listing.ListingId);
             message = "";
         }
@@ -198,6 +198,7 @@
 
     private void UpdateConversations()
     {
+        Conversation = new List<Message>();
         Conversation = SocketService.GetConversation(listing.ListingId);
         GetConversations();
     }
