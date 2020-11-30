@@ -7,6 +7,8 @@ namespace ForagerTier1.Models
     public interface ISocketService
     {
         SearchQuery Search(string message);
+        SearchQuery LazyFilterSearch(string message, string filter, int sequenceNumber);
+        int GetNumberOfResults(string message);
         string SendReceive(string message);
         void Send(string message);
         string UploadImageTest(IList<IBrowserFile> imgs);
@@ -17,13 +19,15 @@ namespace ForagerTier1.Models
         Listing GetListing(string id);
         List<Product> GetProducts();
         List<string> GetProductCategories();
-        int GetUnreadMessages();
         List<Message> GetConversation(int ListingId);
+        Dictionary<string, string> GetListingNamesAndCover();
+        List<string> GetListingPostCodes();
         User GetUser(int id);
         Company GetCompanyFromUserId(int id);
         Company GetCompany(string id);
         List<Message> SendMessage(string Message, int SendToUserId, int SendFromCompanyId, int ListingId);
         List<Message> Respond(string Message, Message m);
         string UpdateCompany(Company company);
+
     }
 }

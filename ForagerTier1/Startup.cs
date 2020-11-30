@@ -14,6 +14,7 @@ using Microsoft.AspNetCore.Components.Authorization;
 using ForagerTier1.Persistance;
 using System.Security.Claims;
 using Syncfusion.Blazor;
+using ForagerTier1.Shared;
 
 namespace ForagerTier1
 {
@@ -37,6 +38,7 @@ namespace ForagerTier1
             services.AddScoped<ICompanyService, CompanyService>();
             services.AddScoped<AuthenticationStateProvider, CustomAuthenticationStateProvider>();
             services.AddSyncfusionBlazor();
+            services.AddScoped<IRefreshService, RefreshService>(); //Stadig relevant? #patrick
 
             services.AddAuthorization(options => {
                 options.AddPolicy("Admin", a =>
