@@ -93,6 +93,7 @@
     @code{
         bool hidden = false;
         string valueComboBox = "";
+        string latestSearchTerm = "";
 
         //For LazyLoad
         [Parameter]
@@ -161,18 +162,17 @@
         public void GetNextSequence()
         {
             SequenceNumber += lazyLoadSequenceValue;
-            NavigationManager.NavigateTo("/find/" + valueComboBox + "/" + SequenceNumber);
+            NavigationManager.NavigateTo("/find/" + latestSearchTerm + "/" + SequenceNumber);
         }
 
         public void BeginNewSequence()
         {
             SequenceNumber = 0;
-            NavigationManager.NavigateTo("/find/" + valueComboBox + "/" + SequenceNumber);
+            NavigationManager.NavigateTo("/find/" + latestSearchTerm + "/" + SequenceNumber);
         }
 
         public void onClick()
         {
-
             valueComboBox = "";
             NavigationManager.NavigateTo("/");
         }
@@ -210,6 +210,7 @@
                 RefreshService.CallRequestRefresh();
 
                 valueComboBox = UppercaseFirst(valueComboBox.Trim());
+                latestSearchTerm = valueComboBox;
                 NavigationManager.NavigateTo("/find/" + valueComboBox + "/" + SequenceNumber);
             }
 
