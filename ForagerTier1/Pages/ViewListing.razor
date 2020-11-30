@@ -37,13 +37,9 @@
                 </div>
             </div>
             <div class="listingInfoTabelItem">
-                @if (myListing)
+                @if (myListing || canIModerate)
                 {
                     <input type="button" class="edit" value="Edit listing" @onclick="Edit" />
-                }
-                @if (canIModerate)
-                {
-                    <input type="button" class="delete" value="Delete listing" @onclick="Delete" />
                 }
                 <p>Seller</p>
                 <h3>@Company.Name</h3>
@@ -51,7 +47,7 @@
                 <h3>@listing.PickupAddress, @listing.Postcode</h3>
                 @if (listing.HasDelivery)
                 {
-                    <div class="breadcrumbs">Has delevery</div>
+                    <div class="breadcrumbs">Has delivery</div>
                 }
                 else
                 {
@@ -79,6 +75,15 @@
             <p>$ @listing.pricePrUnit()</p>
         </div>
         <div>
+            <div class="form-group">
+                <p>Report reason</p>
+                    <select @bind=@reportReason style="width:15rem">
+                        <option value="Illegal goods" selected>Illegal goods</option>
+                        <option value="Breaking the law">Breaking the law</option>
+                        <option value="Offensive picture">Offensive picture</option>
+                        <option value="Offensive description">Offensive description</option>
+                    </select>
+            </div>
             <input type="button" style="text-decoration-color:red" @onclick="Report" value="report listing" />
         </div>
     </div>
@@ -121,6 +126,7 @@
     string imageInView = "";
     string message = "";
     string _authMessage = "";
+    string reportReason = "";
     int fromCompanyId = -1;
     bool myListing = false;
     bool canIModerate = false;
@@ -160,22 +166,13 @@
         NavigationManager.NavigateTo($"/sell/{id}");
     }
 
-    public void Delete()
-    {
-        NavigationManager.NavigateTo($"/");
-        // Listing slettes med success, dog dør blazor siden. Dette sker formentlig fordi at den ikke redirecter til index korrekt. Der bliver i hvert
-        // fald efter sletningen kørt følgende metode på Tier3. public async Task<Listing> GetListing(string id) i ListingService.
-        SocketService.DeleteListing(listing.ListingId);
-    }
-
     public void Report()
     {
         Report report = new Report();
         report.ListingId = listing.ListingId;
         report.UserId = ((User)((CustomAuthenticationStateProvider)AuthenticationStateProvider).GetCashedUser()).UserId;
-        report.ReportType = "TestReport";
+        report.ReportType = reportReason;
         report.Time = DateTime.Now.Ticks + "";
-        string message = SocketService.ReportListing(report);
-        Console.WriteLine("Report id: " + message);
+        SocketService.ReportListing(report);
     }
 }

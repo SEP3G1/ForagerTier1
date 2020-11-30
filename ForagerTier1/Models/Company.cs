@@ -16,7 +16,7 @@ namespace ForagerTier1.Models
         public string Address { get; set; } 
         public string PostCode { get; set; } 
         public string Logo { get; set; }
-
+        public bool WishDeletion { get; set; }
         public List<Employee> Employees { get; set; }
         public string ConnectionAddress { get; set; }
 

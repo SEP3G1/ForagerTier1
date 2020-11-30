@@ -28,5 +28,8 @@ namespace ForagerTier1.Models
         List<Report> GetAllReports();
 
         void DeleteListing(int ListingId);
+        void DeleteCompanyWish(int id);
+        void DeleteCompany(int id);
+        List<Company> GetAllCompaniesToDelete();
     }
 }

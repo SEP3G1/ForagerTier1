@@ -40,5 +40,11 @@ namespace ForagerTier1.Persistance
             socketService.UpdateCompany(company);
             return company;
         }
+        public void DeleteCompanyWish(int id)
+        {
+            if (socketService == null)
+                socketService = new SocketService();
+            socketService.DeleteCompany(id);
+        }
     }
 }

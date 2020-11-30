@@ -12,5 +12,6 @@ namespace ForagerTier1.Persistance
         Company GetCompany(string id);
         Company GetCompanyFromUserId(int id);
         Company UpdateCompany(Company company);
+        void DeleteCompanyWish(int id);
      }
 }

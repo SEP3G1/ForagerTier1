@@ -53,6 +53,9 @@
                     </div>
                 </div>
             </EditForm>
+            <div>
+                <input type="button" style="text-decoration-color:red" @onclick="Delete" value="I wish to delete my company" />
+            </div>
         </div>
     </Authorized>
 </AuthorizeView>
@@ -65,7 +68,6 @@
 
     protected override async Task OnParametersSetAsync()
     {
-        CompanyService companyService = new CompanyService();
         company = (Company)companyService.GetCompany(id);
         await JSRuntime.InvokeVoidAsync("setTitle", "forager. | " + company.Name);
     }
@@ -74,6 +76,11 @@
     {
         companyService.UpdateCompany(company);
         NavigationManager.NavigateTo("/company/" + id);
+    }
+
+    public void Delete()
+    {
+        companyService.DeleteCompanyWish(company.CompanyId);
     }
 
 }

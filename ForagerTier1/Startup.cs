@@ -42,7 +42,7 @@ namespace ForagerTier1
                 options.AddPolicy("Admin", a =>
                    a.RequireAuthenticatedUser().RequireClaim("SecurityLevel", "4"));
                 options.AddPolicy("Moderator", a =>
-                   a.RequireAuthenticatedUser().RequireClaim("SecurityLevel", "3"));
+                   a.RequireAuthenticatedUser().RequireClaim("SecurityLevel", "4", "3"));
                 options.AddPolicy("VR", a =>
                    a.RequireAuthenticatedUser().RequireClaim("SecurityLevel", "2"));
                 options.AddPolicy("VA", a =>

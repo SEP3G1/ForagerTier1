@@ -1,10 +1,10 @@
 ﻿@page "/moderatelistings"
 @using ForagerTier1.Models
-@inject ISocketService SocketService
+@inject ISocketService socketService
 @inject IJSRuntime JSRuntime;
 @inject NavigationManager NavigationManager
-<!-- attribute[Authorize(Policy = "Admin, Moderator")] DOESNT WORK YET
--->
+@attribute [Authorize(Policy = "Moderator")]
+
 <AuthorizeView>
     <NotAuthorized>
         <Login />
@@ -22,14 +22,13 @@
                     </tr>
                     @foreach (Report report in reports)
                     {
-                        <!--Count amounts of type-->
+                        <!--Count amounts of type, maybe do an object to handle this-->
 
                         <tr>
                             <td>
-                                <p @onclick="@(() => openListing(@report.ListingId))">@report.ListingId</p>
+                                <p @onclick="@(() => OpenListing(@report.ListingId))">@report.ListingId</p>
                             </td>
                             <td>
-
                                 <p>@report.ReportType</p>
                             </td>
 
@@ -38,38 +37,63 @@
                     }
                 </table>
             </div>
-        </div>
-    </Authorized>
+            <div class="queryContainer">
+                <table>
+                    <tr>
+                        <td>Company Name</td>
+                        <td>Delete company</td>
+                    </tr>
+
+                    @foreach (Company company in companies)
+                    {
+                    <tr>
+                        <td>@company.Name</td>
+                        <td>
+                            <button @onclick="@(() => DeleteCompany(@company.CompanyId))">
+                                <i class="oi oi-trash" style="color:#ff0000" />
+                            </button>
+                        </td>
+                    </tr>
+                    }
+                </table>
+            </div>
+            </div>
+</Authorized>
 </AuthorizeView>
 
 @code {
-
+    List<Company> companies = new List<Company>();
     List<Report> reports = new List<Report>();
     List<Report> sortedReports = new List<Report>();
 
     protected override async Task OnParametersSetAsync()
     {
-
-        reports = (List<Report>)SocketService.GetAllReports();
+        reports = (List<Report>)socketService.GetAllReports();
+        companies = (List<Company>)socketService.GetAllCompaniesToDelete();
         if (reports != null)
         {
-           // Sort(reports);
+            // Sort(reports);
         }
     }
 
-//    public void Sort(List<Report> reports)
-//    {
-//        int maxListingId = reports.Max(x => x.ListingId);
-//
-//        for (int i = 0; i < maxListingId; i++)
-//        {
-//
-//        }
-//    }
+    //    public void Sort(List<Report> reports)
+    //    {
+    //        int maxListingId = reports.Max(x => x.ListingId);
+    //
+    //        for (int i = 0; i < maxListingId; i++)
+    //        {
+    //
+    //        }
+    //    }
 
-    public void openListing(int id)
+    public void OpenListing(int id)
     {
         NavigationManager.NavigateTo($"/listing/{id}");
+    }
+
+    public void DeleteCompany(int id)
+    {
+        socketService.DeleteCompany(id);
     }
 
 }
