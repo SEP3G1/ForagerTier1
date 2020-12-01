@@ -100,10 +100,6 @@
                     <div class="form-group">
                         <button type="submit" class="btn btn-success">@buttonText</button>
                     </div>
-                    @if (canIModerate)
-                    {
-                        <input type="button" class="delete" value="Delete listing" @onclick="Delete" />
-                    }
                 </div>
             </EditForm>
         </div>
@@ -128,7 +124,6 @@
     IList<IBrowserFile> images = new List<IBrowserFile>();
     string urlString;
     string buttonText = "Submit";
-    bool canIModerate = false;
 
     protected override async Task OnParametersSetAsync()
     {
@@ -147,8 +142,6 @@
             {
                 if (((User)((CustomAuthenticationStateProvider)AuthenticationStateProvider).GetCashedUser()).CompanyId == UserService.GetUser(gListing.UserId).CompanyId)
                 {
-                    if (((User)((CustomAuthenticationStateProvider)AuthenticationStateProvider).GetCashedUser()).SecurityLevel >= 3)
-                        canIModerate = true;
                     newListing = gListing;
                     newProductCategory = newListing.Product.ProductCategory;
                     buttonText = "Update";
@@ -203,14 +196,6 @@
         newListing.BestBefore = ((DateTime)e).Ticks + "";
     }
 
-    public void Delete()
-    {
-
-        // Listing slettes med success, dog dør blazor siden. Dette sker formentlig fordi at den ikke redirecter til index korrekt. Der bliver i hvert
-        // fald efter sletningen kørt følgende metode på Tier3. public async Task<Listing> GetListing(string id) i ListingService.
-        SocketService.DeleteListing(newListing.ListingId);
-        NavigationManager.NavigateTo($"/");
-    }
 
     private async Task OnInputFileChange(InputFileChangeEventArgs e)
     {

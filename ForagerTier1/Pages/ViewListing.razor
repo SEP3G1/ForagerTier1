@@ -134,6 +134,10 @@
                                     }
                                 </Tabs>
                             </RadzenTabs>
+                            @if (canIModerate)
+                            {
+                                <input type="button" class="delete" value="Delete listing" @onclick="Delete" />
+                            }
                         </Authorized>
                         <NotAuthorized>
                             <p>Contact: </p>
@@ -211,6 +215,12 @@
             if (((User)((CustomAuthenticationStateProvider)AuthenticationStateProvider).GetCashedUser()).SecurityLevel >= 3)
                 canIModerate = true;
         }
+    }
+    public void Delete()
+    {
+        listing.IsArchived = true;
+        SocketService.UpdateListing(listing);
+        NavigationManager.NavigateTo($"/");
     }
 
     private void SendMessage(int toUserId, int fromCompanyId)

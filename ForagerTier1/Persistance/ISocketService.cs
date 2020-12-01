@@ -32,8 +32,6 @@ namespace ForagerTier1.Models
         string ReportListing(Report report);
 
         List<Report> GetAllReports();
-
-        void DeleteListing(int ListingId);
         void DeleteCompanyWish(int id);
         void DeleteCompany(int id);
         List<Company> GetAllCompaniesToDelete();
