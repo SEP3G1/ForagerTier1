@@ -1,17 +1,29 @@
 ﻿@page "/find"
 @page "/find/{search}"
+@page "/find/{search}/{sequenceNumber:int}"
 @using ForagerTier1.Models
+@using ForagerTier1.Persistance
 @inject ISocketService SocketService
 @inject IJSRuntime JSRuntime;
 @inject NavigationManager NavigationManager
+@inject AuthenticationStateProvider AuthenticationStateProvider
+@inject IRefreshService RefreshService
+@inject ICompanyService CompanyService
+@implements IDisposable
 <div class="page">
     <table class="searchMenu">
         <tr>
             <td>
                 <h2>@SearchQuery.Query</h2>
-                <p>Showing @SearchQuery.Listings.Count of @SearchQuery.Results:</p>
+                <p>Showing @SearchQuery.Listings.Count of @numberOfResults:</p>
             </td>
             <td>
+                <div>
+                    <RadzenDropDown AllowClear="true" TValue="string" FilterCaseSensitivity="FilterCaseSensitivity.CaseInsensitive" AllowFiltering="true"
+                                    Placeholder="Filter"
+                                    Data=@filterOptions TextProperty="TextProperty" ValueProperty="ValueProperty"
+                                    Change=@(args => FilterResults(args)) />
+                </div>
                 <button class="listButton @(grid?"":"active")" @onclick="displayList"></button>
                 <button class="gridButton @(grid?"active":"")" @onclick="displayGrid"></button>
             </td>
@@ -21,7 +33,7 @@
         @foreach (Listing Listing in SearchQuery.Listings)
         {
             <div class="@(grid?"":"list") listing @(Listing.HasDelivery ? "Delivery" : "")" @onclick="@(e => openListing(@Listing.ListingId))">
-                <div class="listingImage" style="background-image: url(@Listing.getCover());"></div>
+                <div class="listingImage @(CompanyService.GetCompanyFromUserId(Listing.UserId).CompanyId == CompanyId?"MyListing":"")" style="background-image: url(@Listing.getCover());"></div>
                 <p class="type">@Listing.Product.Name</p>
                 <table>
                     <tr>
@@ -51,22 +63,117 @@
 
             </div>
         }
+        <button hidden="@hideLoadMoreListingsButton" @onclick="@LoadMoreListings">Load more Listings</button>
     </div>
-
 </div>
 
 @code {
     [Parameter]
-    public string search { get; init; }
+    public string? Search { get; set; }
+
+    [Parameter]
+    public int? SequenceNumber { get; set; }
+
+    public int lazyLoadSequenceValue = 9; //hardcode #patrick
+    public int numberOfResults { get; set; }
+    public bool hideLoadMoreListingsButton = false;
+    [CascadingParameter]
+    private Task<AuthenticationState> authenticationStateTask { get; set; }
+    int CompanyId = -1;
+
+    [CascadingParameter(Name = "LazyLoadEventName")]
+    public EventCallback LazyLoadEvent { get; set; }
+
+    [CascadingParameter(Name = "BeginNewSequenceEventName")]
+    public EventCallback BeginNewSequenceEvent { get; set; }
+
+    IEnumerable<FilterOption> filterOptions = new List<FilterOption>() {
+    new FilterOption{TextProperty = "Price - low to high", ValueProperty = "priceAscending"},
+    new FilterOption{TextProperty = "Best before - low to high", ValueProperty = "bestBeforeAscending"},
+    new FilterOption{TextProperty = "Best before - high to low", ValueProperty = "bestBeforeDecending"},
+    new FilterOption{TextProperty = "Distance - low to high", ValueProperty = "distanceAscending"},
+    };
+
+    public void FilterResults(object value)
+    {
+        filter = value.ToString();
+        SearchQuery = null;
+        SequenceNumber = 0;
+        LazyFilterSearch();
+        BeginNewSequenceEvent.InvokeAsync();
+        //LazyFilterSearch();
+    }
+
+    public class FilterOption
+    {
+        public string TextProperty { get; set; }
+        public string ValueProperty { get; set; }
+    }
+
+    private void RefreshMe() //#patrick //er denne stadig relevant?
+    {
+        SearchQuery = null;
+        SequenceNumber = 0;
+        LazyFilterSearch();
+    }
+
+    public void LoadMoreListings()
+    {
+        SequenceNumber += lazyLoadSequenceValue;
+        LazyLoadEvent.InvokeAsync();
+        LazyFilterSearch();
+    }
+
 
     bool grid = true;
     SearchQuery SearchQuery;
+    SearchQuery NewSearchQuery;
+    public string filter { get; set; }
+
+    protected override async Task OnInitializedAsync()
+    {
+        var authState = await authenticationStateTask;
+        var user = authState.User;
+
+        if (user.Identity.IsAuthenticated)
+            CompanyId = ((User)((CustomAuthenticationStateProvider)AuthenticationStateProvider).GetCashedUser()).CompanyId;
+
+
+        SequenceNumber = SequenceNumber ?? 0;
+        RefreshService.RefreshRequested += RefreshMe;
+        await LazyFilterSearch();
+    }
 
     protected override async Task OnParametersSetAsync()
     {
-        SearchQuery = (SearchQuery)SocketService.Search(search);
-        await JSRuntime.InvokeVoidAsync("setTitle", "forager. | " + search);
+        await JSRuntime.InvokeVoidAsync("setTitle", "forager. | " + Search);
+        hideLoadMoreListingsButton = SearchQuery.Listings.Count >= numberOfResults;
         //await JSRuntime.InvokeVoidAsync(user.ToString());
+    }
+
+    public async Task LazyFilterSearch()
+    {
+        NewSearchQuery = (SearchQuery)SocketService.LazyFilterSearch(Search, filter, SequenceNumber.Value);
+
+        if (SequenceNumber > 0)
+        {
+            foreach (Listing listing in NewSearchQuery.Listings)
+            {
+                SearchQuery.Listings.Add(listing);
+            }
+        }
+        else
+        {
+            SearchQuery = NewSearchQuery;
+        }
+
+        numberOfResults = SocketService.GetNumberOfResults(Search); // burde man ikke gå via en ListingService her? ... parker evt implementering til efter næste merge #patrick
+    }
+
+    public async void Filter()
+    {
+        SequenceNumber = 0;
+        await LazyFilterSearch();
     }
 
     public void displayGrid()
@@ -80,6 +187,11 @@
     public void openListing(int id)
     {
         NavigationManager.NavigateTo($"/listing/{id}");
+    }
+
+    public void Dispose()
+    {
+        RefreshService.RefreshRequested -= RefreshMe;
     }
 
 }

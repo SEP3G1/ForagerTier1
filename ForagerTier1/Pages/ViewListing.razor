@@ -35,10 +35,17 @@
                 <div class="comment">
                     @listing.Comment
                 </div>
+
+                <div class="priceListing">
+                    <h2>$ @listing.Price</h2>
+                    <p>pr. @listing.Unit</p>
+                    <p>$ @listing.pricePrUnit()</p>
+                </div>
             </div>
             <div class="listingInfoTabelItem">
                 @if (myListing || canIModerate)
                 {
+                    <h3>Views: @listing.NumberOfViews</h3>
                     <input type="button" class="edit" value="Edit listing" @onclick="Edit" />
                 }
                 <p>Seller</p>
@@ -53,19 +60,66 @@
                 {
                     <div class="breadcrumbs">Pickup only</div>
                 }
-                @if (!myListing)
-                {
-                    <p style="margin-top: 2rem;">Contact</p>
-                    <AuthorizeView>
-                        <Authorized>
-                            <textarea class="messageInput" @bind="message"></textarea>
-                            <input type="button" class="sendMessage" @onclick="SendMessage" value="Send message to @Company.Name" />
-                        </Authorized>
-                        <NotAuthorized>
-                            <h3>Login to contact seller</h3>
-                        </NotAuthorized>
-                    </AuthorizeView>
-                }
+
+                <br />
+                <AuthorizeView>
+                    <Authorized>
+                        <h3>Contact: </h3>
+                        <RadzenTabs style="height: 20rem">
+                            <Tabs>
+                                @if (myListing)
+                                {
+                                    @if (Conversation.Count > 0)
+                                    {
+                                        @foreach (Company c in Conversations)
+                                        {
+                                            <RadzenTabsItem Text="@c.Name">
+
+                                                <div class="conversation">
+                                                    @foreach (Message m in GetConversations(c.Name))
+                                                    {
+                                                        <p class="chatMessage @(m.fromCompany.Name.Equals(c.Name)?"recieved":"")">@m.message</p>
+                                                    }
+                                                </div>
+                                                <textarea class="messageInput" @bind="message"></textarea>
+                                                <input type="button" class="sendMessage" @onclick="@(() => Respond(GetConversations(c.Name)[GetConversations(c.Name).Count - 1]))" value="Send" />
+                                                
+                                                <a @onclick="UpdateConversations">&#x27F3; Update</a>
+                                            </RadzenTabsItem>
+                                        }
+                                    }
+                                    else
+                                    {
+                                        <RadzenTabsItem Text="">
+                                            <h3>
+                                                No messages yet...
+                                            </h3>
+                                        </RadzenTabsItem>
+                                    }
+                                }
+                                else
+                                {
+                                    <RadzenTabsItem Text="@Company.Name">
+                                        <div class="conversation">
+                                            @foreach (Message m in GetConversations(Company.Name))
+                                            {
+                                                <p class="chatMessage @(m.fromCompany.Name.Equals(Company.Name)?"recieved":"")">@m.message</p>
+                                            }
+                                        </div>
+                                        <textarea class="messageInput" @bind="message"></textarea>
+                                        <input type="button" class="sendMessage" @onclick="@(() => SendMessage(listing.UserId, fromCompanyId))" value="Send" />
+                                        
+                                        <a @onclick="UpdateConversations">&#x27F3; Update</a>
+                                    </RadzenTabsItem>
+                                }
+                            </Tabs>
+                        </RadzenTabs>
+                    </Authorized>
+                    <NotAuthorized>
+                        <p>Contact: </p>
+                        <h3>Login to contact seller</h3>
+                    </NotAuthorized>
+                </AuthorizeView>
             </div>
         </div>
 
@@ -123,6 +177,9 @@
     Listing listing;
     Company Company = new Company();
     List<Listing> RecommendedListings = new List<Listing>();
+    List<Message> Conversation = new List<Message>();
+    List<Company> Conversations = new List<Company>();
+
     string imageInView = "";
     string message = "";
     string _authMessage = "";
@@ -147,16 +204,39 @@
         {
             fromCompanyId = ((User)((CustomAuthenticationStateProvider)AuthenticationStateProvider).GetCashedUser()).CompanyId;
             myListing = fromCompanyId == Company.CompanyId;
+            UpdateConversations();
             if (((User)((CustomAuthenticationStateProvider)AuthenticationStateProvider).GetCashedUser()).SecurityLevel >= 3)
                 canIModerate = true;
         }
     }
 
-    private void SendMessage()
+    private void SendMessage(int toUserId, int fromCompanyId)
     {
         if (!message.Equals(""))
-            SocketService.SendMessage(message, listing.UserId, fromCompanyId);
+        {
+            Conversation = new List<Message>();
+            Conversation = SocketService.SendMessage(message, toUserId, fromCompanyId, listing.ListingId);
+            message = "";
+        }
     }
+
+    private void UpdateConversations()
+    {
+        Conversation = new List<Message>();
+        Conversation = SocketService.GetConversation(listing.ListingId);
+        GetConversations();
+    }
+
+    private void Respond(Message m)
+    {
+        if (!message.Equals(""))
+        {
+            Conversation.Clear();
+            Conversation = SocketService.Respond(message, m);
+            message = "";
+        }
+    }
+
     public void openListing(int id)
     {
         NavigationManager.NavigateTo($"/listing/{id}");
@@ -164,6 +244,39 @@
     public void Edit()
     {
         NavigationManager.NavigateTo($"/sell/{id}");
+    }
+    private List<Message> GetConversations(string CompanyName)
+    {
+        List<Message> C = new List<Message>();
+
+        foreach (Message m in Conversation)
+        {
+            if (m.fromCompany.Name.Equals(CompanyName) || m.toCompany.Name.Equals(CompanyName))
+                C.Add(m);
+        }
+        return C;
+    }
+    private void GetConversations()
+    {
+        Conversations = new List<Company>();
+        foreach (Message message in Conversation)
+        {
+            Boolean seen = false;
+            if (message.fromCompany.CompanyId == fromCompanyId)
+                continue;
+
+            foreach(Company company in Conversations)
+            {
+                if (message.fromCompany.Name.Equals(company.Name))
+                {
+                    seen = true;
+                    break;
+                }
+            }
+
+            if (!seen)
+                Conversations.Add(message.fromCompany);
+        }
     }
 
     public void Report()
