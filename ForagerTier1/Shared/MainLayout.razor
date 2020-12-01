@@ -55,6 +55,7 @@
                             <RadzenMenuItem Text="@GetUser().Name" Icon="account_box">
                                 <RadzenMenuItem Text="Profile" Path="profile" Icon="perm_identity"></RadzenMenuItem>
                                 <RadzenMenuItem Text="Add Company" Path="addcompany" Icon="domain"></RadzenMenuItem>
+                                <RadzenMenuItem Text="Moderate" Path="moderatelistings" Icon="build"></RadzenMenuItem>
                             </RadzenMenuItem>
                         </RadzenMenu>
                     }
@@ -64,7 +65,6 @@
             <button class="navButton"><a href="find">buy</a></button>
             <a href="/"><div class="logo">forager<span>.</span></div></a>
             <button class="navButton"><a href="sell">sell</a></button>
-            <button class="navButton"><a href="moderatelistings">moderate</a></button>
             <AuthorizeView>
                 <NotAuthorized>
                     <a class="login" @onclick="@login">Login</a>

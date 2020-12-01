@@ -532,9 +532,7 @@ h2 {
     overflow-x: scroll;
     display: flex;
 }
-.relatedCont .listing{
-    width: 20rem;
-}
+
 .MyListing:after {
     content: "My listing";
     width: 100%;
@@ -692,4 +690,15 @@ input, textarea {
 
 .ui-tabview-nav span {
     color: var(--logo-bg) !important;
+}
+
+.isArchived {
+    width: 100%;
+    font-size: 2rem;
+    color: white;
+    background: #EAC43D;
+    text-align: center;
+    padding: 1rem 0;
+    font-weight: 900;
+    font-family: 'Roboto Condensed', sans-serif;
 }

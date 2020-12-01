@@ -9,7 +9,12 @@
 @inject ICompanyService CompanyService
 @inject AuthenticationStateProvider AuthenticationStateProvider
 
-
+@if (listing.IsArchived)
+{
+    <div class="isArchived">
+        This listing is no longer for sale
+    </div>
+}
 <div id="listingContainer">
     <div class="listingContainerImage" style="background-image: url(@imageInView);">
         @if (listing.getPictures().Count > 1)
@@ -41,7 +46,8 @@
                     <p>pr. @listing.Unit</p>
                     <p>$ @listing.pricePrUnit()</p>
                 </div>
-                <div>
+                @if (!myListing || !listing.IsArchived)
+                {
                     <div class="form-group">
                         <p>Report reason</p>
                         <select @bind=@reportReason style="width:15rem">
@@ -52,7 +58,7 @@
                         </select>
                     </div>
                     <input type="button" style="text-decoration-color:red" @onclick="Report" value="report listing" />
-                </div>
+                }
             </div>
             <div class="listingInfoTabelItem">
                 @if (myListing || canIModerate)
@@ -74,65 +80,68 @@
                 }
 
                 <br />
-                <AuthorizeView>
-                    <Authorized>
-                        <h3>Contact: </h3>
-                        <RadzenTabs style="height: 20rem">
-                            <Tabs>
-                                @if (myListing)
-                                {
-                                    @if (Conversation.Count > 0)
+                @if (!listing.IsArchived)
+                {
+                    <AuthorizeView>
+                        <Authorized>
+                            <h3>Contact: </h3>
+                            <RadzenTabs style="height: 20rem">
+                                <Tabs>
+                                    @if (myListing)
                                     {
-                                        @foreach (Company c in Conversations)
+                                        @if (Conversation.Count > 0)
                                         {
-                                            <RadzenTabsItem Text="@c.Name">
+                                            @foreach (Company c in Conversations)
+                                            {
+                                                <RadzenTabsItem Text="@c.Name">
 
-                                                <div class="conversation">
-                                                    @foreach (Message m in GetConversations(c.Name))
-                                                    {
-                                                        <p class="chatMessage @(m.fromCompany.Name.Equals(c.Name)?"recieved":"")">@m.message</p>
-                                                    }
-                                                </div>
-                                                <textarea class="messageInput" @bind="message"></textarea>
-                                                <input type="button" class="sendMessage" @onclick="@(() => Respond(GetConversations(c.Name)[GetConversations(c.Name).Count - 1]))" value="Send" />
-                                                
-                                                <a @onclick="UpdateConversations">&#x27F3; Update</a>
+                                                    <div class="conversation">
+                                                        @foreach (Message m in GetConversations(c.Name))
+                                                        {
+                                                            <p class="chatMessage @(m.fromCompany.Name.Equals(c.Name) ? "recieved" : "")">@m.message</p>
+                                                        }
+                                                    </div>
+                                                    <textarea class="messageInput" @bind="message"></textarea>
+                                                    <input type="button" class="sendMessage" @onclick="@(() => Respond(GetConversations(c.Name)[GetConversations(c.Name).Count - 1]))" value="Send" />
+
+                                                    <a @onclick="UpdateConversations">&#x27F3; Update</a>
+                                                </RadzenTabsItem>
+                                            }
+                                        }
+                                        else
+                                        {
+                                            <RadzenTabsItem Text="">
+                                                <h3>
+                                                    No messages yet...
+                                                </h3>
                                             </RadzenTabsItem>
                                         }
                                     }
                                     else
                                     {
-                                        <RadzenTabsItem Text="">
-                                            <h3>
-                                                No messages yet...
-                                            </h3>
+                                        <RadzenTabsItem Text="@Company.Name">
+                                            <div class="conversation">
+                                                @foreach (Message m in GetConversations(Company.Name))
+                                                {
+                                                    <p class="chatMessage @(m.fromCompany.Name.Equals(Company.Name) ? "recieved" : "")">@m.message</p>
+                                                }
+                                            </div>
+                                            <textarea class="messageInput" @bind="message"></textarea>
+                                            <input type="button" class="sendMessage" @onclick="@(() => SendMessage(listing.UserId, fromCompanyId))" value="Send" />
+
+                                            <a @onclick="UpdateConversations">&#x27F3; Update</a>
                                         </RadzenTabsItem>
                                     }
-                                }
-                                else
-                                {
-                                    <RadzenTabsItem Text="@Company.Name">
-                                        <div class="conversation">
-                                            @foreach (Message m in GetConversations(Company.Name))
-                                            {
-                                                <p class="chatMessage @(m.fromCompany.Name.Equals(Company.Name)?"recieved":"")">@m.message</p>
-                                            }
-                                        </div>
-                                        <textarea class="messageInput" @bind="message"></textarea>
-                                        <input type="button" class="sendMessage" @onclick="@(() => SendMessage(listing.UserId, fromCompanyId))" value="Send" />
-                                        
-                                        <a @onclick="UpdateConversations">&#x27F3; Update</a>
-                                    </RadzenTabsItem>
-                                }
-                            </Tabs>
-                        </RadzenTabs>
-                    </Authorized>
-                    <NotAuthorized>
-                        <p>Contact: </p>
-                        <h3>Login to contact seller</h3>
-                    </NotAuthorized>
-                </AuthorizeView>
-            </div>
+                                </Tabs>
+                            </RadzenTabs>
+                        </Authorized>
+                        <NotAuthorized>
+                            <p>Contact: </p>
+                            <h3>Login to contact seller</h3>
+                        </NotAuthorized>
+                    </AuthorizeView>
+                }
+                </div>
         </div>
     </div>
 </div>
@@ -142,7 +151,7 @@
     @foreach (Listing Listing in RecommendedListings)
     {
         <div class="listing @(Listing.HasDelivery ? "Delivery" : "")" @onclick="@(e => openListing(@Listing.ListingId))">
-            <div class="listingImage" style="background-image: url(@Listing.getCover());"></div>
+            <div class="listingImage  @(Listing.CompanyId == fromCompanyId?"MyListing":"")" style="background-image: url(@Listing.getCover());"></div>
             <p class="type">@Listing.Product.Name</p>
             <table>
                 <tr>

@@ -33,7 +33,7 @@
         @foreach (Listing Listing in SearchQuery.Listings)
         {
             <div class="@(grid?"":"list") listing @(Listing.HasDelivery ? "Delivery" : "")" @onclick="@(e => openListing(@Listing.ListingId))">
-                <div class="listingImage @(CompanyService.GetCompanyFromUserId(Listing.UserId).CompanyId == CompanyId?"MyListing":"")" style="background-image: url(@Listing.getCover());"></div>
+                <div class="listingImage  @(Listing.CompanyId == CompanyId?"MyListing":"")" style="background-image: url(@Listing.getCover());"></div>
                 <p class="type">@Listing.Product.Name</p>
                 <table>
                     <tr>
