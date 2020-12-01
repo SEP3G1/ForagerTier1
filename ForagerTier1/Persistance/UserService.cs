@@ -9,7 +9,15 @@ namespace ForagerTier1.Models
     public class UserService : IUserService
     {
         public User User { get; set; }
+        public ISocketService socketService;
 
+        public string CreateUser(User newUser)
+        {
+            if (socketService == null)
+                socketService = new SocketService();
+            string id = socketService.AddUser(newUser);
+            return id;
+        }
         public User GetUser()
         {
             return User;
@@ -40,5 +48,6 @@ namespace ForagerTier1.Models
             return first;
         }
 
+        
     }
 }

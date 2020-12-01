@@ -11,7 +11,7 @@ namespace ForagerTier1.Models
 {
     public class SocketService : ISocketService
     {
-        private static string IP = "10.152.222.49";
+        private static string IP = "192.168.5.192";
         private static int PORT = 4343;
         private static Socket clientSocket;
 
@@ -108,6 +108,8 @@ namespace ForagerTier1.Models
             string rcv = SendReceive(message);
             return rcv;
         }
+
+      
 
         public string UploadImageTest(IList<IBrowserFile> imgs)
         {
@@ -347,6 +349,23 @@ namespace ForagerTier1.Models
             }
 
             string[] r = { "updatecompany", JsonSerializer.Serialize(company) };
+            string message = JsonSerializer.Serialize(r);
+
+            //Sends message to connected Rest web API and gets a response in json
+            string rcv = SendReceive(message);
+            return rcv;
+        }
+        public string AddUser(User user)
+        {
+            if (clientSocket == null)
+            {
+                IPEndPoint serverAddress = new IPEndPoint(IPAddress.Parse(IP), PORT);
+
+                clientSocket = new Socket(AddressFamily.InterNetwork, SocketType.Stream, ProtocolType.Tcp);
+                clientSocket.Connect(serverAddress);
+            }
+
+            string[] r = { "createuser", JsonSerializer.Serialize(user) };
             string message = JsonSerializer.Serialize(r);
 
             //Sends message to connected Rest web API and gets a response in json
