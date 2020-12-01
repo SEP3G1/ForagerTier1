@@ -95,7 +95,7 @@
                                                 </div>
                                                 <textarea class="messageInput" @bind="message"></textarea>
                                                 <input type="button" class="sendMessage" @onclick="@(() => Respond(GetConversations(c.Name)[GetConversations(c.Name).Count - 1]))" value="Send" />
-                                                
+
                                                 <a @onclick="UpdateConversations">&#x27F3; Update</a>
                                             </RadzenTabsItem>
                                         }
@@ -120,12 +120,16 @@
                                         </div>
                                         <textarea class="messageInput" @bind="message"></textarea>
                                         <input type="button" class="sendMessage" @onclick="@(() => SendMessage(listing.UserId, fromCompanyId))" value="Send" />
-                                        
+
                                         <a @onclick="UpdateConversations">&#x27F3; Update</a>
                                     </RadzenTabsItem>
                                 }
                             </Tabs>
                         </RadzenTabs>
+                        @if (canIModerate)
+                        {
+                            <input type="button" class="delete" value="Delete listing" @onclick="Delete" />
+                        }
                     </Authorized>
                     <NotAuthorized>
                         <p>Contact: </p>
@@ -202,6 +206,12 @@
             if (((User)((CustomAuthenticationStateProvider)AuthenticationStateProvider).GetCashedUser()).SecurityLevel >= 3)
                 canIModerate = true;
         }
+    }
+    public void Delete()
+    {
+        listing.IsArchived = true;
+        SocketService.UpdateListing(listing);
+        NavigationManager.NavigateTo($"/");
     }
 
     private void SendMessage(int toUserId, int fromCompanyId)
