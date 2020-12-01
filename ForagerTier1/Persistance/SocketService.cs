@@ -12,7 +12,7 @@ namespace ForagerTier1.Models
 {
     public class SocketService : ISocketService
     {
-        private static string IP = "10.152.210.30";
+        private static string IP = "192.168.87.168";
         private static int PORT = 4343;
         private static Socket clientSocket;
         public event EventHandler SomethingHappened;
@@ -530,6 +530,23 @@ namespace ForagerTier1.Models
             //Sends message to connected Rest web API and gets a response in json
             string rcv = SendReceive(message);
             return rcv;
+        }
+
+        public List<Listing> GetListingsFromCompany(int id)
+        {
+            string[] r = { "getListingsFromCompany", id + "" };
+            string message = JsonSerializer.Serialize(r);
+
+            //Sends message to connected Rest web API and gets a response in json
+            string rcv = SendReceive(message);
+
+            //Makes json deserializor case insensitive
+            var options = new JsonSerializerOptions();
+            options.PropertyNameCaseInsensitive = true;
+            options.Converters.Add(new JsonStringEnumConverter());
+
+            List<Listing> listings = JsonSerializer.Deserialize<List<Listing>>(rcv, options);
+            return listings;
         }
     }
 }

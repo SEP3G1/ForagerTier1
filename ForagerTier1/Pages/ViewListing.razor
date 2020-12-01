@@ -2,7 +2,7 @@
 @page "/listing/{id}"
 @using ForagerTier1.Models
 @using ForagerTier1.Persistance
-@inject IJSRuntime JSRuntime;
+@inject IJSRuntime JSRuntime
 @inject ISocketService SocketService
 @inject NavigationManager NavigationManager
 @inject IUserService UserService
@@ -29,7 +29,13 @@
     </div>
     <div class="listingInfoContainer">
         <div class="breadcrumbs"><a href="../find/@listing.Product.ProductCategory">@listing.Product.ProductCategory</a> > <a href="../find/@listing.Product.Name">@listing.Product.Name</a> ></div>
-        <h2>@listing.Product.Name</h2>
+        <h2>
+            @listing.Product.Name
+                @if (myListing || canIModerate)
+                {
+                    <div class="views">@listing.NumberOfViews</div>
+                }
+        </h2>
         <div class="listingInfoTabel">
             <div class="listingInfoTabelItem">
                 <p>Best before</p>
@@ -63,11 +69,10 @@
             <div class="listingInfoTabelItem">
                 @if (myListing || canIModerate)
                 {
-                    <h3>Views: @listing.NumberOfViews</h3>
                     <input type="button" class="edit" value="Edit listing" @onclick="Edit" />
                 }
                 <p>Seller</p>
-                <h3>@Company.Name</h3>
+                <h3><a href="/company/@listing.CompanyId">@Company.Name</a></h3>
                 <p>Address</p>
                 <h3>@listing.PickupAddress, @listing.Postcode</h3>
                 @if (listing.HasDelivery)

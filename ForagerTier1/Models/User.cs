@@ -17,5 +17,17 @@ namespace ForagerTier1.Models
         public string Email { get; set; }
         public int CompanyId { get; set; }
 
+        public string GetUserLevel()
+        {
+            string l = "";
+            switch (SecurityLevel)
+            {
+                case 1: l = "Employee"; break;
+                case 2: l = "Company Administrator"; break;
+                case 3: l = "Moderator"; break;
+                case 4: l = "Admin"; break;
+            }
+            return l;
+        }
     }
 }

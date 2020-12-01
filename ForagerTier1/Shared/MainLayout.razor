@@ -54,6 +54,7 @@
                         <RadzenMenu>
                             <RadzenMenuItem Text="@GetUser().Name" Icon="account_box">
                                 <RadzenMenuItem Text="Profile" Path="profile" Icon="perm_identity"></RadzenMenuItem>
+                                <RadzenMenuItem Text="Your company" Path="@GetCompanyAddress()" Icon="home"></RadzenMenuItem>
                                 <RadzenMenuItem Text="Add Company" Path="addcompany" Icon="domain"></RadzenMenuItem>
                                 <RadzenMenuItem Text="Moderate" Path="moderatelistings" Icon="build"></RadzenMenuItem>
                             </RadzenMenuItem>
@@ -103,10 +104,10 @@
 
         User user;
 
-    // For ComboBox dropdown
-    private IList<Listing> listings;
-    public Dictionary<string, string> suggestionListForComboBox;
-    List<Suggestion> DataForComboBox;
+        // For ComboBox dropdown
+        private IList<Listing> listings;
+        public Dictionary<string, string> suggestionListForComboBox;
+        List<Suggestion> DataForComboBox;
 
         // https://stackoverflow.com/questions/58123063/call-method-in-mainlayout-from-a-page-component-in-blazor
         //To make sure you only create this object once, you can use the following:
@@ -132,32 +133,36 @@
             }
         }
 
-    protected override async Task OnParametersSetAsync()
-    {
-        if (user == null)
+        protected override async Task OnParametersSetAsync()
         {
-            user = GetUser();
+            if (user == null)
+            {
+                user = GetUser();
+            }
+            //Console.WriteLine(user.ToString());
+            if (NavigationManager.Uri.Split('/').ToList<string>()[3].Equals("listing"))
+            {
+                hidden = true;
+            }
+            else
+            {
+                hidden = false;
+            }
+            valueComboBox = null;
         }
-        //Console.WriteLine(user.ToString());
-        if (NavigationManager.Uri.Split('/').ToList<string>()[3].Equals("listing"))
+        private User GetUser()
         {
-            hidden = true;
+            return ((CustomAuthenticationStateProvider)AuthenticationStateProvider).GetCashedUser();
         }
-        else
-        {
-            hidden = false;
-        }
-        valueComboBox = null;
-    }
-    private User GetUser()
-    {
-        return ((CustomAuthenticationStateProvider)AuthenticationStateProvider).GetCashedUser();
-    }
         protected override async Task OnInitializedAsync()
         {
             //Henter opdateret data én gang for hver initialisering. Giver bedre brugeroplevelse (pga. loadtid), men betyder at data ikke opdateres hver gang man søger. 
             //Evt lav en timer til at opdatere ComboBoxData med et interval. #patrick
             setComboBoxData();
+        }
+        public String GetCompanyAddress()
+        {
+            return "company/" + GetUser().CompanyId;
         }
 
         public void GetNextSequence()

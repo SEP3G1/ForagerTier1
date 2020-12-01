@@ -532,7 +532,6 @@ h2 {
     overflow-x: scroll;
     display: flex;
 }
-
 .MyListing:after {
     content: "My listing";
     width: 100%;
@@ -701,4 +700,30 @@ input, textarea {
     padding: 1rem 0;
     font-weight: 900;
     font-family: 'Roboto Condensed', sans-serif;
+}
+.listingInfoContainer h2{
+    width: 50rem;
+}
+.views {
+    float: right;
+}
+    .views:before {
+        content: "Views";
+        position: absolute;
+        font-size: .8rem;
+        text-align: center;
+    }
+
+    .sellColum p{
+        font-size: 1rem;
+    }
+    .sellColum h3{
+        font-weight: 700;
+    }
+.companyButtons{
+    display: flex;
+    width: 10rem;
+    margin-left: 50%;
+    transform: translateX(-50%);
+    justify-content: space-around;
 }

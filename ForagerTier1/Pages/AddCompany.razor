@@ -8,80 +8,109 @@
 @using ForagerTier1.Models
 @using ForagerTier1.Persistance
 
+<AuthorizeView>
+    <NotAuthorized>
+        <Login />
+    </NotAuthorized>
+    <Authorized Context="Auth">
+        <div>
+            <EditForm class="sellCont" Context="Company" Model="@newCompany" OnValidSubmit="AddNewCompany">
+                @if (CompanyId == null)
+                {
 
-<div>
-    <EditForm class="sellCont" Context="Company" Model="@newCompany" OnValidSubmit="AddNewCompany">
-        <h1>Create a company<span class="acc">.</span></h1>
-        <h3 style="width: 100%;">Create a company in the form below</h3>
-        <div class="sellColum">
-            <DataAnnotationsValidator />
-            <ValidationSummary />
+                    <h1>Create a company<span class="acc">.</span></h1>
+                    <h3 style="width: 100%;">Create a company in the form below</h3>
+                }
+                else
+                {
+                    <h1>Edit @newCompany.Name<span class="acc">.</span></h1>
+                    <h3 style="width: 100%;">Edit you company in the form below. Changes are first saved when the button is pressed</h3>
+                }
+                <div class="sellColum">
+                    <DataAnnotationsValidator />
+                    <ValidationSummary />
 
-            <div class="form-group">
-                <p>Cvr</p>
-                <InputText @bind-Value="newCompany.Cvr" />
-            </div>
+                    <div class="form-group">
+                        <p>Cvr</p>
+                        <InputText @bind-Value="newCompany.Cvr" />
+                    </div>
 
-            <div class="form-group">
-                <p>Name</p>
-                <InputText @bind-Value="newCompany.Name" />
-            </div>
+                    <div class="form-group">
+                        <p>Name</p>
+                        <InputText @bind-Value="newCompany.Name" />
+                    </div>
 
-            <div class="form-group">
-                <p>Address</p>
-                <InputText @bind-Value="newCompany.Address" />
-            </div>
+                    <div class="form-group">
+                        <p>Address</p>
+                        <InputText @bind-Value="newCompany.Address" />
+                    </div>
 
-        </div>
-        <div class="sellColum">
-            <div class="form-group">
-                <p>Postcode</p>
-                <InputText @bind-Value="newCompany.PostCode" />
-            </div>
-            <div class="form-group">
-                <p>Ip Adress</p>
-                <InputText @bind-Value="newCompany.ConnectionAddress" />
-            </div>
-            <div class="form-group">
-                <button type="submit" class="btn btn-success">Submit</button>
-            </div>
-        </div>
-    </EditForm>
+                </div>
+                <div class="sellColum">
+                    <div class="form-group">
+                        <p>Postcode</p>
+                        <InputText @bind-Value="newCompany.PostCode" />
+                    </div>
+                    <div class="form-group">
+                        <p>Ip Adress</p>
+                        <InputText @bind-Value="newCompany.ConnectionAddress" />
+                    </div>
+                    @if (CompanyId == null)
+                    {
+                        <div class="form-group">
+                            <button type="submit" class="btn btn-success">Submit</button>
+                        </div>
+                    }
+                    else
+                    {
+                        <div class="form-group">
+                            <button type="submit" class="btn btn-success">Save changes</button>
+                        </div>
+                    }
+                </div>
+            </EditForm>
 
-    <EditForm class="sellCont" Context="User" Model="@newUser" OnValidSubmit="AddNewUser">
-        <h1>Create an account for your employee<span class="acc">.</span></h1>
-        <h3 style="width: 100%;">Fill in the information about your employee here</h3>
-        <div class="sellColum">
-            <DataAnnotationsValidator />
-            <ValidationSummary />
+            @if (CompanyId != null)
+            {
+                <EditForm class="sellCont" Context="User" Model="@newUser" OnValidSubmit="AddNewUser">
+                    <h1>Create an account for your employee<span class="acc">.</span></h1>
+                    <h3 style="width: 100%;">Fill in the information about your employee here</h3>
+                    <div class="sellColum">
+                        <DataAnnotationsValidator />
+                        <ValidationSummary />
 
-            <div class="form-group">
-                <p>Name</p>
-                <InputText @bind-Value="newUser.Name" />
-            </div>
+                        <div class="form-group">
+                            <p>Name</p>
+                            <InputText @bind-Value="newUser.Name" />
+                        </div>
 
-            <div class="form-group">
-                <p>Email</p>
-                <InputText @bind-Value="newUser.Email" />
+                        <div class="form-group">
+                            <p>Email</p>
+                            <InputText @bind-Value="newUser.Email" />
+                        </div>
+                        <div class="form-group">
+                            <p>Password</p>
+                            <InputText @bind-Value="newUser.Password" />
+                        </div>
+                    </div>
+                    <div class="sellColum">
+                        <div class="form-group">
+                            <p>Securitylevel</p>
+                            <InputNumber @bind-Value="newUser.SecurityLevel" />
+                        </div>
+                        <div class="form-group">
+                            <p>CompanyId</p>
+                            <InputNumber @bind-Value="newUser.CompanyId" />
+                        </div>
+                        <div class="form-group">
+                            <button type="Submit" class="btn btn-success">Create user</button>
+                        </div>
+                    </div>
+                </EditForm>
+            }
             </div>
-            <div class="form-group">
-                <p>Password</p>
-                <InputText @bind-Value="newUser.Password" />
-            </div>
-            <div class="form-group">
-                <p>Securitylevel</p>
-                <InputNumber @bind-Value="newUser.SecurityLevel" />
-            </div>
-            <div class="form-group">
-                <p>CompanyId</p>
-                <InputNumber @bind-Value="newUser.CompanyId" />
-            </div>
-            <div class="form-group">
-                <button type="Submit" class="btn btn-success">Create user</button>
-            </div>
-        </div>
-    </EditForm>
-</div>
+    </Authorized>
+</AuthorizeView>
 
 
 @code {
@@ -101,9 +130,13 @@
 
     public void AddNewCompany()
     {
-        string id = CompanyService.CreateCompany(newCompany);
-
-        NavigationManager.NavigateTo("/company/" + id);
+        if (CompanyId == null)
+        {
+            string id = CompanyService.CreateCompany(newCompany);
+            NavigationManager.NavigateTo("/company/" + id);
+        }
+        else
+            SaveChanges();
     }
     public void AddNewUser()
     {
@@ -112,6 +145,17 @@
 
         NavigationManager.NavigateTo("/company/" + newUser.CompanyId);
     }
+
+    public void SaveChanges()
+    {
+        CompanyService.UpdateCompany(newCompany);
+        NavigationManager.NavigateTo("/company/" + CompanyId);
+    }
+
+    public void Delete()
+    {
+        CompanyService.DeleteCompanyWish(newCompany.CompanyId);
+    }
 }
-}
+        }
 

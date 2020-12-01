@@ -28,9 +28,8 @@ namespace ForagerTier1.Models
         List<Message> SendMessage(string Message, int SendToUserId, int SendFromCompanyId, int ListingId);
         List<Message> Respond(string Message, Message m);
         string UpdateCompany(Company company);
-
         string ReportListing(Report report);
-
+        List<Listing> GetListingsFromCompany(int id);
         List<Report> GetAllReports();
         void DeleteCompanyWish(int id);
         void DeleteCompany(int id);

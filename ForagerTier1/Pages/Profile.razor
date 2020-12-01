@@ -1,6 +1,43 @@
 ﻿@page "/profile"
-<h3>Profile</h3>
+@using ForagerTier1.Models
+@using ForagerTier1.Persistance
+@inject AuthenticationStateProvider AuthenticationStateProvider
+<h1>Profile<span class="acc">.</span></h1>
+<AuthorizeView>
+    <NotAuthorized>
+        <Login />
+    </NotAuthorized>
+    <Authorized Context="Auth">
+        <div class="sellCont">
+            <div class="sellColum">
+                <p>Name</p>
+                <h3>@User.Name</h3>
+                <p>Email</p>
+                <h3>@User.Email</h3>
+            </div>
+            <div class="sellColum">
+                <p>Permission level</p>
+                <h3>@User.GetUserLevel()</h3>
+            </div>
+        </div>
+        <h1 class="related" style="margin-bottom: -2rem;">works for</h1>
+        <CompanyPage id="@User.CompanyId.ToString()" />
+    </Authorized>
+</AuthorizeView>
 
 @code {
+    [CascadingParameter]
+    private Task<AuthenticationState> authenticationStateTask { get; set; }
+    private User User;
 
+    protected override async Task OnParametersSetAsync()
+    {
+        var authState = await authenticationStateTask;
+        var user = authState.User;
+
+        if (user.Identity.IsAuthenticated)
+        {
+            User = ((CustomAuthenticationStateProvider)AuthenticationStateProvider).GetCashedUser();
+        }
+    }
 }

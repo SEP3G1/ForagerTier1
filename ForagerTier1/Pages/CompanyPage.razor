@@ -2,14 +2,13 @@
 @page "/company/{id}"
 @using ForagerTier1.Models
 @using ForagerTier1.Persistance
-@inject IJSRuntime JSRuntime;
+@inject IJSRuntime JSRuntime
+@inject ISocketService SocketService
 @inject ICompanyService Companyservice
 @inject NavigationManager NavigationManager
 
 
 <div class="sellCont">
-    <button type="submit" class="btn btn-warning" @onclick="@EditCompany">Edit</button>
-    <button type="submit" class="btn btn-danger">Delete</button>
     <h1>@company.Name<span class="acc">.</span></h1>
 
     <div class="sellColum">
@@ -19,32 +18,68 @@
         <h3>@company.TrustScore</h3>
         <p>Number of votes:</p>
         <h3>@company.NumberOfVotes</h3>
+    </div>
+    <div class="sellColum">
         <p>Address:</p>
         <h3>@company.Address</h3>
         <p>Postcode:</p>
         <h3>@company.PostCode</h3>
-        <p>Logo:</p>
-        <h3>@company.Logo</h3>
         <p>ConnectionAddress:</p>
         <h3>@company.ConnectionAddress</h3>
     </div>
 </div>
+<div class="companyButtons">
+    <button type="submit" class="btn btn-warning" @onclick="@EditCompany">Edit</button>
+    <button type="submit" class="btn btn-danger">Delete</button>
+</div>
+<h1 class="related">Active listings from @company.Name</h1>
+<div class="relatedCont">
+    @foreach (Listing Listing in Listings)
+    {
+        <div class="listing @(Listing.HasDelivery ? "Delivery" : "")" @onclick="@(e => openListing(@Listing.ListingId))">
+            <div class="listingImage" style="background-image: url(@Listing.getCover());"></div>
+            <p class="type">@Listing.Product.Name</p>
+            <table>
+                <tr>
+                    <td>
+                        <p class="attr">Price:</p>
+                        <p class="price">@Listing.Price</p>
+                    </td>
+                    <td>
+                        <p class="attr">Quantity:</p>
+                        <p class="weight">@Listing.Quantity @Listing.Unit</p>
+                    </td>
+                </tr>
+            </table>
+            <p class="attr">Best before:</p><br />
+            <p class="bestBy">@Listing.getDate()</p>
 
-        @code {
-            [Parameter]
-            public string id { get; set; }
-            Company company;
+        </div>
+    }
+</div>
 
-            protected override async Task OnParametersSetAsync()
-            {
-                CompanyService companyService = new CompanyService();
-                company = (Company)companyService.GetCompany(id);
-                await JSRuntime.InvokeVoidAsync("setTitle", "forager. | " + company.Name);
-            }
+@code {
+    [Parameter]
+    public string id { get; set; }
+    Company company;
+    List<Listing> Listings;
 
-            public void EditCompany()
-            {
-                NavigationManager.NavigateTo("/editcompany/" + id);
-            }
+    protected override async Task OnParametersSetAsync()
+    {
+        CompanyService companyService = new CompanyService();
+        company = (Company)companyService.GetCompany(id);
+        Listings = SocketService.GetListingsFromCompany(company.CompanyId);
+        await JSRuntime.InvokeVoidAsync("setTitle", "forager. | " + company.Name);
+    }
 
-        }
+    public void EditCompany()
+    {
+        NavigationManager.NavigateTo("/addcompany/" + id);
+    }
+
+
+    public void openListing(int id)
+    {
+        NavigationManager.NavigateTo($"/listing/{id}");
+    }
+}
