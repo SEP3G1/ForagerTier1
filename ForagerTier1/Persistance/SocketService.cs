@@ -181,14 +181,13 @@ namespace ForagerTier1.Models
         }
         public void Send(string message)
         {
-            clientSocket.Connect(serverAddress);
             // Sending
             int toSendLen = System.Text.Encoding.ASCII.GetByteCount(message);
             byte[] toSendBytes = System.Text.Encoding.ASCII.GetBytes(message);
             byte[] toSendLenBytes = System.BitConverter.GetBytes(toSendLen);
             clientSocket.Send(toSendLenBytes);
             clientSocket.Send(toSendBytes);
-            clientSocket.Close();
+
         }
         public Listing GetListing(string id)
         {
@@ -475,7 +474,7 @@ namespace ForagerTier1.Models
             string message = JsonSerializer.Serialize(r);
 
             //Sends message to connected Rest web API and gets a response in json
-            string rcv = SendReceive(message);
+            Send(message);
         }
         public void DeleteCompanyWish(int id)
         {

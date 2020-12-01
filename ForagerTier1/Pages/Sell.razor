@@ -132,6 +132,7 @@
 
     protected override async Task OnParametersSetAsync()
     {
+        Console.WriteLine("Loading sell page");
         products = SocketService.GetProducts();
         productsToShow = new List<Product>(products);
         productCategories = SocketService.GetProductCategories();
@@ -161,8 +162,11 @@
 
     public void AddNewListing()
     {
+
         TrySubmit();
-        newListing.UserId = ((User)((CustomAuthenticationStateProvider)AuthenticationStateProvider).GetCashedUser()).UserId;
+        User user = ((User)((CustomAuthenticationStateProvider)AuthenticationStateProvider).GetCashedUser());
+        newListing.UserId = user.UserId;
+        newListing.CompanyId = user.CompanyId;
         string id;
         if (buttonText.Equals("Submit"))
             id = SocketService.CreateListing(newListing);
@@ -201,10 +205,11 @@
 
     public void Delete()
     {
-        NavigationManager.NavigateTo($"/");
+
         // Listing slettes med success, dog dør blazor siden. Dette sker formentlig fordi at den ikke redirecter til index korrekt. Der bliver i hvert
         // fald efter sletningen kørt følgende metode på Tier3. public async Task<Listing> GetListing(string id) i ListingService.
         SocketService.DeleteListing(newListing.ListingId);
+        NavigationManager.NavigateTo($"/");
     }
 
     private async Task OnInputFileChange(InputFileChangeEventArgs e)
