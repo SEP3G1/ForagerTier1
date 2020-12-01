@@ -149,6 +149,8 @@ namespace ForagerTier1.Models
             return rcv;
         }
 
+      
+
         public string UploadImageTest(IList<IBrowserFile> imgs)
         {
             string[] r = { "uploadImage", JsonSerializer.Serialize(imgs) };
@@ -528,6 +530,23 @@ namespace ForagerTier1.Models
             string rcv = SendReceive(message);
             List<Company> companies = Newtonsoft.Json.JsonConvert.DeserializeObject<List<Company>>(rcv);
             return companies;
+        }
+        public string AddUser(User user)
+        {
+            if (clientSocket == null)
+            {
+                IPEndPoint serverAddress = new IPEndPoint(IPAddress.Parse(IP), PORT);
+
+                clientSocket = new Socket(AddressFamily.InterNetwork, SocketType.Stream, ProtocolType.Tcp);
+                clientSocket.Connect(serverAddress);
+            }
+
+            string[] r = { "createuser", JsonSerializer.Serialize(user) };
+            string message = JsonSerializer.Serialize(r);
+
+            //Sends message to connected Rest web API and gets a response in json
+            string rcv = SendReceive(message);
+            return rcv;
         }
     }
 }

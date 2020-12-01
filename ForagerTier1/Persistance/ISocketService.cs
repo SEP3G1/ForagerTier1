@@ -37,5 +37,7 @@ namespace ForagerTier1.Models
         void DeleteCompanyWish(int id);
         void DeleteCompany(int id);
         List<Company> GetAllCompaniesToDelete();
+        string AddUser(User user);
+
     }
 }
