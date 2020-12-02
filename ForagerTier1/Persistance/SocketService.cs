@@ -61,9 +61,9 @@ namespace ForagerTier1.Models
             return JsonSerializer.Deserialize<SearchQuery>(rcv, options); ;
         }
 
-        public SearchQuery LazyFilterSearch(string message, string filter, int sequenceNumber)
+        public SearchQuery LazyFilterSearch(string message, string filter, int sequenceNumber, int resultsToReturn)
         {
-            string[] r = { "lazyFilterSearch", message, filter, sequenceNumber+"" };
+            string[] r = { "lazyFilterSearch", message, filter, sequenceNumber+"", resultsToReturn+"" };
          
             //Sends message to connected Rest web API and gets a response in json
             string rcv = SendReceive(JsonSerializer.Serialize(r));

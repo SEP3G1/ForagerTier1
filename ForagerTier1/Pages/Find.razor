@@ -152,7 +152,7 @@
 
     public async Task LazyFilterSearch()
     {
-        NewSearchQuery = (SearchQuery)SocketService.LazyFilterSearch(Search, filter, SequenceNumber.Value);
+        NewSearchQuery = (SearchQuery)SocketService.LazyFilterSearch(Search, filter, SequenceNumber.Value, lazyLoadSequenceValue);
 
         if (SequenceNumber > 0)
         {
