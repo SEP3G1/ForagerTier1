@@ -311,8 +311,7 @@
             SocketService.ReportListing(report);
         } else
         {
-
-            Console.WriteLine("Not allowed"); //TODO #patrick make a popup
+            JSRuntime.InvokeVoidAsync("alert", "Too many reportings. Please wait before trying again");
         }
     }
 }
