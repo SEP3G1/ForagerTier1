@@ -52,7 +52,7 @@
                     <div class="form-group">
                         <p>Images</p>
                         <p>
-                            <InputFile OnChange="@OnInputFileChange" multiple />
+                            <InputText @bind-Value="newListing.PictureList" />
                         </p>
 
                         @if (imageDataUrls.Count > 0)

@@ -17,13 +17,13 @@
                 <h2>@SearchQuery.Query</h2>
                 <p>Showing @SearchQuery.Listings.Count of @numberOfResults:</p>
             </td>
+            <td class="filter">
+                <RadzenDropDown AllowClear="true" TValue="string"
+                                Placeholder="Filter"
+                                Data=@filterOptions TextProperty="TextProperty" ValueProperty="ValueProperty"
+                                Change=@(args => FilterResults(args)) />
+            </td>
             <td>
-                <div>
-                    <RadzenDropDown AllowClear="true" TValue="string" FilterCaseSensitivity="FilterCaseSensitivity.CaseInsensitive" AllowFiltering="true"
-                                    Placeholder="Filter"
-                                    Data=@filterOptions TextProperty="TextProperty" ValueProperty="ValueProperty"
-                                    Change=@(args => FilterResults(args)) />
-                </div>
                 <button class="listButton @(grid?"":"active")" @onclick="displayList"></button>
                 <button class="gridButton @(grid?"active":"")" @onclick="displayGrid"></button>
             </td>
@@ -63,7 +63,7 @@
 
             </div>
         }
-        <button hidden="@hideLoadMoreListingsButton" @onclick="@LoadMoreListings">Load more Listings</button>
+        <button hidden="@hideLoadMoreListingsButton" @onclick="@LoadMoreListings">Load more</button>
     </div>
 </div>
 

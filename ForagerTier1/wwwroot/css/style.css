@@ -4,6 +4,7 @@
     --logo-acc: #3bc061;
     --dark-gray: #232323;
     --gray: #757575;
+    --yellow: #EAC43D;
     --sb-bg: white;
 }
 body {
@@ -51,7 +52,7 @@ body {
     right: 0;
     margin-right: 2rem;
 }
-#headNav .logo {
+#headNav .logo, .footer .logo {
     font-family: 'Crete Round', serif;
     color: white;
     font-size: 3rem;
@@ -59,11 +60,11 @@ body {
 #headNav a {
     text-decoration-color: var(--logo-acc);
 }
-#headNav a:hover {
+#headNav a:hover, .footer a:hover{
     text-decoration: underline;
     text-decoration-color: var(--logo-acc);
 }
-#headNav .logo span{
+#headNav .logo span, .footer .logo span{
     color: var(--logo-acc);
 }
 .navButton {
@@ -255,13 +256,34 @@ h2 {
     max-width: 60rem;
     margin-left: 50%;
     transform: translate(-50%, 0);
-} 
+}
 
-.footer{
+.footer {
     background-color: var(--logo-bg);
-    height: 15rem;
+    height: 12rem;
     margin-top: 8rem;
     width: 100%;
+    background-image: url(images/banner_black.png);
+    background-size: contain;
+    background-repeat: repeat-x;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+.git{
+    position: absolute;
+    bottom: 1rem;
+}
+.git a{
+    color: white;
+}
+.git span{
+    margin: 1rem .5rem;
+    font-size: .9rem;
+}
+.git img{
+    height: 1.5rem;
+    margin-left: .8rem;
 }
 
 
@@ -695,7 +717,7 @@ input, textarea {
     width: 100%;
     font-size: 2rem;
     color: white;
-    background: #EAC43D;
+    background: var(--yellow);
     text-align: center;
     padding: 1rem 0;
     font-weight: 900;
@@ -726,4 +748,23 @@ input, textarea {
     margin-left: 50%;
     transform: translateX(-50%);
     justify-content: space-around;
+}
+.delete{
+    background-color: var(--yellow);
+    color: white;
+    font-weight: 800;
+    margin-top: -1rem;
+    margin-bottom: 1rem;
+}
+.queryContainer button {
+    border: none;
+    background-color: var(--logo-acc);
+    color: white;
+    font-size: 1rem;
+    padding: .5rem 3rem;
+    font-weight: 800;
+    margin: 3rem 1rem;
+    cursor: pointer;
+    border-radius: 1rem;
+    box-shadow: rgba(50, 50, 93, 0.25) 0px 13px 27px -5px, rgba(0, 0, 0, 0.3) 0px 8px 16px -8px;
 }

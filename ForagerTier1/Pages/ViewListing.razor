@@ -54,15 +54,15 @@
                 </div>
                 @if (!myListing || !listing.IsArchived)
                 {
-                    <div class="form-group">
-                        <p>Report reason</p>
-                        <select @bind=@reportReason style="width:15rem">
-                            <option value="Illegal goods" selected>Illegal goods</option>
-                            <option value="Breaking the law">Breaking the law</option>
-                            <option value="Offensive picture">Offensive picture</option>
-                            <option value="Offensive description">Offensive description</option>
-                        </select>
-                    </div>
+            <div class="form-group">
+                <p>Report reason</p>
+                <select class="reportSelect" @bind=@reportReason style="width:15rem">
+                    <option value="Illegal goods" selected>Illegal goods</option>
+                    <option value="Breaking the law">Breaking the law</option>
+                    <option value="Offensive picture">Offensive picture</option>
+                    <option value="Offensive description">Offensive description</option>
+                </select>
+            </div>
                     <input type="button" style="text-decoration-color:red" @onclick="Report" value="report listing" />
                 }
             </div>
@@ -70,6 +70,7 @@
                 @if (myListing || canIModerate)
                 {
                     <input type="button" class="edit" value="Edit listing" @onclick="Edit" />
+                    <input type="button" class="delete" value="Archive listing" @onclick="Delete" />
                 }
                 <p>Seller</p>
                 <h3><a href="/company/@listing.CompanyId">@Company.Name</a></h3>
@@ -139,10 +140,6 @@
                                     }
                                 </Tabs>
                             </RadzenTabs>
-                            @if (canIModerate)
-                            {
-                                <input type="button" class="delete" value="Delete listing" @onclick="Delete" />
-                            }
                         </Authorized>
                         <NotAuthorized>
                             <p>Contact: </p>
@@ -150,7 +147,7 @@
                         </NotAuthorized>
                     </AuthorizeView>
                 }
-                </div>
+            </div>
         </div>
     </div>
 </div>
