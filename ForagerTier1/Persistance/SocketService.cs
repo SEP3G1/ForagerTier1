@@ -12,7 +12,7 @@ namespace ForagerTier1.Models
 {
     public class SocketService : ISocketService
     {
-        private static string IP = "192.168.87.168";
+        private static string IP = "192.168.1.69";
         private static int PORT = 4343;
         private static Socket clientSocket;
         public event EventHandler SomethingHappened;
@@ -334,7 +334,7 @@ namespace ForagerTier1.Models
             //Sends message to connected Rest web API and gets a response in json
             string rcv = SendReceive(JsonSerializer.Serialize(r));
 
-            return JsonSerializer.Deserialize<List<Listing>>(rcv, options);
+            return Newtonsoft.Json.JsonConvert.DeserializeObject<List<Listing>>(rcv);
         }
     }
 }

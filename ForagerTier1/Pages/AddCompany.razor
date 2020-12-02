@@ -20,11 +20,13 @@
 
                     <h1>Create a company<span class="acc">.</span></h1>
                     <h3 style="width: 100%;">Create a company in the form below</h3>
+                    <h3 style="width: 100%; color:red;">@Errorlabel</h3>
                 }
                 else
                 {
                     <h1>Edit @newCompany.Name<span class="acc">.</span></h1>
                     <h3 style="width: 100%;">Edit you company in the form below. Changes are first saved when the button is pressed</h3>
+                    <h3 style="width: 100%; color:red;">@Errorlabel</h3>
                 }
                 <div class="sellColum">
                     <DataAnnotationsValidator />
@@ -118,9 +120,10 @@
     public string CompanyId { get; init; }
     public User newUser = new User();
     public Company newCompany = new Company();
-
+    public string Errorlabel = "";
     protected override async Task OnParametersSetAsync()
     {
+        Errorlabel = "";
         if (CompanyId is not null)
         {
             newCompany = CompanyService.GetCompany(CompanyId);
@@ -133,7 +136,10 @@
         if (CompanyId == null)
         {
             string id = CompanyService.CreateCompany(newCompany);
-            NavigationManager.NavigateTo("/company/" + id);
+            if (id.Equals("alreadyExists"))
+                Errorlabel = "Company already exists";
+            else
+                NavigationManager.NavigateTo("/company/" + id);
         }
         else
             SaveChanges();

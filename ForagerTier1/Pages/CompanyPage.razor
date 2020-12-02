@@ -61,13 +61,14 @@
 @code {
     [Parameter]
     public string id { get; set; }
+
     Company company;
-    List<Listing> Listings;
+    List<Listing> Listings = new List<Listing>();
 
     protected override async Task OnParametersSetAsync()
     {
-        CompanyService companyService = new CompanyService();
-        company = (Company)companyService.GetCompany(id);
+
+        company = Companyservice.GetCompany(id);
         Listings = SocketService.GetListingsFromCompany(company.CompanyId);
         await JSRuntime.InvokeVoidAsync("setTitle", "forager. | " + company.Name);
     }
