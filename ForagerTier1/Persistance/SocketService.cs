@@ -47,14 +47,6 @@ namespace ForagerTier1.Models
 
         public SearchQuery LazyFilterSearch(string message, string filter, int sequenceNumber)
         {
-            if (clientSocket == null)
-            {
-                IPEndPoint serverAddress = new IPEndPoint(IPAddress.Parse(IP), PORT);
-
-                clientSocket = new Socket(AddressFamily.InterNetwork, SocketType.Stream, ProtocolType.Tcp);
-                clientSocket.Connect(serverAddress);
-            }
-            
             string[] r = { "lazyFilterSearch", message, filter, sequenceNumber+"" };
             message = JsonSerializer.Serialize(r);
 
@@ -74,14 +66,6 @@ namespace ForagerTier1.Models
 
         public int GetNumberOfResults(string message)
         {
-            if (clientSocket == null)
-            {
-                IPEndPoint serverAddress = new IPEndPoint(IPAddress.Parse(IP), PORT);
-
-                clientSocket = new Socket(AddressFamily.InterNetwork, SocketType.Stream, ProtocolType.Tcp);
-                clientSocket.Connect(serverAddress);
-            }
-
             string[] r = { "getNumberOfResults", message };
             message = JsonSerializer.Serialize(r);
 
@@ -371,14 +355,6 @@ namespace ForagerTier1.Models
 
         public Dictionary<string, string> GetListingNamesAndCover()
         {
-            if (clientSocket == null)
-            {
-                IPEndPoint serverAddress = new IPEndPoint(IPAddress.Parse(IP), PORT);
-
-                clientSocket = new Socket(AddressFamily.InterNetwork, SocketType.Stream, ProtocolType.Tcp);
-                clientSocket.Connect(serverAddress);
-            }
-
             string[] r = { "getListingNamesAndCovers", null };
             string message = JsonSerializer.Serialize(r);
 
@@ -397,14 +373,6 @@ namespace ForagerTier1.Models
 
         public List<string> GetListingPostCodes()
         {
-            if (clientSocket == null)
-            {
-                IPEndPoint serverAddress = new IPEndPoint(IPAddress.Parse(IP), PORT);
-
-                clientSocket = new Socket(AddressFamily.InterNetwork, SocketType.Stream, ProtocolType.Tcp);
-                clientSocket.Connect(serverAddress);
-            }
-
             string[] r = { "getListingPostCodes", null };
             string message = JsonSerializer.Serialize(r);
 
@@ -423,14 +391,6 @@ namespace ForagerTier1.Models
 
         public string ReportListing(Report report)
         {
-            if (clientSocket == null)
-            {
-                IPEndPoint serverAddress = new IPEndPoint(IPAddress.Parse(IP), PORT);
-
-                clientSocket = new Socket(AddressFamily.InterNetwork, SocketType.Stream, ProtocolType.Tcp);
-                clientSocket.Connect(serverAddress);
-            }
-
             string[] r = { "reportlisting", JsonSerializer.Serialize(report) };
             string message = JsonSerializer.Serialize(r);
 
@@ -441,14 +401,6 @@ namespace ForagerTier1.Models
 
         public List<Report> GetAllReports()
         {
-            if (clientSocket == null)
-            {
-                IPEndPoint serverAddress = new IPEndPoint(IPAddress.Parse(IP), PORT);
-
-                clientSocket = new Socket(AddressFamily.InterNetwork, SocketType.Stream, ProtocolType.Tcp);
-                clientSocket.Connect(serverAddress);
-            }
-
             string[] r = { "getallreports", "" };
             string message = JsonSerializer.Serialize(r);
 
@@ -462,14 +414,6 @@ namespace ForagerTier1.Models
 
         public void DeleteCompanyWish(int id)
         {
-            if (clientSocket == null)
-            {
-                IPEndPoint serverAddress = new IPEndPoint(IPAddress.Parse(IP), PORT);
-
-                clientSocket = new Socket(AddressFamily.InterNetwork, SocketType.Stream, ProtocolType.Tcp);
-                clientSocket.Connect(serverAddress);
-            }
-
             string[] r = { "deletecompanywish", id + "" };
             string message = JsonSerializer.Serialize(r);
 
@@ -480,14 +424,6 @@ namespace ForagerTier1.Models
 
         public void DeleteCompany(int id)
         {
-            if (clientSocket == null)
-            {
-                IPEndPoint serverAddress = new IPEndPoint(IPAddress.Parse(IP), PORT);
-
-                clientSocket = new Socket(AddressFamily.InterNetwork, SocketType.Stream, ProtocolType.Tcp);
-                clientSocket.Connect(serverAddress);
-            }
-
             string[] r = { "deletecompany", id + "" };
             string message = JsonSerializer.Serialize(r);
 
@@ -498,14 +434,6 @@ namespace ForagerTier1.Models
 
         public List<Company> GetAllCompaniesToDelete()
         {
-            if (clientSocket == null)
-            {
-                IPEndPoint serverAddress = new IPEndPoint(IPAddress.Parse(IP), PORT);
-
-                clientSocket = new Socket(AddressFamily.InterNetwork, SocketType.Stream, ProtocolType.Tcp);
-                clientSocket.Connect(serverAddress);
-            }
-
             string[] r = { "getcompaniestodelete", "" };
             string message = JsonSerializer.Serialize(r);
 
@@ -516,14 +444,6 @@ namespace ForagerTier1.Models
         }
         public string AddUser(User user)
         {
-            if (clientSocket == null)
-            {
-                IPEndPoint serverAddress = new IPEndPoint(IPAddress.Parse(IP), PORT);
-
-                clientSocket = new Socket(AddressFamily.InterNetwork, SocketType.Stream, ProtocolType.Tcp);
-                clientSocket.Connect(serverAddress);
-            }
-
             string[] r = { "createuser", JsonSerializer.Serialize(user) };
             string message = JsonSerializer.Serialize(r);
 
