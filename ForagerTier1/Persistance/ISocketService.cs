@@ -10,7 +10,6 @@ namespace ForagerTier1.Models
         SearchQuery LazyFilterSearch(string message, string filter, int sequenceNumber);
         int GetNumberOfResults(string message);
         string SendReceive(string message);
-        void Send(string message);
         string UploadImageTest(IList<IBrowserFile> imgs);
         User Login(string username, string password);
         string CreateListing(Listing listing);
