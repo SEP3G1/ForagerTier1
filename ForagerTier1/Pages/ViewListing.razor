@@ -298,11 +298,21 @@
 
     public void Report()
     {
-        Report report = new Report();
-        report.ListingId = listing.ListingId;
-        report.UserId = ((User)((CustomAuthenticationStateProvider)AuthenticationStateProvider).GetCashedUser()).UserId;
-        report.ReportType = reportReason;
-        report.Time = DateTime.Now.Ticks + "";
-        SocketService.ReportListing(report);
+        int userId = ((User)((CustomAuthenticationStateProvider)AuthenticationStateProvider).GetCashedUser()).UserId;
+        string isUserAllowedToReport = SocketService.IsUserAllowedToReport(userId);
+
+        if(isUserAllowedToReport == "true" )
+        {
+            Report report = new Report();
+            report.ListingId = listing.ListingId;
+            report.UserId = ((User)((CustomAuthenticationStateProvider)AuthenticationStateProvider).GetCashedUser()).UserId;
+            report.ReportType = reportReason;
+            report.Time = DateTime.Now.Ticks + "";
+            SocketService.ReportListing(report);
+        } else
+        {
+
+            Console.WriteLine("Not allowed"); //TODO #patrick make a popup
+        }
     }
 }

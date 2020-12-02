@@ -12,7 +12,7 @@ namespace ForagerTier1.Models
 {
     public class SocketService : ISocketService
     {
-        private static string IP = "192.168.1.69";
+        private static string IP = "192.168.10.101";
         private static int PORT = 4343;
         private static Socket clientSocket;
         public event EventHandler SomethingHappened;
@@ -195,7 +195,7 @@ namespace ForagerTier1.Models
             //Sends message to connected Rest web API and gets a response in json
             string rcv = SendReceive(JsonSerializer.Serialize(r));
 
-            return JsonSerializer.Deserialize<List<Message>>(rcv, options); ;
+            return JsonSerializer.Deserialize<List<Message>>(rcv, options);
         }
 
         public List<Message> Respond(string Message, Message m)
@@ -249,7 +249,7 @@ namespace ForagerTier1.Models
             //Sends message to connected Rest web API and gets a response in json
             string rcv = SendReceive(JsonSerializer.Serialize(r));
 
-            return JsonSerializer.Deserialize<List<Message>>(rcv, options); ;
+            return JsonSerializer.Deserialize<List<Message>>(rcv, options);
         }
 
         public Dictionary<string, string> GetListingNamesAndCover()
@@ -260,7 +260,7 @@ namespace ForagerTier1.Models
             string rcv = SendReceive(JsonSerializer.Serialize(r));
 
             //Deserializing received query
-            return JsonSerializer.Deserialize<Dictionary<string, string>>(rcv, options); ;
+            return JsonSerializer.Deserialize<Dictionary<string, string>>(rcv, options);
         }
 
         public List<string> GetListingPostCodes()
@@ -271,7 +271,16 @@ namespace ForagerTier1.Models
             string rcv = SendReceive(JsonSerializer.Serialize(r));
 
             //Deserializing received query
-            return JsonSerializer.Deserialize<List<string>>(rcv, options); ;
+            return JsonSerializer.Deserialize<List<string>>(rcv, options);
+        }
+
+        public string IsUserAllowedToReport(int userId)
+        {
+            string[] r = { "isUserAllowedToReport", JsonSerializer.Serialize(userId) };
+
+            //Sends message to connected Rest web API and gets a response in json
+            string rcv = SendReceive(JsonSerializer.Serialize(r));
+            return rcv;
         }
 
         public string ReportListing(Report report)
@@ -291,7 +300,7 @@ namespace ForagerTier1.Models
             string rcv = SendReceive(JsonSerializer.Serialize(r));
 
             //SKAL være Newtonsoft.Json ellers deserializer den til et array med 0
-            return Newtonsoft.Json.JsonConvert.DeserializeObject<List<Report>>(rcv); ;
+            return Newtonsoft.Json.JsonConvert.DeserializeObject<List<Report>>(rcv);
         }
 
         public void DeleteCompanyWish(int id)
@@ -316,7 +325,7 @@ namespace ForagerTier1.Models
 
             //Sends message to connected Rest web API and gets a response in json
             string rcv = SendReceive(JsonSerializer.Serialize(r));
-            return Newtonsoft.Json.JsonConvert.DeserializeObject<List<Company>>(rcv); ;
+            return Newtonsoft.Json.JsonConvert.DeserializeObject<List<Company>>(rcv);
         }
         public string AddUser(User user)
         {
@@ -336,5 +345,6 @@ namespace ForagerTier1.Models
 
             return Newtonsoft.Json.JsonConvert.DeserializeObject<List<Listing>>(rcv);
         }
+
     }
 }
