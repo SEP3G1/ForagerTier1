@@ -7,6 +7,7 @@
 @inject NavigationManager NavigationManager
 @using ForagerTier1.Models
 @using ForagerTier1.Persistance
+@using System.Net 
 
 <AuthorizeView>
     <NotAuthorized>
@@ -124,6 +125,8 @@
         if (CompanyId is not null)
         {
             newCompany = CompanyService.GetCompany(CompanyId);
+            newCompany.Name = WebUtility.HtmlDecode(newCompany.Name).Replace("+", " ");
+            newCompany.Address = WebUtility.HtmlDecode(newCompany.Address).Replace("+", " ");
         }
         newUser.SecurityLevel = 1;
     }
@@ -132,6 +135,8 @@
     {
         if (CompanyId == null)
         {
+            newCompany.Name = WebUtility.HtmlEncode(newCompany.Name);
+            newCompany.Address = WebUtility.HtmlEncode(newCompany.Address);
             string id = CompanyService.CreateCompany(newCompany);
             NavigationManager.NavigateTo("/company/" + id);
         }
@@ -148,6 +153,8 @@
 
     public void SaveChanges()
     {
+        newCompany.Name = WebUtility.HtmlEncode(newCompany.Name);
+        newCompany.Address = WebUtility.HtmlEncode(newCompany.Address);
         CompanyService.UpdateCompany(newCompany);
         NavigationManager.NavigateTo("/company/" + CompanyId);
     }

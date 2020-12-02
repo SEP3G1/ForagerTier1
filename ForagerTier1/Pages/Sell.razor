@@ -7,6 +7,7 @@
 @inject IUserService UserService
 @using ForagerTier1.Models
 @using ForagerTier1.Persistance
+@using System.Net 
 
 <AuthorizeView>
     <NotAuthorized>
@@ -143,6 +144,8 @@
                 if (((User)((CustomAuthenticationStateProvider)AuthenticationStateProvider).GetCashedUser()).CompanyId == UserService.GetUser(gListing.UserId).CompanyId)
                 {
                     newListing = gListing;
+                    newListing.Comment = WebUtility.HtmlDecode(newListing.Comment).Replace("+", " ");
+                    newListing.PickupAddress = WebUtility.HtmlDecode(newListing.PickupAddress).Replace("+", " ");
                     newProductCategory = newListing.Product.ProductCategory;
                     buttonText = "Update";
                 }
@@ -160,6 +163,9 @@
         User user = ((User)((CustomAuthenticationStateProvider)AuthenticationStateProvider).GetCashedUser());
         newListing.UserId = user.UserId;
         newListing.CompanyId = user.CompanyId;
+        newListing.Comment = WebUtility.HtmlEncode(newListing.Comment);
+        newListing.PickupAddress = WebUtility.HtmlEncode(newListing.PickupAddress);
+        newListing.Comment = WebUtility.HtmlEncode(newListing.Comment);
         string id;
         if (buttonText.Equals("Submit"))
             id = SocketService.CreateListing(newListing);
