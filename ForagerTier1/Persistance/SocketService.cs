@@ -17,9 +17,14 @@ namespace ForagerTier1.Models
         private static Socket clientSocket;
         public event EventHandler SomethingHappened;
         IPEndPoint serverAddress;
+        private JsonSerializerOptions options;
 
         public SocketService()
         {
+            options = new JsonSerializerOptions();
+            options.PropertyNameCaseInsensitive = true;
+            options.Converters.Add(new JsonStringEnumConverter());
+
             serverAddress = new IPEndPoint(IPAddress.Parse(IP), PORT);
 
             clientSocket = new Socket(AddressFamily.InterNetwork, SocketType.Stream, ProtocolType.Tcp);
@@ -54,7 +59,7 @@ namespace ForagerTier1.Models
             string rcv = SendReceive(message);
 
             //Makes json deserializor case insensitive
-            var options = new JsonSerializerOptions();
+            JsonSerializerOptions options = new JsonSerializerOptions();
             options.PropertyNameCaseInsensitive = true;
             options.Converters.Add(new JsonStringEnumConverter());
 
@@ -72,11 +77,6 @@ namespace ForagerTier1.Models
             //Sends message to connected Rest web API and gets a response in json
             string rcv = SendReceive(message);
 
-            //Makes json deserializor case insensitive
-            var options = new JsonSerializerOptions();
-            options.PropertyNameCaseInsensitive = true;
-            options.Converters.Add(new JsonStringEnumConverter());
-
             //Deserializing received query
             int numberOfResults = JsonSerializer.Deserialize<int>(rcv, options);
 
@@ -91,11 +91,6 @@ namespace ForagerTier1.Models
 
             //Sends message to connected Rest web API and gets a response in json
             string rcv = SendReceive(message);
-
-            //Makes json deserializor case insensitive
-            var options = new JsonSerializerOptions();
-            options.PropertyNameCaseInsensitive = true;
-            options.Converters.Add(new JsonStringEnumConverter());
 
             //Deserializing received query
             User sq = JsonSerializer.Deserialize<User>(rcv, options);
@@ -182,11 +177,6 @@ namespace ForagerTier1.Models
             //Sends message to connected Rest web API and gets a response in json
             string rcv = SendReceive(message);
 
-            //Makes json deserializor case insensitive
-            var options = new JsonSerializerOptions();
-            options.PropertyNameCaseInsensitive = true;
-            options.Converters.Add(new JsonStringEnumConverter());
-
             Listing listing = JsonSerializer.Deserialize<Listing>(rcv, options);
             return listing;
         }
@@ -199,11 +189,6 @@ namespace ForagerTier1.Models
 
             //Sends message to connected Rest web API and gets a response in json
             string rcv = SendReceive(message);
-
-            //Makes json deserializor case insensitive
-            var options = new JsonSerializerOptions();
-            options.PropertyNameCaseInsensitive = true;
-            options.Converters.Add(new JsonStringEnumConverter());
 
             Company company = JsonSerializer.Deserialize<Company>(rcv, options);
             return company;
@@ -218,11 +203,6 @@ namespace ForagerTier1.Models
             //Sends message to connected Rest web API and gets a response in json
             string rcv = SendReceive(message);
 
-            //Makes json deserializor case insensitive
-            var options = new JsonSerializerOptions();
-            options.PropertyNameCaseInsensitive = true;
-            options.Converters.Add(new JsonStringEnumConverter());
-
             Company company = JsonSerializer.Deserialize<Company>(rcv, options);
             return company;
         }
@@ -234,10 +214,6 @@ namespace ForagerTier1.Models
 
             //Sends message to connected Rest web API and gets a response in json
             string rcv = SendReceive(message);
-            //Makes json deserializor case insensitive
-            var options = new JsonSerializerOptions();
-            options.PropertyNameCaseInsensitive = true;
-            options.Converters.Add(new JsonStringEnumConverter());
 
             List<Product> listing = JsonSerializer.Deserialize<List<Product>>(rcv, options);
             return listing;
@@ -251,10 +227,6 @@ namespace ForagerTier1.Models
 
             //Sends message to connected Rest web API and gets a response in json
             string rcv = SendReceive(message);
-            //Makes json deserializor case insensitive
-            var options = new JsonSerializerOptions();
-            options.PropertyNameCaseInsensitive = true;
-            options.Converters.Add(new JsonStringEnumConverter());
 
             List<string> listing = JsonSerializer.Deserialize<List<string>>(rcv,options);
             return listing;
@@ -268,10 +240,6 @@ namespace ForagerTier1.Models
 
             //Sends message to connected Rest web API and gets a response in json
             string rcv = SendReceive(message);
-            //Makes json deserializor case-insencitive
-            var options = new JsonSerializerOptions();
-            options.PropertyNameCaseInsensitive = true;
-            options.Converters.Add(new JsonStringEnumConverter());
 
             List<Message> Conversation = JsonSerializer.Deserialize<List<Message>>(rcv, options);
             return Conversation;
@@ -289,10 +257,6 @@ namespace ForagerTier1.Models
 
             //Sends message to connected Rest web API and gets a response in json
             string rcv = SendReceive(message);
-            //Makes json deserializor case-insencitive
-            var options = new JsonSerializerOptions();
-            options.PropertyNameCaseInsensitive = true;
-            options.Converters.Add(new JsonStringEnumConverter());
 
             List<Message> Conversation = JsonSerializer.Deserialize<List<Message>>(rcv, options);
             return Conversation; ;
@@ -305,11 +269,6 @@ namespace ForagerTier1.Models
 
             //Sends message to connected Rest web API and gets a response in json
             string rcv = SendReceive(message);
-
-            //Makes json deserializor case insensitive
-            var options = new JsonSerializerOptions();
-            options.PropertyNameCaseInsensitive = true;
-            options.Converters.Add(new JsonStringEnumConverter());
 
             User u= JsonSerializer.Deserialize<User>(rcv, options);
             return u;
@@ -344,10 +303,6 @@ namespace ForagerTier1.Models
 
             //Sends message to connected Rest web API and gets a response in json
             string rcv = SendReceive(message);
-            //Makes json deserializor case-insencitive
-            var options = new JsonSerializerOptions();
-            options.PropertyNameCaseInsensitive = true;
-            options.Converters.Add(new JsonStringEnumConverter());
 
             List<Message> Conversation = JsonSerializer.Deserialize<List<Message>>(rcv, options);
             return Conversation;
@@ -361,11 +316,6 @@ namespace ForagerTier1.Models
             //Sends message to connected Rest web API and gets a response in json
             string rcv = SendReceive(message);
 
-            //Makes json deserializor case insensitive
-            var options = new JsonSerializerOptions();
-            options.PropertyNameCaseInsensitive = true;
-            options.Converters.Add(new JsonStringEnumConverter());
-
             //Deserializing received query
             Dictionary<string, string> listingNamesAndCovers = JsonSerializer.Deserialize<Dictionary<string, string>>(rcv, options);
             return listingNamesAndCovers;
@@ -378,11 +328,6 @@ namespace ForagerTier1.Models
 
             //Sends message to connected Rest web API and gets a response in json
             string rcv = SendReceive(message);
-
-            //Makes json deserializor case insensitive
-            var options = new JsonSerializerOptions();
-            options.PropertyNameCaseInsensitive = true;
-            options.Converters.Add(new JsonStringEnumConverter());
 
             //Deserializing received query
             List<string> postCodes = JsonSerializer.Deserialize<List<string>>(rcv, options);
@@ -459,11 +404,6 @@ namespace ForagerTier1.Models
 
             //Sends message to connected Rest web API and gets a response in json
             string rcv = SendReceive(message);
-
-            //Makes json deserializor case insensitive
-            var options = new JsonSerializerOptions();
-            options.PropertyNameCaseInsensitive = true;
-            options.Converters.Add(new JsonStringEnumConverter());
 
             List<Listing> listings = JsonSerializer.Deserialize<List<Listing>>(rcv, options);
             return listings;
