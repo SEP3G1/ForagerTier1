@@ -2,6 +2,7 @@
 @page "/company/{id}"
 @using ForagerTier1.Models
 @using ForagerTier1.Persistance
+@using System.Net 
 @inject IJSRuntime JSRuntime
 @inject ISocketService SocketService
 @inject ICompanyService Companyservice
@@ -67,8 +68,10 @@
 
     protected override async Task OnParametersSetAsync()
     {
-
-        company = Companyservice.GetCompany(id);
+        CompanyService companyService = new CompanyService();
+        company = (Company)companyService.GetCompany(id);
+        company.Name = WebUtility.HtmlDecode(company.Name).Replace("+", " ");
+        company.Address = WebUtility.HtmlDecode(company.Address).Replace("+", " ");
         Listings = SocketService.GetListingsFromCompany(company.CompanyId);
         await JSRuntime.InvokeVoidAsync("setTitle", "forager. | " + company.Name);
     }
