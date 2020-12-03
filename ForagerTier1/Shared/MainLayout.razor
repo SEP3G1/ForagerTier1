@@ -47,7 +47,7 @@
 
 
         <div id="header" class="headCont">
-            <AuthorizeView>
+            <AuthorizeView Context="Auth">
                 <Authorized>
                     @if (GetUser() != null)
                     {
