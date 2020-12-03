@@ -7,7 +7,7 @@ namespace ForagerTier1.Models
     public interface ISocketService
     {
         SearchQuery Search(string message);
-        SearchQuery LazyFilterSearch(string message, string filter, int sequenceNumber);
+        SearchQuery LazyFilterSearch(string message, string filter, int sequenceNumber, int resultsToReturn);
         int GetNumberOfResults(string message);
         string SendReceive(string message);
         string UploadImageTest(IList<IBrowserFile> imgs);

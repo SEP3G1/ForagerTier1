@@ -201,11 +201,12 @@
     protected override async Task OnParametersSetAsync()
     {
         listing = (Listing)SocketService.GetListing(id);
+        listing.Comment = WebUtility.HtmlDecode(listing.Comment).Replace("+", " ");
+        listing.PickupAddress = WebUtility.HtmlDecode(listing.PickupAddress).Replace("+", " ");
         if (listing == null)
             NavigationManager.NavigateTo($"/");
         imageInView = listing.getCover();
-        listing.Comment = WebUtility.HtmlDecode(listing.Comment).Replace("+", " ");
-        listing.PickupAddress = WebUtility.HtmlDecode(listing.PickupAddress).Replace("+", " ");
+
         await JSRuntime.InvokeVoidAsync("setTitle", "forager. | " + listing.Product.Name);
         RecommendedListings = (List<Listing>)SocketService.Search(listing.Product.ProductCategory).Listings;
         Company = CompanyService.GetCompanyFromUserId(listing.UserId);
