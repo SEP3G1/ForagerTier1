@@ -30,8 +30,10 @@
     </div>
 </div>
 <div class="companyButtons">
-    <button type="submit" class="btn btn-warning" @onclick="@EditCompany">Edit</button>
-    <button type="submit" class="btn btn-danger" @onclick="@Delete">Delete</button>
+    <AuthorizeView Policy="VR">
+        <button type="submit" class="btn btn-warning" @onclick="@EditCompany">Edit</button>
+        <button type="submit" class="btn btn-danger" @onclick="@Delete">Delete</button>
+    </AuthorizeView>
 </div>
 <h1 class="related">Active listings from @company.Name</h1>
 <div class="relatedCont">
