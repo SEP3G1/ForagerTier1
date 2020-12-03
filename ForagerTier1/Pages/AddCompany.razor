@@ -11,14 +11,14 @@
 @using ForagerTier1.Persistance
 @using System.Net
 
-<AuthorizeView>
+<AuthorizeView Policy="VR">
     <NotAuthorized>
         <Login />
     </NotAuthorized>
     <Authorized Context="Auth">
         <div>
             <EditForm class="sellCont" Context="Company" Model="@newCompany" OnValidSubmit="AddNewCompany">
-                @if (CompanyId == null)
+                @if (((User)((CustomAuthenticationStateProvider)AuthenticationStateProvider).GetCashedUser()).SecurityLevel >= 3)
                 {
 
                     <h1>Create a company<span class="acc">.</span></h1>
@@ -62,15 +62,19 @@
                     </div>
                     @if (CompanyId == null)
                     {
-                        <div class="form-group">
-                            <button type="submit" class="btn btn-success">Submit</button>
-                        </div>
+                <AuthorizeView Policy="Moderator">
+                    <div class="form-group">
+                        <button type="submit" class="btn btn-success">Submit</button>
+                    </div>
+                </AuthorizeView>
                     }
                     else
                     {
-                        <div class="form-group">
-                            <button type="submit" class="btn btn-success">Save changes</button>
-                        </div>
+                <AuthorizeView Policy="VR">
+                    <div class="form-group">
+                        <button type="submit" class="btn btn-success">Save changes</button>
+                    </div>
+                </AuthorizeView>
                     }
                 </div>
             </EditForm>
@@ -105,7 +109,7 @@
                         </div>
                         <div class="form-group">
                             <p>CompanyId</p>
-                            <InputNumber @bind-Value="newUser.CompanyId" />
+                            <InputNumber CurrentValue="@Int32.Parse(CompanyId)" @bind-Value="newUser.CompanyId" />
                         </div>
                         <div class="form-group">
                             <button type="Submit" class="btn btn-success">Create user</button>
@@ -171,11 +175,6 @@
         newCompany.Address = WebUtility.HtmlEncode(newCompany.Address);
         CompanyService.UpdateCompany(newCompany);
         NavigationManager.NavigateTo("/company/" + CompanyId);
-    }
-
-    public void Delete()
-    {
-        CompanyService.DeleteCompanyWish(newCompany.CompanyId);
     }
 
     private void RefreshMe()

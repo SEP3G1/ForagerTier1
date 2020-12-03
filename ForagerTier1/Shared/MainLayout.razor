@@ -47,7 +47,7 @@
 
 
         <div id="header" class="headCont">
-            <AuthorizeView>
+            <AuthorizeView Context="Auth">
                 <Authorized>
                     @if (GetUser() != null)
                     {
@@ -55,8 +55,10 @@
                             <RadzenMenuItem Text="@GetUser().Name" Icon="account_box" @onselect="@(e => CallRequestRefresh())">
                                 <RadzenMenuItem Text="Profile" Path="profile" Icon="perm_identity"></RadzenMenuItem>
                                 <RadzenMenuItem Text="Your company" Path="@GetCompanyAddress()" Icon="home"></RadzenMenuItem>
-                                <RadzenMenuItem Text="Add Company" Path="addcompany" Icon="domain"></RadzenMenuItem>
-                                <RadzenMenuItem Text="Moderate" Path="moderatelistings" Icon="build"></RadzenMenuItem>
+                                <AuthorizeView Policy="Moderator">
+                                    <RadzenMenuItem Text="Add Company" Path="addcompany" Icon="domain"></RadzenMenuItem>
+                                    <RadzenMenuItem Text="Moderate" Path="moderatelistings" Icon="build"></RadzenMenuItem>
+                                </AuthorizeView>
                             </RadzenMenuItem>
                         </RadzenMenu>
                     }
