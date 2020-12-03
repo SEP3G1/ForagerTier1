@@ -163,9 +163,10 @@
         User user = ((User)((CustomAuthenticationStateProvider)AuthenticationStateProvider).GetCashedUser());
         newListing.UserId = user.UserId;
         newListing.CompanyId = user.CompanyId;
+
         newListing.Comment = WebUtility.HtmlEncode(newListing.Comment);
         newListing.PickupAddress = WebUtility.HtmlEncode(newListing.PickupAddress);
-        newListing.Comment = WebUtility.HtmlEncode(newListing.Comment);
+
         string id;
         if (buttonText.Equals("Submit"))
             id = SocketService.CreateListing(newListing);

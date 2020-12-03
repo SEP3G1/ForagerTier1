@@ -1,5 +1,6 @@
 ﻿@page "/moderatelistings"
 @using ForagerTier1.Models
+@using System.Net
 @inject ISocketService socketService
 @inject IJSRuntime JSRuntime;
 @inject NavigationManager NavigationManager
@@ -46,6 +47,7 @@
 
                     @foreach (Company company in companies)
                     {
+                        company.Name = WebUtility.HtmlDecode(company.Name).Replace("+", " ");
                     <tr>
                         <td>@company.Name</td>
                         <td>
@@ -69,6 +71,12 @@
     protected override async Task OnParametersSetAsync()
     {
         reports = (List<Report>)socketService.GetAllReports();
+
+        foreach(Report r in reports)
+        {
+            r.ReportType = WebUtility.HtmlDecode(r.ReportType).Replace("+", " ");
+        }
+
         companies = (List<Company>)socketService.GetAllCompaniesToDelete();
         if (reports != null)
         {

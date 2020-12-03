@@ -61,9 +61,9 @@ namespace ForagerTier1.Models
             return JsonSerializer.Deserialize<SearchQuery>(rcv, options); ;
         }
 
-        public SearchQuery LazyFilterSearch(string message, string filter, int sequenceNumber)
+        public SearchQuery LazyFilterSearch(string message, string filter, int sequenceNumber, int resultsToReturn)
         {
-            string[] r = { "lazyFilterSearch", message, filter, sequenceNumber+"" };
+            string[] r = { "lazyFilterSearch", message, filter, sequenceNumber+"", resultsToReturn+"" };
          
             //Sends message to connected Rest web API and gets a response in json
             string rcv = SendReceive(JsonSerializer.Serialize(r));
@@ -162,7 +162,8 @@ namespace ForagerTier1.Models
          
             //Sends message to connected Rest web API and gets a response in json
             string rcv = SendReceive(JsonSerializer.Serialize(r));
-
+            if (rcv.Equals("null"))
+                return null;
             return JsonSerializer.Deserialize<Company>(rcv, options); 
         }
         public List<Product> GetProducts()
@@ -195,7 +196,7 @@ namespace ForagerTier1.Models
             //Sends message to connected Rest web API and gets a response in json
             string rcv = SendReceive(JsonSerializer.Serialize(r));
 
-            return JsonSerializer.Deserialize<List<Message>>(rcv, options); ;
+            return JsonSerializer.Deserialize<List<Message>>(rcv, options);
         }
 
         public List<Message> Respond(string Message, Message m)
@@ -249,7 +250,7 @@ namespace ForagerTier1.Models
             //Sends message to connected Rest web API and gets a response in json
             string rcv = SendReceive(JsonSerializer.Serialize(r));
 
-            return JsonSerializer.Deserialize<List<Message>>(rcv, options); ;
+            return JsonSerializer.Deserialize<List<Message>>(rcv, options);
         }
 
         public Dictionary<string, string> GetListingNamesAndCover()
@@ -260,7 +261,7 @@ namespace ForagerTier1.Models
             string rcv = SendReceive(JsonSerializer.Serialize(r));
 
             //Deserializing received query
-            return JsonSerializer.Deserialize<Dictionary<string, string>>(rcv, options); ;
+            return JsonSerializer.Deserialize<Dictionary<string, string>>(rcv, options);
         }
 
         public List<string> GetListingPostCodes()
@@ -271,7 +272,16 @@ namespace ForagerTier1.Models
             string rcv = SendReceive(JsonSerializer.Serialize(r));
 
             //Deserializing received query
-            return JsonSerializer.Deserialize<List<string>>(rcv, options); ;
+            return JsonSerializer.Deserialize<List<string>>(rcv, options);
+        }
+
+        public string IsUserAllowedToReport(int userId)
+        {
+            string[] r = { "isUserAllowedToReport", JsonSerializer.Serialize(userId) };
+
+            //Sends message to connected Rest web API and gets a response in json
+            string rcv = SendReceive(JsonSerializer.Serialize(r));
+            return rcv;
         }
 
         public string ReportListing(Report report)
@@ -291,7 +301,7 @@ namespace ForagerTier1.Models
             string rcv = SendReceive(JsonSerializer.Serialize(r));
 
             //SKAL være Newtonsoft.Json ellers deserializer den til et array med 0
-            return Newtonsoft.Json.JsonConvert.DeserializeObject<List<Report>>(rcv); ;
+            return Newtonsoft.Json.JsonConvert.DeserializeObject<List<Report>>(rcv);
         }
 
         public void DeleteCompanyWish(int id)
@@ -316,7 +326,7 @@ namespace ForagerTier1.Models
 
             //Sends message to connected Rest web API and gets a response in json
             string rcv = SendReceive(JsonSerializer.Serialize(r));
-            return Newtonsoft.Json.JsonConvert.DeserializeObject<List<Company>>(rcv); ;
+            return Newtonsoft.Json.JsonConvert.DeserializeObject<List<Company>>(rcv);
         }
         public string AddUser(User user)
         {
@@ -336,5 +346,6 @@ namespace ForagerTier1.Models
 
             return Newtonsoft.Json.JsonConvert.DeserializeObject<List<Listing>>(rcv);
         }
+
     }
 }
