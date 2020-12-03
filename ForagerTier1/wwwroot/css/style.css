@@ -768,3 +768,27 @@ input, textarea {
     border-radius: 1rem;
     box-shadow: rgba(50, 50, 93, 0.25) 0px 13px 27px -5px, rgba(0, 0, 0, 0.3) 0px 8px 16px -8px;
 }
+
+.report{
+    text-decoration: underline;
+    cursor: pointer;
+}
+.report:hover{
+    color: red;
+}
+.reportSelect{
+    margin-top: 1rem;
+    font-size: 1rem;
+    padding: .5rem .5rem;
+}
+.reportButton {
+    width: 5rem;
+    float: right;
+    font-size: 1rem;
+    padding: .5rem .5rem;
+    margin-top: .9rem;
+    margin-right: 4rem;
+    background: red;
+    color: white;
+    font-weight: 900;
+}

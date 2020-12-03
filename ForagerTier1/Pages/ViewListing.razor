@@ -55,16 +55,23 @@
                 </div>
                 @if (!myListing || !listing.IsArchived)
                 {
-            <div class="form-group">
-                <p>Report reason</p>
-                <select class="reportSelect" @bind=@reportReason style="width:15rem">
-                    <option value="Illegal goods" selected>Illegal goods</option>
-                    <option value="Breaking the law">Breaking the law</option>
-                    <option value="Offensive picture">Offensive picture</option>
-                    <option value="Offensive description">Offensive description</option>
-                </select>
-            </div>
-                    <input type="button" style="text-decoration-color:red" @onclick="Report" value="report listing" />
+                    <div class="form-group">
+                        <p class="report" @onclick="toggleReportListing">Report listing</p>
+                        @if (reportListing)
+                        {
+
+                            <select class="reportSelect" @bind=@reportReason style="width:15rem">
+                                <option value="Illegal goods" selected>Illegal goods</option>
+                                <option value="Breaking the law">Breaking the law</option>
+                                <option value="Offensive picture">Offensive picture</option>
+                                <option value="Offensive description">Offensive description</option>
+                            </select>
+                            @if (reportReason != "")
+                            {
+                                <input type="button" class="reportButton" style="text-decoration-color:red" @onclick="Report" value="report" />
+                            }
+                        }
+                    </div>
                 }
             </div>
             <div class="listingInfoTabelItem">
@@ -197,6 +204,8 @@
     int fromCompanyId = -1;
     bool myListing = false;
     bool canIModerate = false;
+    bool reportListing = false;
+
 
     protected override async Task OnParametersSetAsync()
     {
@@ -225,6 +234,14 @@
     {
         listing.IsArchived = true;
         SocketService.UpdateListing(listing);
+    }
+
+    public void toggleReportListing()
+    {
+        if (reportListing)
+            reportListing = false;
+        else
+            reportListing = true;
     }
 
     private void SendMessage(int toUserId, int fromCompanyId)
