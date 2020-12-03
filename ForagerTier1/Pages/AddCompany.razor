@@ -103,7 +103,7 @@
                         </div>
                         <div class="form-group">
                             <p>CompanyId</p>
-                            <InputNumber @bind-Value="newUser.CompanyId" />
+                            <InputNumber CurrentValue="@Int32.Parse(CompanyId)" @bind-Value="newUser.CompanyId" />
                         </div>
                         <div class="form-group">
                             <button type="Submit" class="btn btn-success">Create user</button>
@@ -165,10 +165,6 @@
         NavigationManager.NavigateTo("/company/" + CompanyId);
     }
 
-    public void Delete()
-    {
-        CompanyService.DeleteCompanyWish(newCompany.CompanyId);
-    }
 }
         }
 

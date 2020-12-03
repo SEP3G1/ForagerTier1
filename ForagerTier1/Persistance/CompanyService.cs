@@ -44,7 +44,7 @@ namespace ForagerTier1.Persistance
         {
             if (socketService == null)
                 socketService = new SocketService();
-            socketService.DeleteCompany(id);
+            socketService.DeleteCompanyWish(id);
         }
     }
 }

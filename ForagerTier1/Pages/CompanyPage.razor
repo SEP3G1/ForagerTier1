@@ -31,7 +31,7 @@
 </div>
 <div class="companyButtons">
     <button type="submit" class="btn btn-warning" @onclick="@EditCompany">Edit</button>
-    <button type="submit" class="btn btn-danger">Delete</button>
+    <button type="submit" class="btn btn-danger" @onclick="@Delete">Delete</button>
 </div>
 <h1 class="related">Active listings from @company.Name</h1>
 <div class="relatedCont">
@@ -68,8 +68,7 @@
 
     protected override async Task OnParametersSetAsync()
     {
-        CompanyService companyService = new CompanyService();
-        company = (Company)companyService.GetCompany(id);
+        company = (Company)Companyservice.GetCompany(id);
         company.Name = WebUtility.HtmlDecode(company.Name).Replace("+", " ");
         company.Address = WebUtility.HtmlDecode(company.Address).Replace("+", " ");
         Listings = SocketService.GetListingsFromCompany(company.CompanyId);
@@ -85,5 +84,10 @@
     public void openListing(int id)
     {
         NavigationManager.NavigateTo($"/listing/{id}");
+    }
+
+    public void Delete()
+    {
+        Companyservice.DeleteCompanyWish(Int32.Parse(id));
     }
 }
