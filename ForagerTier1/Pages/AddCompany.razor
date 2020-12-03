@@ -5,9 +5,11 @@
 @inject ICompanyService CompanyService
 @inject AuthenticationStateProvider AuthenticationStateProvider
 @inject NavigationManager NavigationManager
+@inject IRefreshService RefreshService
+@implements IDisposable
 @using ForagerTier1.Models
 @using ForagerTier1.Persistance
-@using System.Net 
+@using System.Net
 
 <AuthorizeView>
     <NotAuthorized>
@@ -111,19 +113,20 @@
                     </div>
                 </EditForm>
             }
-            </div>
+        </div>
     </Authorized>
 </AuthorizeView>
 
 
 @code {
     [Parameter]
-    public string CompanyId { get; init; }
+    public string CompanyId { get; set; }
     public User newUser = new User();
     public Company newCompany = new Company();
     public string Errorlabel = "";
     protected override async Task OnParametersSetAsync()
     {
+        RefreshService.RefreshRequested += RefreshMe;
         Errorlabel = "";
         if (CompanyId is not null)
         {
@@ -131,6 +134,11 @@
             newCompany.Name = WebUtility.HtmlDecode(newCompany.Name).Replace("+", " ");
             newCompany.Address = WebUtility.HtmlDecode(newCompany.Address).Replace("+", " ");
         }
+        else //CompanyId can be null because of the RefreshMe method 
+        {
+            newCompany = new Company();
+        }
+
         newUser.SecurityLevel = 1;
     }
 
@@ -168,6 +176,16 @@
     public void Delete()
     {
         CompanyService.DeleteCompanyWish(newCompany.CompanyId);
+    }
+
+    private void RefreshMe()
+    {
+        CompanyId = null;
+    }
+
+    public void Dispose()
+    {
+        RefreshService.RefreshRequested -= RefreshMe;
     }
 }
         }

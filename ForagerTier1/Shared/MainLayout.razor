@@ -52,7 +52,7 @@
                     @if (GetUser() != null)
                     {
                         <RadzenMenu>
-                            <RadzenMenuItem Text="@GetUser().Name" Icon="account_box">
+                            <RadzenMenuItem Text="@GetUser().Name" Icon="account_box" @onselect="@(e => CallRequestRefresh())">
                                 <RadzenMenuItem Text="Profile" Path="profile" Icon="perm_identity"></RadzenMenuItem>
                                 <RadzenMenuItem Text="Your company" Path="@GetCompanyAddress()" Icon="home"></RadzenMenuItem>
                                 <RadzenMenuItem Text="Add Company" Path="addcompany" Icon="domain"></RadzenMenuItem>
@@ -178,6 +178,11 @@
         {
             SequenceNumber = 0;
             NavigationManager.NavigateTo("/find/" + latestSearchTerm + "/" + SequenceNumber);
+        }
+
+        public void CallRequestRefresh()
+        {
+            RefreshService.CallRequestRefresh();
         }
 
         public void onClick()
