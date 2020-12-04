@@ -88,8 +88,11 @@
         NavigationManager.NavigateTo($"/listing/{id}");
     }
 
-    public void Delete()
+    public async void Delete()
     {
+        if (!await JSRuntime.InvokeAsync<bool>("confirm", $"Do you really wish to delete {company.Name}?"))
+            return;
         Companyservice.DeleteCompanyWish(Int32.Parse(id));
+        await JSRuntime.InvokeVoidAsync("alert", $"Your request to delete {company.Name} was successfully sent to the Moderator.");
     }
 }

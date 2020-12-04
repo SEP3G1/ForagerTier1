@@ -38,7 +38,7 @@ namespace ForagerTier1
             services.AddScoped<ICompanyService, CompanyService>();
             services.AddScoped<AuthenticationStateProvider, CustomAuthenticationStateProvider>();
             services.AddSyncfusionBlazor();
-            services.AddScoped<IRefreshService, RefreshService>(); //Stadig relevant? #patrick
+            services.AddScoped<IRefreshService, RefreshService>();
 
             services.AddAuthorization(options => {
                 options.AddPolicy("Admin", a =>
