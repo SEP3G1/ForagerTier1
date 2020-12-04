@@ -222,7 +222,7 @@
             listing.Comment = WebUtility.HtmlDecode(listing.Comment).Replace("+", " ");
         listing.PickupAddress = WebUtility.HtmlDecode(listing.PickupAddress).Replace("+", " ");
         await JSRuntime.InvokeVoidAsync("setTitle", "forager. | " + listing.Product.Name);
-        RecommendedListings = (List<Listing>)SocketService.Search(listing.Product.ProductCategory).Listings;
+        RecommendedListings = (List<Listing>)SocketService.LazyFilterSearch(listing.Product.ProductCategory, "", 0, 15).Listings;
         Company = CompanyService.GetCompanyFromUserId(listing.UserId);
         if (Company == null)
         {

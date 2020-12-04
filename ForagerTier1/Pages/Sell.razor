@@ -16,8 +16,17 @@
     <Authorized>
         <div>
             <EditForm class="sellCont" Context="Listing" Model="@newListing" OnValidSubmit="AddNewListing">
-                <h1>Create a listing<span class="acc">.</span></h1>
-                <h3>Search through the products to find exactly what you want to sell. Then specify the quantity and total price for the listing. Upload up to 8 photos of your product. Remember, good photos drasticly reduces the time it takes to sell your product! <br /> Under 'Best Before' you can press the calender to easily find the expiration date. Anything else to add? Leave it in the comment</h3>
+                @if (ListingId == null)
+                {
+                    <h1>Create a listing<span class="acc">.</span></h1>
+                    <h3>Search through the products to find exactly what you want to sell. Then specify the quantity and total price for the listing. Upload up to 8 photos of your product. Remember, good photos drasticly reduces the time it takes to sell your product! <br /> Under 'Best Before' you can press the calender to easily find the expiration date. Anything else to add? Leave it in the comment</h3>
+
+                }
+                else
+                {
+                    <h1>Update your listing<span class="acc">.</span></h1>
+                    <h3>When you are done editing your listing, press the update</h3>
+                }
                 <div class="sellColum">
                     <DataAnnotationsValidator />
                     <ValidationSummary />
