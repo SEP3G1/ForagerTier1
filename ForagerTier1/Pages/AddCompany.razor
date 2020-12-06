@@ -1,5 +1,6 @@
 ﻿@page "/addCompany"
 @page "/addCompany/{CompanyId}"
+@inject IJSRuntime JSRuntime
 @inject ISocketService SocketService
 @inject IUserService UserService
 @inject ICompanyService CompanyService
@@ -62,19 +63,19 @@
                     </div>
                     @if (CompanyId == null)
                     {
-                <AuthorizeView Policy="Moderator">
-                    <div class="form-group">
-                        <button type="submit" class="btn btn-success">Submit</button>
-                    </div>
-                </AuthorizeView>
+                        <AuthorizeView Policy="Moderator">
+                            <div class="form-group">
+                                <button type="submit" class="btn btn-success">Submit</button>
+                            </div>
+                        </AuthorizeView>
                     }
                     else
                     {
-                <AuthorizeView Policy="VR">
-                    <div class="form-group">
-                        <button type="submit" class="btn btn-success">Save changes</button>
-                    </div>
-                </AuthorizeView>
+                        <AuthorizeView Policy="VR">
+                            <div class="form-group">
+                                <button type="submit" class="btn btn-success">Save changes</button>
+                            </div>
+                        </AuthorizeView>
                     }
                 </div>
             </EditForm>
@@ -138,7 +139,7 @@
             newCompany.Name = WebUtility.HtmlDecode(newCompany.Name).Replace("+", " ");
             newCompany.Address = WebUtility.HtmlDecode(newCompany.Address).Replace("+", " ");
         }
-        else //CompanyId can be null because of the RefreshMe method 
+        else //CompanyId can be null because of the RefreshMe method
         {
             newCompany = new Company();
         }
@@ -165,7 +166,7 @@
     {
         User users = new User();
         string Userid = UserService.CreateUser(newUser);
-
+        JSRuntime.InvokeVoidAsync("alert", $"{newUser.Name} was successfully created.");
         NavigationManager.NavigateTo("/company/" + newUser.CompanyId);
     }
 

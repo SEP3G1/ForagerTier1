@@ -140,9 +140,15 @@
         NavigationManager.NavigateTo($"/listing/{id}");
     }
 
-    public void DeleteCompany(int id)
+    public async void DeleteCompany(int id)
     {
+        Company companyToDelete = socketService.GetCompany(id + "");
+        companyToDelete.Name = WebUtility.HtmlDecode(companyToDelete.Name).Replace("+", " ");
+        if(!await JSRuntime.InvokeAsync<bool>("confirm", $"Do you really wish to delete {companyToDelete.Name}?"))
+            return;
         socketService.DeleteCompany(id);
+        await JSRuntime.InvokeVoidAsync("alert", $"{companyToDelete.Name} has now been deleted from the system.");
+        NavigationManager.NavigateTo(NavigationManager.Uri, forceLoad: true);
     }
 
 }
