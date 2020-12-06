@@ -104,14 +104,17 @@
                         </div>
                     </div>
                     <div class="sellColum">
-                        <div class="form-group">
-                            <p>Securitylevel</p>
-                            <InputNumber @bind-Value="newUser.SecurityLevel" />
-                        </div>
-                        <div class="form-group">
-                            <p>CompanyId</p>
-                            <InputNumber CurrentValue="@Int32.Parse(CompanyId)" @bind-Value="newUser.CompanyId" />
-                        </div>
+                        @if (canIModerate)
+                        {
+                            <div class="form-group">
+                                <p>Securitylevel</p>
+                                <InputNumber @bind-Value="newUser.SecurityLevel" />
+                            </div>
+                            <div class="form-group">
+                                <p>CompanyId</p>
+                                <InputNumber @bind-Value="newUser.CompanyId" />
+                            </div>
+                        }
                         <div class="form-group">
                             <button type="Submit" class="btn btn-success">Create user</button>
                         </div>
@@ -129,6 +132,7 @@
     public User newUser = new User();
     public Company newCompany = new Company();
     public string Errorlabel = "";
+    public bool canIModerate = false;
     protected override async Task OnParametersSetAsync()
     {
         RefreshService.RefreshRequested += RefreshMe;
@@ -138,13 +142,16 @@
             newCompany = CompanyService.GetCompany(CompanyId);
             newCompany.Name = WebUtility.HtmlDecode(newCompany.Name).Replace("+", " ");
             newCompany.Address = WebUtility.HtmlDecode(newCompany.Address).Replace("+", " ");
+            newUser.CompanyId = int.Parse(CompanyId);
+            newUser.SecurityLevel = 1;
+
+            if ((((User)((CustomAuthenticationStateProvider)AuthenticationStateProvider).GetCashedUser()).SecurityLevel >= 3))
+                canIModerate = true;
         }
         else //CompanyId can be null because of the RefreshMe method
         {
             newCompany = new Company();
         }
-
-        newUser.SecurityLevel = 1;
     }
 
     public void AddNewCompany()
