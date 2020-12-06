@@ -1,0 +1,34 @@
+﻿@using ForagerTier1.Models
+@using ForagerTier1.Persistance
+@inject NavigationManager NavigationManager
+
+<div class="listing @(Listing.HasDelivery ? "Delivery" : "")" @onclick="@(e => openListing(@Listing.ListingId))">
+    <div class="listingImage  @(Listing.CompanyId == fromCompanyId?"MyListing":"")" style="background-image: url(@Listing.getCover());"></div>
+    <p class="type">@Listing.Product.Name</p>
+    <table>
+        <tr>
+            <td>
+                <p class="attr">Price:</p>
+                <p class="price">@Listing.Price</p>
+            </td>
+            <td>
+                <p class="attr">Quantity:</p>
+                <p class="weight">@Listing.Quantity @Listing.Unit</p>
+            </td>
+        </tr>
+    </table>
+    <p class="attr">Best before:</p><br />
+    <p class="bestBy">@Listing.getDate()</p>
+</div>
+
+@code {
+    [Parameter]
+    public Listing Listing { get; set; }
+    [Parameter]
+    public int fromCompanyId { get; set; }
+
+    public void openListing(int id)
+    {
+        NavigationManager.NavigateTo($"/listing/{id}");
+    }
+}

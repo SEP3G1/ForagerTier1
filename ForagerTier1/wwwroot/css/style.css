@@ -1,6 +1,6 @@
 :root {
     --bg: #ebebeb;
-    --logo-bg: #1c1b19;
+    --logo-bg: #1C1B19;
     --logo-acc: #3bc061;
     --dark-gray: #232323;
     --gray: #757575;
@@ -31,6 +31,7 @@ body {
     color: white;
     margin: 0;
     background: var(--logo-bg);
+    background-repeat: repeat-x;
     position: absolute;
     left: 0;
     margin-left: 2rem;
@@ -293,8 +294,23 @@ h2 {
     align-items: center;
     flex-wrap: wrap;
 }
-
-.searchMenu button{
+.searchMenu {
+    margin-top: 2rem;
+}
+.reportPage .ui-tabview {
+    margin-top: 2rem;
+}
+.reportPage .ui-tabview-panels {
+    background-color: #F5FFEC;
+    padding-bottom:5rem;
+    box-shadow: none;
+    outline: none;
+    border:none;
+}
+.reportPage .ui-tabview-nav .ui-tabview-selected {
+    background-color: #F5FFEC;
+}
+    .searchMenu button{
     float: right;
     height: 4rem; 
     width: 4rem;
@@ -781,6 +797,9 @@ input, textarea {
     font-size: 1rem;
     padding: .5rem .5rem;
 }
+.reportView .listing{
+    min-width: 10rem;
+}
 .reportButton {
     width: 5rem;
     float: right;
@@ -792,3 +811,95 @@ input, textarea {
     color: white;
     font-weight: 900;
 }
+.reports{
+    display: flex;
+    padding: 0 1rem;
+}
+.reportCount {
+    font-size: 1rem;
+    color: white;
+    font-weight: 900;
+    padding: .1rem .8rem;
+    border-radius: 1rem;
+    margin: .4rem;
+    box-shadow: rgba(50, 50, 93, 0.25) 0px 2px 5px -1px, rgba(0, 0, 0, 0.3) 0px 1px 3px -1px;
+}
+    .reportCount.il {
+        background-color: #ED4F32;
+    }
+    .reportCount.bl {
+        background-color: #ed3234;
+    }
+    .reportCount.op {
+        background-color: #FF7200;
+    }
+    .reportCount.od {
+        background-color: #FFBA00;
+    }
+
+/**
+ * Tooltip Styles
+ */
+
+/* Add this attribute to the element that needs a tooltip */
+[data-tooltip] {
+    position: relative;
+    z-index: 2;
+    cursor: pointer;
+}
+
+    /* Hide the tooltip content by default */
+    [data-tooltip]:before,
+    [data-tooltip]:after {
+        visibility: hidden;
+        -ms-filter: "progid:DXImageTransform.Microsoft.Alpha(Opacity=0)";
+        filter: progid: DXImageTransform.Microsoft.Alpha(Opacity=0);
+        opacity: 0;
+        pointer-events: none;
+    }
+
+    /* Position tooltip above the element */
+    [data-tooltip]:before {
+        position: absolute;
+        top: 150%;
+        left: 50%;
+        margin-bottom: 5px;
+        margin-left: -80px;
+        padding: 7px;
+        width: 160px;
+        -webkit-border-radius: 3px;
+        -moz-border-radius: 3px;
+        border-radius: 3px;
+        background-color: #000;
+        background-color: hsla(0, 0%, 20%, 0.9);
+        color: #fff;
+        content: attr(data-tooltip);
+        text-align: center;
+        font-size: 14px;
+        line-height: 1.2;
+    }
+
+    /* Triangle hack to make tooltip look like a speech bubble */
+    [data-tooltip]:after {
+        position: absolute;
+        top: 124%;
+        left: 50%;
+        margin-left: -5px;
+        width: 0;
+        border-bottom: 5px solid #000;
+        border-bottom: 5px solid hsla(0, 0%, 20%, 0.9);
+        border-right: 5px solid transparent;
+        border-left: 5px solid transparent;
+        content: " ";
+        font-size: 0;
+        line-height: 0;
+    }
+
+    /* Show tooltip content on hover */
+    [data-tooltip]:hover:before,
+    [data-tooltip]:hover:after {
+        visibility: visible;
+        -ms-filter: "progid:DXImageTransform.Microsoft.Alpha(Opacity=100)";
+        filter: progid: DXImageTransform.Microsoft.Alpha(Opacity=100);
+        opacity: 1;
+    }

@@ -1,9 +1,12 @@
 ﻿@page "/moderatelistings"
 @using ForagerTier1.Models
+@using ForagerTier1.Pages
+@using ForagerTier1.Pages.Components
 @using System.Net
 @inject ISocketService socketService
 @inject IJSRuntime JSRuntime;
 @inject NavigationManager NavigationManager
+@inject ISocketService SocketService
 @attribute [Authorize(Policy = "Moderator")]
 
 <AuthorizeView>
@@ -11,89 +14,127 @@
         <Login />
     </NotAuthorized>
     <Authorized>
-        <div class="page">
-            <div class="queryContainer">
-                <table>
-                    <tr>
-                        <td>ListingId</td>
-                        <td>Illegal goods</td>
-                        <td>Breaking the law</td>
-                        <td>Offensive picture</td>
-                        <td>Offensive description</td>
-                    </tr>
-                    @foreach (Report report in reports)
-                    {
-                        <!--Count amounts of type, maybe do an object to handle this-->
+        <div class="page reportPage">
+            <RadzenTabs>
+                <Tabs>
+                    <RadzenTabsItem Text="Reports">
+                        <table class="searchMenu">
+                            <tr>
+                                <td>
+                                    <h2>Reported listings</h2>
+                                </td>
+                                <td class="filter ">
+                                    <select class="ui-dropdown ui-clear" @onchange="FilterReports">
+                                        <option selected value="newest">Newest offences</option>
+                                        <option value="most">Most Offences</option>
+                                    </select>
+                                </td>
+                            </tr>
+                        </table>
 
-                        <tr>
-                            <td>
-                                <p @onclick="@(() => OpenListing(@report.ListingId))">@report.ListingId</p>
-                            </td>
-                            <td>
-                                <p>@report.ReportType</p>
-                            </td>
+                        <div class="queryContainer">
+                            @foreach (Report r in qReports)
+                            {
+                                <div class="reportView">
+                                    <ListingCard fromCompanyId="0" Listing="SocketService.GetListing(r.ListingId.ToString())" />
+                                    <div class="reports">
+                                        @foreach (var o in offences)
+                                        {
+                                            if (GetReportTypeFromListing(o.Value, r.ListingId) != 0)
+                                            {
+                                                <div class="reportCount @o.Key" data-tooltip="@o.Value">@GetReportTypeFromListing(o.Value, r.ListingId)</div>
+                                            }
+                                        }
+                                    </div>
+                                </div>
+                            }
+                        </div>
+                    </RadzenTabsItem>
+                    <RadzenTabsItem Text="Delete requests">
+                        <table class="searchMenu">
+                            <tr>
+                                <td>
+                                    <h2>Company delete requests</h2>
+                                </td>
+                            </tr>
+                        </table>
+                        <div class="queryContainer">
+                            <table class="deleteCompany">
+                                <tr>
+                                    <td>Company Name</td>
+                                    <td>Delete company</td>
+                                </tr>
 
-                        </tr>
-
-                    }
-                </table>
-            </div>
-            <div class="queryContainer">
-                <table>
-                    <tr>
-                        <td>Company Name</td>
-                        <td>Delete company</td>
-                    </tr>
-
-                    @foreach (Company company in companies)
-                    {
-                        company.Name = WebUtility.HtmlDecode(company.Name).Replace("+", " ");
-                    <tr>
-                        <td>@company.Name</td>
-                        <td>
-                            <button @onclick="@(() => DeleteCompany(@company.CompanyId))">
-                                <i class="oi oi-trash" style="color:#ff0000" />
-                            </button>
-                        </td>
-                    </tr>
-                    }
-                </table>
-            </div>
-            </div>
-</Authorized>
+                                @foreach (Company company in companies)
+                                {
+                                    company.Name = WebUtility.HtmlDecode(company.Name).Replace("+", " ");
+                                    <tr>
+                                        <td><a href="/company/@company.CompanyId">@company.Name</a></td>
+                                        <td>
+                                            <button @onclick="@(() => DeleteCompany(@company.CompanyId))">
+                                                <i class="oi oi-trash" style="color:#ff0000" />
+                                            </button>
+                                        </td>
+                                    </tr>
+                                }
+                            </table>
+                        </div>
+                    </RadzenTabsItem>
+                </Tabs>
+            </RadzenTabs>
+        </div>
+    </Authorized>
 </AuthorizeView>
 
 @code {
     List<Company> companies = new List<Company>();
-    List<Report> reports = new List<Report>();
-    List<Report> sortedReports = new List<Report>();
+    List<Report> allReports = new List<Report>();
+    List<Report> qReports = new List<Report>();
+    new Dictionary<string, string> offences = new Dictionary<string, string>(){
+        {"il", "Illegal goods"},
+        {"bl", "Breaking the law"},
+        {"op", "Offensive picture"},
+        {"od", "Offensive description"}
+    };
+    string filter = "newest";
+
 
     protected override async Task OnParametersSetAsync()
     {
-        reports = (List<Report>)socketService.GetAllReports();
+        allReports = (List<Report>)socketService.GetAllReports();
 
-        foreach(Report r in reports)
+        foreach (Report r in allReports)
         {
             r.ReportType = WebUtility.HtmlDecode(r.ReportType).Replace("+", " ");
         }
 
         companies = (List<Company>)socketService.GetAllCompaniesToDelete();
-        if (reports != null)
+        if (allReports != null)
         {
-            // Sort(reports);
+            Filter();
         }
     }
-
-    //    public void Sort(List<Report> reports)
-    //    {
-    //        int maxListingId = reports.Max(x => x.ListingId);
-    //
-    //        for (int i = 0; i < maxListingId; i++)
-    //        {
-    //
-    //        }
-    //    }
-
+    public int GetReportTypeFromListing(string o, int id)
+    {
+        return allReports.Where(r => r.ListingId == id && r.ReportType == o).Count();
+    }
+    void FilterReports(ChangeEventArgs e)
+    {
+        filter = e.Value.ToString();
+        Filter();
+    }
+    void Filter()
+    {
+        qReports.Clear();
+        if (filter == "newest")
+        {
+            qReports = allReports.OrderByDescending(r => r.ReportId).GroupBy(r => r.ListingId).Select(g => g.First()).ToList();
+        }
+        else
+        {
+            qReports = allReports.GroupBy(r => r.ListingId).OrderByDescending(g => g.Count()).Select(g => g.First()).ToList();
+        }
+    }
     public void OpenListing(int id)
     {
         NavigationManager.NavigateTo($"/listing/{id}");
