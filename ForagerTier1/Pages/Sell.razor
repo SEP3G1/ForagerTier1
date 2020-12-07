@@ -142,19 +142,27 @@
         productsToShow = new List<Product>(products);
         productCategories = SocketService.GetProductCategories();
 
-        if (ListingId is not null)
-        {
-            var gListing = SocketService.GetListing(ListingId);
-            var authState = await authenticationStateTask;
-            var user = authState.User;
 
-            if (user.Identity.IsAuthenticated)
+        var authState = await authenticationStateTask;
+        var user = authState.User;
+
+        if (user.Identity.IsAuthenticated)
+        {
+            User u = ((User)((CustomAuthenticationStateProvider)AuthenticationStateProvider).GetCashedUser());
+            Company c = SocketService.GetCompany(u.CompanyId + "");
+            newListing.PickupAddress = WebUtility.HtmlDecode(c.Address).Replace("+", " ");
+            newListing.Postcode = c.PostCode;
+
+            if (ListingId is not null)
             {
-                if (((User)((CustomAuthenticationStateProvider)AuthenticationStateProvider).GetCashedUser()).CompanyId == UserService.GetUser(gListing.UserId).CompanyId)
+                var gListing = SocketService.GetListing(ListingId);
+
+                if (UserService.GetUser(gListing.UserId).CompanyId == u.CompanyId)
                 {
                     newListing = gListing;
                     newListing.Comment = WebUtility.HtmlDecode(newListing.Comment).Replace("+", " ");
-                    newListing.PickupAddress = WebUtility.HtmlDecode(newListing.PickupAddress).Replace("+", " ");
+                    newListing.PickupAddress = WebUtility.HtmlDecode(gListing.PickupAddress).Replace("+", " ");
+                    newListing.Postcode = gListing.Postcode;
                     newProductCategory = newListing.Product.ProductCategory;
                     buttonText = "Update";
                 }

@@ -1,6 +1,7 @@
 ﻿using Microsoft.AspNetCore.Components.Forms;
 using System.Collections.Generic;
 using System.Threading.Tasks;
+using ForagerTier1.Models;
 
 namespace ForagerTier1.Models
 {
