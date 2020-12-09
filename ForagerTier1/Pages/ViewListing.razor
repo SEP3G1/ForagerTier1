@@ -72,6 +72,10 @@
                                 <input type="button" class="reportButton" style="text-decoration-color:red" @onclick="Report" value="report" />
                             }
                         }
+                        @if (reportStatus)
+                        {
+                            <p style="color:green;">Listing successfully reported</p>
+                        }
                     </div>
                 }
             </div>
@@ -193,6 +197,7 @@
     bool myListing = false;
     bool canIModerate = false;
     bool reportListing = false;
+    bool reportStatus = false;
 
 
     protected override async Task OnParametersSetAsync()
@@ -225,6 +230,7 @@
             if ((((User)((CustomAuthenticationStateProvider)AuthenticationStateProvider).GetCashedUser()).SecurityLevel >= 3) && (!listing.IsArchived))
                 canIModerate = true;
         }
+        reportStatus = false;
     }
     public void Delete()
     {
@@ -322,6 +328,7 @@
             report.ReportType = reportReason;
             report.Time = DateTime.Now.Ticks + "";
             SocketService.ReportListing(report);
+            reportStatus = true;
         } else
         {
             JSRuntime.InvokeVoidAsync("alert", "Too many reportings. Please wait before trying again");

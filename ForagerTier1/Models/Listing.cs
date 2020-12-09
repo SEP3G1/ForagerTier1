@@ -4,6 +4,7 @@ using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
 using System.Globalization;
 using System.Linq;
+using System.Net;
 using System.Text.Json;
 using System.Threading.Tasks;
 
@@ -66,11 +67,11 @@ namespace ForagerTier1.Models
             {
                 if (PictureList != null && !PictureList.Equals(""))
                 {
-                    Pictures.Add(PictureList);
+                    Pictures.Add(WebUtility.UrlDecode(PictureList));
                 }
 
                 if (Product.ImagesString != "")
-                    Pictures.Add(Product.ImagesString);
+                    Pictures.Add(WebUtility.UrlDecode(Product.ImagesString));
             }
             return Pictures[0];
         }
