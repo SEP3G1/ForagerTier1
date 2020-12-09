@@ -143,7 +143,7 @@
                                             <div class="conversation">
                                                 @foreach (Message m in GetConversations(Company.Name))
                                                 {
-                                                    <p class="chatMessage @(m.fromCompany.Name.Equals(Company.Name) ? "recieved" : "")">@m.message</p>
+                                                <p class="chatMessage @(m.fromCompany.Name.Equals(Company.Name) ? "recieved" : "")">@WebUtility.HtmlDecode(m.message)</p>
                                                 }
                                             </div>
                                             <textarea class="messageInput" @bind="message"></textarea>
@@ -207,6 +207,7 @@
         await JSRuntime.InvokeVoidAsync("setTitle", "forager. | " + listing.Product.Name);
         RecommendedListings = (List<Listing>)SocketService.LazyFilterSearch(listing.Product.ProductCategory, "", 0, 15).Listings;
         Company = CompanyService.GetCompanyFromUserId(listing.UserId);
+        Company.Name = WebUtility.HtmlDecode(Company.Name).Replace("+", " ");
         if (Company == null)
         {
             Company = new Company();
