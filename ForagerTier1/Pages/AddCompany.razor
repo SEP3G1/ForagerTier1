@@ -96,11 +96,11 @@
 
                         <div class="form-group">
                             <p>Email</p>
-                            <InputText @bind-Value="newUser.Email" />
+                            <input type="email" @bind="@newUser.Email" />
                         </div>
                         <div class="form-group">
                             <p>Password</p>
-                            <InputText @bind-Value="newUser.Password" />
+                            <input type="password" @bind="@newUser.Password" />
                         </div>
                     </div>
                     <div class="sellColum">
@@ -171,7 +171,7 @@
     }
     public void AddNewUser()
     {
-        User users = new User();
+        newUser.Password = WebUtility.UrlEncode(newUser.Password);
         string Userid = UserService.CreateUser(newUser);
         JSRuntime.InvokeVoidAsync("alert", $"{newUser.Name} was successfully created.");
         NavigationManager.NavigateTo("/company/" + newUser.CompanyId);

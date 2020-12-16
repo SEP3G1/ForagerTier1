@@ -2,8 +2,6 @@
     --bg: #ebebeb;
     --logo-bg: #1C1B19;
     --logo-acc: #3bc061;
-    --dark-gray: #232323;
-    --gray: #757575;
     --yellow: #EAC43D;
     --sb-bg: white;
 }
@@ -102,7 +100,7 @@ body {
 .searchIcon {
     height: 6rem;
     width: 7rem;
-    fill: var(--gray);
+    fill: #757575;
     background-color: var(--sb-bg);
     padding: 1.5rem;
     padding-top: 2rem;
@@ -115,7 +113,7 @@ body {
     font-family: Helvetica, sans-serif;
     margin: 0 !important;
     background-color: var(--sb-bg);
-    color: var(--dark-gray);
+    color: #232323;
     outline: none !important;
     border: none !important;
     border-radius: 0;

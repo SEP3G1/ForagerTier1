@@ -1,6 +1,7 @@
 ﻿@page "/login"
 @using ForagerTier1.Persistance
 @using ForagerTier1.Models
+@using System.Net
 
 @inject AuthenticationStateProvider AuthenticationStateProvider
 @inject NavigationManager NavigationManager
@@ -52,7 +53,7 @@
         errorMessage = "";
         try
         {
-            ((CustomAuthenticationStateProvider)AuthenticationStateProvider).ValidateLogin(email, password);
+            ((CustomAuthenticationStateProvider)AuthenticationStateProvider).ValidateLogin(email, WebUtility.UrlEncode(password));
             email = "";
             password = "";
         }

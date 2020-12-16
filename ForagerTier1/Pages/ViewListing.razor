@@ -80,7 +80,7 @@
                 }
             </div>
             <div class="listingInfoTabelItem">
-                @if (myListing || canIModerate)
+                @if ((myListing || canIModerate) && !listing.IsArchived)
                 {
                     <input type="button" class="edit" value="Edit listing" @onclick="Edit" />
                     <input type="button" class="delete" value="Archive listing" @onclick="Delete" />
